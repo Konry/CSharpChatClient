@@ -22,6 +22,13 @@ namespace CSharpChatClient
         public ChatForm()
         {
             InitializeComponent();
+            InitializeContent();
+        }
+
+        private void InitializeContent()
+        {
+            //throw new NotImplementedException();
+
         }
 
         private void SendButton_Click(object sender, EventArgs e)
@@ -42,7 +49,7 @@ namespace CSharpChatClient
 
         private void ChatForm_Load(object sender, EventArgs e)
         {
-            Debug.WriteLine("Load on ChatForm!");
+            Debug.WriteLine("Initiate ChatForm!");
         }
 
         private void MessageFlowBox_TextChanged(object sender, EventArgs e)
