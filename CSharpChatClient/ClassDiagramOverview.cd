@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="Modell">
+    <Position X="4.708" Y="6.812" Height="0.417" Width="0.7" />
+  </Comment>
+  <Comment CommentText="View">
+    <Position X="3.562" Y="0.5" Height="0.75" Width="1.7" />
+  </Comment>
+  <Comment CommentText="controller">
+    <Position X="5.646" Y="3.708" Height="0.75" Width="1.7" />
+  </Comment>
+  <Class Name="CSharpChatClient.ChatForm" Collapsed="true">
+    <Position X="5.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAABABCAAAAAACICEAIAGAAAQAAAEAgAQACAEAIA=</HashCode>
+      <FileName>Gui\Form1.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.Program" Collapsed="true">
+    <Position X="5.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Controller\Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.Properties.Resources" Collapsed="true">
+    <Position X="5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.Properties.Settings" Collapsed="true">
+    <Position X="3.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.Message">
+    <Position X="5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAhAABAAAAAAAAAAAAAAAAIAAAAAAAAAKAAAAA=</HashCode>
+      <FileName>Model\Message.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.User">
+    <Position X="3.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAIAAAAAAAAAAAAAEAAgAAAAAAAAAAAA=</HashCode>
+      <FileName>Model\User.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.TCPHandler">
+    <Position X="12" Y="1.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controller\Netzwerk\TCPHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.BroadcastSender">
+    <Position X="11.75" Y="6" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAACAAAAAAKCAAIAAAAEAIAAAAIAAAAAAAAQA=</HashCode>
+      <FileName>Controller\Netzwerk\BroadcastSender.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.BroadcastReceiver">
+    <Position X="9.75" Y="6.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAACAAAAAAAAAAAAAAAAAAAFAAAAAA=</HashCode>
+      <FileName>Controller\Netzwerk\BroadcastReceiver.cs</FileName>
+      <NewMemberFileName>BroadCastReceiver.cs</NewMemberFileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.TcpMessageServer">
+    <Position X="10.5" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAGAAAACAIAQEAAECAAAAAAAAAAAAAIAACAAAAAIY=</HashCode>
+      <FileName>Controller\Netzwerk\TcpMessageServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.ConnectionService">
+    <Position X="8.25" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controller\Netzwerk\ConnectionService.cs</FileName>
+      <NewMemberFileName>MessageService.cs</NewMemberFileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.FileService">
+    <Position X="7.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controller\FileService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.FileReader">
+    <Position X="5.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controller\FileReader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.TcpConnectionObject">
+    <Position X="8.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAACCAEAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>Model\TcpConnectionObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="CSharpChatClient.Configuration">
+    <Position X="6.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAYABAAAAAAAAAAAAAQAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>Model\Configuration.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
