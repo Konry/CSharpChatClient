@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CSharpChatClient
 {
-    public class TcpConnectionObject
+    public class TcpDataObject
     {
         // Client socket.
         public Socket workSocket = null;

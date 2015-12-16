@@ -16,7 +16,7 @@ namespace CSharpChatClient
         private static ManualResetEvent receiveDone = new ManualResetEvent(false);
         private static ManualResetEvent sendDone = new ManualResetEvent(false);
         public Socket client { get; set;}
-        private bool connected;
+        private bool connected = false;
 
         public TcpMessageClient()
         {
@@ -52,6 +52,11 @@ namespace CSharpChatClient
             connected = false;
         }
 
+        public void Send(string message)
+        {
+            Send(client, message);
+        }
+
         private void SendConnectMessage(IPAddress ipAddress, int port)
         {
             Debug.WriteLine("TRY Connect to " + ipAddress.ToString() + ":" + port);
@@ -79,16 +84,17 @@ namespace CSharpChatClient
                 Debug.WriteLine(e.ToString());
             }
         }
+
         private void Receive(Socket client)
         {
             try
             {
                 // Create the state object.
-                TcpConnectionObject state = new TcpConnectionObject();
+                TcpDataObject state = new TcpDataObject();
                 state.workSocket = client;
 
-                    // Begin receiving the data from the remote device.
-                    client.BeginAccept(new AsyncCallback(ReceiveCallback), state);
+                // Begin receiving the data from the remote device.
+                client.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0, new AsyncCallback(ReceiveCallback), state);
             }
             catch (Exception e)
             {
@@ -102,7 +108,7 @@ namespace CSharpChatClient
             {
                 // Retrieve the state object and the client socket 
                 // from the asynchronous state object.
-                TcpConnectionObject state = (TcpConnectionObject)ar.AsyncState;
+                TcpDataObject state = (TcpDataObject)ar.AsyncState;
                 Socket client = state.workSocket;
 
                 // Read data from the remote device.
@@ -114,7 +120,7 @@ namespace CSharpChatClient
                     state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
 
                     // Get the rest of the data.
-                    client.BeginReceive(state.buffer, 0, TcpConnectionObject.BufferSize, 0,
+                    client.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
                         new AsyncCallback(ReceiveCallback), state);
                 }
                 else {
@@ -133,7 +139,7 @@ namespace CSharpChatClient
             }
         }
 
-        public void Send(Socket client, String data)
+        private void Send(Socket client, String data)
         {
             // Convert the string data to byte data using ASCII encoding.
             byte[] byteData = Encoding.ASCII.GetBytes(data);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSharpChatClient.Model;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -12,10 +13,15 @@ namespace CSharpChatClient
 {
     public class TcpMessageServer
     {
-        public static ManualResetEvent allDone = new ManualResetEvent(false);
+        public static ManualResetEvent serverBlock = new ManualResetEvent(false);
         private bool enabled = true;
+
         private Thread thread = null;
+
         private Socket server = null;
+        //private Socket client = null;
+
+        private LinkedList<UserConnection> connectionList = null;
 
         public TcpMessageServer()
         {
@@ -32,9 +38,8 @@ namespace CSharpChatClient
 
         private void Initialize()
         {
+            connectionList = new LinkedList<UserConnection>();
             Start();
-            //thread = new Thread(StartListening);
-            //thread.Start();
         }
 
         public void Start()
@@ -53,7 +58,18 @@ namespace CSharpChatClient
 
         public void Stop()
         {
-            enabled = false;
+           // client = null;
+        }
+
+        public void Send(User user, string message)
+        {
+            foreach (UserConnection uc in connectionList)
+            {
+                if (uc.user.Equals(user))
+                {
+                    Send(uc.socket, message);
+                }
+            }
         }
 
         private void StartListening()
@@ -62,13 +78,8 @@ namespace CSharpChatClient
             // Data buffer for incoming data.
             byte[] bytes = new Byte[1024];
 
-            IPHostEntry ipHostInfo = Dns.Resolve(Dns.GetHostName());
-            IPAddress ipAddress = ipHostInfo.AddressList[0];
-            int index = 0;
-            index = selectAvaiableConfigurationTCPPort();
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, Configuration.PORT_TCP[index]);
-
-            Configuration.localIpAddress = ipAddress;
+            
+            IPEndPoint localEndPoint = new IPEndPoint(Configuration.localIpAddress, Configuration.selectedTcpPort);
 
             // Create a TCP/IP socket.
             server = new Socket(AddressFamily.InterNetwork,
@@ -82,7 +93,7 @@ namespace CSharpChatClient
                 while (enabled)
                 {
                     // Set the event to nonsignaled state.
-                    allDone.Reset();
+                    serverBlock.Reset();
 
                     // Start an asynchronous socket to listen for connections.
                     Debug.WriteLine("Waiting for a connection...");
@@ -91,43 +102,32 @@ namespace CSharpChatClient
                         server);
 
                     // Wait until a connection is made before continuing.
-                    allDone.WaitOne();
+                    serverBlock.WaitOne();
                 }
 
             }
             catch (Exception e)
             {
-                Debug.WriteLine("StartListening "+e.ToString());
+                Debug.WriteLine("StartListening " + e.ToString());
             }
         }
 
-        private int selectAvaiableConfigurationTCPPort()
-        {
-            int index;
-            for (index = 0; index < Configuration.PORT_TCP.Length; index++)
-            {
-                if (checkTcpPortAvaibility(Configuration.PORT_TCP[index]))
-                {
-                    break;
-                }
-            }
-
-            return index;
-        }
+ 
 
         private void AcceptCallback(IAsyncResult ar)
         {
             // Signal the main thread to continue.
-            allDone.Set();
+            serverBlock.Set();
 
             // Get the socket that handles the client request.
             Socket listener = (Socket)ar.AsyncState;
-            Socket handler = listener.EndAccept(ar);
+            Socket handle = listener.EndAccept(ar);
 
             // Create the state object.
-            TcpConnectionObject state = new TcpConnectionObject();
-            state.workSocket = handler;
-            handler.BeginReceive(state.buffer, 0, TcpConnectionObject.BufferSize, 0,
+            TcpDataObject state = new TcpDataObject();
+            state.workSocket = handle;
+
+            handle.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
                 new AsyncCallback(ReadCallback), state);
         }
 
@@ -137,38 +137,59 @@ namespace CSharpChatClient
 
             // Retrieve the state object and the handler socket
             // from the asynchronous state object.
-            TcpConnectionObject state = (TcpConnectionObject)ar.AsyncState;
-            Socket handler = state.workSocket;
+            TcpDataObject state = (TcpDataObject)ar.AsyncState;
+            Socket handle = state.workSocket;
 
-            // Read data from the client socket. 
-            int bytesRead = handler.EndReceive(ar);
+            int bytesRead = handle.EndReceive(ar);
 
             if (bytesRead > 0)
             {
                 // There  might be more data, so store the data received so far.
-                state.sb.Append(Encoding.ASCII.GetString(
-                    state.buffer, 0, bytesRead));
+                state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
 
                 // Check for end-of-file tag. If it is not there, read 
                 // more data.
                 content = state.sb.ToString();
-                if (content.IndexOf("<EOF>") > -1)
+
+                if (!isNewContact(content)) {
+                    /* TODO Handle here the incoming data from an other client */
+                    NetworkService.IncomingTCPDataFromServer(content);
+                } else
                 {
-                    // All the data has been read from the 
-                    // client. Display it on the console.
-                    Debug.WriteLine("Read {0} bytes from socket. \n Data : {1}",
-                        content.Length, content);
-                    // Echo the data back to the client.
-                    Send(handler, content);
+                    /* Add the new contact to the connection list */
+                    bool isAlreadyInList = false;
+                    foreach (UserConnection uc in connectionList)
+                    {
+                        if (uc.socket.Equals(handle))
+                        {
+                            isAlreadyInList = true;
+                            break;
+                        }
+                    }
+                    if (isAlreadyInList)
+                    {
+                        connectionList.AddLast(new UserConnection(new User("temporary"), handle));
+                    }
+
                 }
-                else {
-                    // Not all data received. Get more.
-                    handler.BeginReceive(state.buffer, 0, TcpConnectionObject.BufferSize, 0,
-                    new AsyncCallback(ReadCallback), state);
-                }
+
+                // Echo the data back to the client. TODO optional, normally remove this.
+                Send(handle, content);
+
+                // ReceiveData
+                handle.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
+                new AsyncCallback(ReadCallback), state);
             }
         }
-        private static void Send(Socket handler, String data)
+
+        private bool isNewContact(string content)
+        {
+            
+            /* TODO parse the content for the username, the ip and the port -> content of first message */
+            throw new NotImplementedException();
+        }
+
+        private static void Send(Socket handler, string data)
         {
             // Convert the string data to byte data using ASCII encoding.
             byte[] byteData = Encoding.ASCII.GetBytes(data);
@@ -199,29 +220,7 @@ namespace CSharpChatClient
             }
         }
 
-        private bool checkTcpPortAvaibility(int port)
-        {
-            bool isAvailable = true;
-
-            // Evaluate current system tcp connections. This is the same information provided
-            // by the netstat command line application, just in .Net strongly-typed object
-            // form.  We will look through the list, and if our port we would like to use
-            // in our TcpClient is occupied, we will set isAvailable to false.
-            IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
-            TcpConnectionInformation[] tcpConnInfoArray = ipGlobalProperties.GetActiveTcpConnections();
-
-            foreach (TcpConnectionInformation tcpi in tcpConnInfoArray)
-            {
-                if (tcpi.LocalEndPoint.Port == port)
-                {
-                    isAvailable = false;
-                    break;
-                }
-            }
-            if (isAvailable)
-                Debug.WriteLine("Port: " + port + " is selected");
-            return isAvailable;
-        }
+        
 
     }
 }

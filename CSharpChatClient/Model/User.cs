@@ -12,6 +12,12 @@ namespace CSharpChatClient
         public IPAddress ipAddress { get; set; }
         public int port { get; set; }
 
+        public User(string name)
+        {
+            this.name = name;
+            this.port = Configuration.DEFAULT_TCP_PORT;
+        }
+
         public User(string name, IPAddress ipAddress)
         {
             this.name = name;

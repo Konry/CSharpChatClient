@@ -15,7 +15,7 @@ namespace CSharpChatClient
         public static int BROADCAST_TIMER_INTERVAL_MSEC = 10000;
 
         public static IPAddress localIpAddress = null;
-        public static int SELECTED_PORT_TCP = -1;
+        public static int selectedTcpPort = -1;
 
     }
 }
