@@ -1,8 +1,4 @@
-﻿using CSharpChatClient.Controller.Netzwerk;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -13,7 +9,7 @@ namespace CSharpChatClient
     * The Broadcast Sender sends a Live Message every x seconds;
     *
     */
-    public class BroadcastSender : IBroadcastInterface
+    public class BroadcastSender 
     {
         private int PORT_NUMBER = Configuration.PORT_UDP_BROADCAST;
         private static System.Timers.Timer timer;
@@ -49,7 +45,7 @@ namespace CSharpChatClient
 
         private void SendMessage(bool online)
         {
-            SendBroadcastMessage(NetworkMessage.GenerateHeartbeatMessage(online));
+            SendBroadcastMessage(Message.GenerateHeartbeatMessage(online));
         }
 
         private void SendBroadcastMessage(string message)

@@ -57,6 +57,7 @@ namespace CSharpChatClient.Controller
                 Configuration.localUser.name = username;
             }
             chatForm.UpdateUsernameLabel(username);
+            programControl.fileService.UpdateUserName();
         }
 
         private static string GenerateRandomName()

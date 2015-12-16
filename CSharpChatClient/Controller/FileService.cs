@@ -16,13 +16,11 @@ namespace CSharpChatClient
         public FileService(ProgramController programController)
         {
             this.programController = programController;
-
-            Initialize();
         }
 
-        public void Initialize()
+        private void InitializeUserID()
         {
-            if (!ReadUserID())
+            if (!HasUserCfgFile())
             {
                 WriteUserIDFile();
             }
@@ -39,7 +37,7 @@ namespace CSharpChatClient
             try {
                 long id = GenerateUserID();
                 Configuration.localUser.id = id;
-                using (StreamWriter sw = new StreamWriter(Configuration.localUser.name+".cfg"))
+                using (StreamWriter sw = new StreamWriter("user.cfg"))
                 {
                     sw.WriteLine(Configuration.localUser.name);
                     sw.WriteLine(id);
@@ -57,6 +55,75 @@ namespace CSharpChatClient
                 Debug.WriteLine("Unbekannte Exeption wurde gefangen! "+ex.StackTrace);
             }
         }
+
+        internal User ReadUserCfgFile()
+        {
+            try
+            {
+                using (StreamReader sr = new StreamReader("user.cfg"))
+                {
+                    // Read the stream to a string, and write the string to the console.
+                    String line = sr.ReadToEnd();
+                    if (line.Length > 0)
+                    {
+                        String[] split = line.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+
+                        long id = long.Parse(split[1]);
+                        Debug.WriteLine(id);
+                        User user = new User(split[0]);
+                        user.id = id;
+                        sr.Close();
+                        return user;
+                    }
+                    sr.Close();
+                }
+            }
+            catch (FileNotFoundException ex)
+            {
+                Debug.WriteLine("Datei konnte nicht gelesen werden! " + ex.StackTrace);
+            }
+            catch (IOException ex)
+            {
+                Debug.WriteLine("Schreiben nicht möglich, bitte prüfen Sie ihre Rechte! " + ex.StackTrace);
+            }
+            catch (ObjectDisposedException ex)
+            {
+                Debug.WriteLine("Datei konnte aufgrund eines internen Fehlers nicht geschrieben werden! " + ex.StackTrace);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Unbekannte Exeption wurde gefangen! " + ex.StackTrace);
+            }
+            return null;
+        }
+
+        internal bool HasCurrentUserName()
+        {
+            return HasUserCfgFile();
+        }
+
+        private bool HasUserCfgFile()
+        {
+            if(ReadUserCfgFile() != null)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        internal void UpdateUserName()
+        {
+            WriteUserIDFile();
+        }
+
+        private static long GenerateUserID()
+        {
+            Random random = new Random();
+            byte[] buffer = new byte[8];
+            random.NextBytes(buffer);
+            return BitConverter.ToInt64(buffer, 0);
+        }
+
 
         //private bool CreateHistoryFilesDirectory()
         //{
@@ -102,49 +169,5 @@ namespace CSharpChatClient
         //        Debug.WriteLine("Unbekannte Exeption wurde gefangen! " + ex.StackTrace);
         //    }
         //}
-
-        private bool ReadUserID()
-        {
-            try {
-                using (StreamReader sr = new StreamReader(Configuration.localUser.name+".cfg"))
-                {
-                    // Read the stream to a string, and write the string to the console.
-                    String line = sr.ReadToEnd();
-                    if (line.Length > 0)
-                    {
-                        long id = long.Parse(line);
-                        Debug.WriteLine(id);
-                        Configuration.localUser.id = id;
-                        sr.Close();
-                        return true;
-                    }
-                    sr.Close();
-                }
-            } catch (FileNotFoundException ex)
-            {
-                Debug.WriteLine("Datei konnte nicht gelesen werden! " + ex.StackTrace);
-            }
-            catch (IOException ex)
-            {
-                Debug.WriteLine("Schreiben nicht möglich, bitte prüfen Sie ihre Rechte! " + ex.StackTrace);
-            }
-            catch (ObjectDisposedException ex)
-            {
-                Debug.WriteLine("Datei konnte aufgrund eines internen Fehlers nicht geschrieben werden! " + ex.StackTrace);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Unbekannte Exeption wurde gefangen! " + ex.StackTrace);
-            }
-            return false;
-        }
-
-        private static long GenerateUserID()
-        {
-            Random random = new Random();
-            byte[] buffer = new byte[8];
-            random.NextBytes(buffer);
-            return BitConverter.ToInt64(buffer, 0);
-        }
     }
 }

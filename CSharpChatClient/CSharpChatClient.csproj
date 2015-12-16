@@ -84,37 +84,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="controller\GraphicalInterfaceController.cs" />
-    <Compile Include="controller\network\IBroadcastInterface.cs" />
-    <Compile Include="controller\network\NetworkMessage.cs" />
-    <Compile Include="controller\ProgramController.cs" />
-    <Compile Include="model\ConnectionList.cs" />
-    <Compile Include="model\MessageHistory.cs" />
-    <Compile Include="model\User.cs" />
-    <Compile Include="controller\network\BroadcastReceiver.cs" />
-    <Compile Include="controller\network\BroadcastSender.cs" />
-    <Compile Include="controller\network\ConnectionService.cs" />
-    <Compile Include="model\OwnExceptions.cs" />
-    <Compile Include="model\Configuration.cs" />
-    <Compile Include="controller\FileReader.cs" />
-    <Compile Include="controller\FileService.cs" />
+    <Compile Include="Controller\GraphicalInterfaceController.cs" />
+    <Compile Include="Controller\ProgramController.cs" />
+    <Compile Include="Model\ConnectionList.cs" />
+    <Compile Include="Model\MessageHistory.cs" />
+    <Compile Include="Model\User.cs" />
+    <Compile Include="Controller\Network\BroadcastReceiver.cs" />
+    <Compile Include="Controller\Network\BroadcastSender.cs" />
+    <Compile Include="Model\OwnExceptions.cs" />
+    <Compile Include="Model\Configuration.cs" />
+    <Compile Include="Controller\FileService.cs" />
     <Compile Include="Gui\MainFrame.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Gui\MainFrame.Designer.cs">
       <DependentUpon>MainFrame.cs</DependentUpon>
     </Compile>
-    <Compile Include="model\Message.cs" />
-    <Compile Include="controller\network\TcpMessageClient.cs" />
-    <Compile Include="controller\network\TcpMessageServer.cs" />
-    <Compile Include="controller\network\NetworkService.cs" />
-    <Compile Include="controller\Program.cs" />
-    <Compile Include="model\UserList.cs" />
+    <Compile Include="Model\Message.cs" />
+    <Compile Include="Controller\Network\TcpMessageClient.cs" />
+    <Compile Include="Controller\Network\TcpMessageServer.cs" />
+    <Compile Include="Controller\Network\NetworkService.cs" />
+    <Compile Include="Controller\Program.cs" />
+    <Compile Include="Model\UserList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="model\TcpDataObject.cs" />
-    <Compile Include="controller\network\TCPHandler.cs" />
+    <Compile Include="Model\TcpDataObject.cs" />
     <Compile Include="Test\TestMessage.cs" />
-    <Compile Include="Test\TestNetworkMessage.cs" />
     <EmbeddedResource Include="Gui\MainFrame.resx">
       <DependentUpon>MainFrame.cs</DependentUpon>
     </EmbeddedResource>

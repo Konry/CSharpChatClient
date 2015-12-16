@@ -31,7 +31,7 @@ namespace CSharpChatClient
             }
         }
 
-        public void ConnectToIp(IPAddress ipAddress, int port)
+        public void Connect(IPAddress ipAddress, int port)
         {
             Disconnect();
             IPEndPoint remoteEnd = new IPEndPoint(ipAddress, port);
@@ -62,8 +62,8 @@ namespace CSharpChatClient
 
         private void SendConnectMessage(User user, IPAddress ipAddress, int port)
         {
-            Debug.WriteLine("TRYConnectTo;" + user.name + ";" + ipAddress.ToString() + ";" + port);
-            Send(client, "TRYConnectTo;" + user.name + ";" + ipAddress.ToString() + ";" + port);
+            Debug.WriteLine(Message.GenerateConnectMessage(user, ipAddress, port));
+            Send(client, Message.GenerateConnectMessage(user, ipAddress, port));
         }
 
         private void ConnectCallback(IAsyncResult ar)
@@ -123,8 +123,11 @@ namespace CSharpChatClient
                     state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
 
                     // Get the rest of the data.
-                    client.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
-                        new AsyncCallback(ReceiveCallback), state);
+                    if (connected)
+                    {
+                        client.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
+                            new AsyncCallback(ReceiveCallback), state);
+                    }
                 }
                 else {
                     // All the data has arrived; put it in response.

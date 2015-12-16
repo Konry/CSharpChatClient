@@ -7,7 +7,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using CSharpChatClient.Controller.Netzwerk;
 
 [assembly: InternalsVisibleTo("TestTcpMessageServer")]
 namespace CSharpChatClient
@@ -16,8 +15,9 @@ namespace CSharpChatClient
     public class TcpMessageServer
     {
         public static ManualResetEvent serverBlock = new ManualResetEvent(false);
-        private bool enabled = true;
         private Thread thread = null;
+        private volatile bool shouldStop;
+
         private Socket server = null;
         //private Socket client = null;
 
@@ -43,7 +43,7 @@ namespace CSharpChatClient
 
         public void Start()
         {
-            enabled = true;
+            shouldStop = false;
             if (thread == null)
             {
                 thread = new Thread(StartListening);
@@ -57,7 +57,7 @@ namespace CSharpChatClient
 
         public void Stop()
         {
-           // client = null;
+            shouldStop = true;
         }
 
         public void Send(User user, string message)
@@ -89,7 +89,7 @@ namespace CSharpChatClient
                 server.Bind(localEndPoint);
                 server.Listen(100);
 
-                while (enabled)
+                while (!shouldStop)
                 {
                     // Set the event to nonsignaled state.
                     serverBlock.Reset();

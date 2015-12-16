@@ -30,7 +30,13 @@ namespace CSharpChatClient
             InitializeComponent();
             InitializeContent();
 
-            GetInitialUsername();
+            if (Configuration.localUser.name.Equals(""))
+            {
+                GetInitialUsername();
+            } else
+            {
+                SetOtherUsername();
+            }
         }
 
         private void InitializeController()
@@ -39,18 +45,24 @@ namespace CSharpChatClient
             this.graphicControl = programControl.graphicControl;
         }
 
-        private void GetInitialUsername()
-        {
-            string username = ShowEnterUsernameBox("Bitte geben Sie einen Benutzernamen an:");
-            graphicControl.ChangeUsername(username);
-        }
-
         private void InitializeContent()
         {
             this.StartPosition = FormStartPosition.CenterScreen;
 
             SendButton.Enabled = false;
             richTextBox1.Multiline = false;
+        }
+        
+        private void GetInitialUsername()
+        {
+            string username = ShowEnterUsernameBox("Bitte geben Sie einen Benutzernamen an:");
+            graphicControl.ChangeUsername(username);
+        }
+        
+        private void SetOtherUsername()
+        {
+            string username = ShowEnterUsernameBox("Der Benutzername ist "+Configuration.localUser.name+ ", wenn nicht einfach neuen eingeben:");
+            graphicControl.ChangeUsername(username);
         }
 
         private void SendButton_Click(object sender, EventArgs e)
@@ -106,7 +118,7 @@ namespace CSharpChatClient
             prompt.Text = "Benutzernamen eingeben";
             prompt.StartPosition = FormStartPosition.CenterScreen;
 
-            Label textLabel = new Label() { Left = 50, Top = 20, Width = 250, Text = text };
+            Label textLabel = new Label() { Left = 50, Top = 20, Width = 350, Text = text };
             TextBox textBox = new TextBox() { Left = 50, Top = 50, Width = 400 };
             Button confirmation = new Button() { Text = "Ok", Left = 350, Width = 100, Top = 70, DialogResult = DialogResult.OK };
             Button cancel = new Button() { Text = "Abbrechen", Left = 250, Width = 100, Top = 70, DialogResult = DialogResult.Cancel };

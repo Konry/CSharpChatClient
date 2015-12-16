@@ -25,9 +25,11 @@ namespace CSharpChatClient.controller
         private void InitiateController()
         {
             Debug.WriteLine("\n\nNew Program start");
+            fileService = new FileService(this);
             networkService = new NetworkService(this);
             graphicControl = new GraphicalInterfaceController(this, chatForm, networkService);
-            fileService = new FileService(this);
+
+            networkService.Start();
         }
 
     }

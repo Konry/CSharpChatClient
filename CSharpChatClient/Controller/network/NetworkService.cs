@@ -3,11 +3,9 @@ using CSharpChatClient.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Text;
 
 namespace CSharpChatClient
 {
@@ -35,18 +33,36 @@ namespace CSharpChatClient
             FillNetworkConfiguration();
             if (Configuration.localUser == null)
             {
-                Configuration.localUser = new User("");
+                User user = control.fileService.ReadUserCfgFile();
+                if(user != null)
+                {
+                    Configuration.localUser = user;
+                }  else
+                {
+                    Configuration.localUser = new User("");
+                }
             }
 
             tcpServer = new TcpMessageServer();
             tcpClient = new TcpMessageClient();
-            //TestSelfconnect();
-
-            //tcpClient.Send("Test");
 
             broadReceiver = new BroadcastReceiver();
             broadSender = new BroadcastSender();
+        }
+
+        public void Start()
+        {
+            broadReceiver.Start();
             broadSender.Start();
+            tcpServer.Start();
+        }
+
+        public void Stop()
+        {
+            broadReceiver.Stop();
+            broadSender.Stop();
+            tcpServer.Stop();
+            tcpClient.Disconnect();
         }
 
         public void Send(Message message)
@@ -57,12 +73,7 @@ namespace CSharpChatClient
                 //if()
             }
         }
-
-        private string buildTCPMessage(User fromUser, User toUser, string message)
-        {
-            return "FROM:" + fromUser.name + ";TO:" + toUser.name + ";Mess:" + message;
-        }
-
+        
         private void FillNetworkConfiguration()
         {
             IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
@@ -73,7 +84,7 @@ namespace CSharpChatClient
 
         internal void SendMessage(Message text)
         {
-
+            
         }
 
         private IPAddress GetLocalIPAddress(IPHostEntry host)

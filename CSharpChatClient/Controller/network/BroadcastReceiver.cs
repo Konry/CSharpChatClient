@@ -8,14 +8,14 @@ using System.Net.NetworkInformation;
 
 namespace CSharpChatClient
 {
-    public class BroadcastReceiver : IBroadcastInterface
+    public class BroadcastReceiver
     {
         private int PORT_NUMBER = Configuration.PORT_UDP_BROADCAST;
         private UdpClient client;
 
         public BroadcastReceiver()
         {
-            Initialize();
+            
         }
 
         private void Initialize()
@@ -25,12 +25,13 @@ namespace CSharpChatClient
 
         public void Start()
         {
+            Initialize();
             client.BeginReceive(new AsyncCallback(receive), null);
         }
 
         public void Stop()
         {
-
+            client.Close();
         }
 
         private void receive(IAsyncResult res)

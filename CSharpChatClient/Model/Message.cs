@@ -30,10 +30,6 @@ namespace CSharpChatClient
             return "TRYConnectTo;" + user.name + ";" + user.id + ";" + ipAddress.ToString() + ";" + port;
         }
 
-        //public static string GenerateConnectMessage(User user)
-        //{
-        //    return GenerateConnectMessage(user, user.ipAddress, user.port);
-        //}
         public static string GenerateHeartbeatMessage(bool online)
         {
             return GenerateHeartbeatMessage(Configuration.localUser, Configuration.localIpAddress, Configuration.selectedTcpPort, online);
@@ -54,7 +50,8 @@ namespace CSharpChatClient
 
         public static string GenerateTCPMessage(Message message)
         {
-            return "" + message.FromUser.name + ";" + message.FromUser.id + ";" + message.ToUser.name + ";" + message.ToUser.id + ";" + message.MessageContent;
+            return "TCPMessage;" + message.FromUser.name + ";" + message.FromUser.id + ";" + message.ToUser.name + ";" + message.ToUser.id + ";" + message.MessageContent;
+            //return message.MessageContent;
         }
 
         public static bool IsNewContact(string content)
@@ -70,16 +67,43 @@ namespace CSharpChatClient
             }
         }
 
+        public static bool IsTCPMessage(string content)
+        {
+            if (content.StartsWith("TCPMessage;"))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
+        /// <summary>
+        /// Parses a string to a message, awaits a correct formated string
+        /// </summary>
+        /// 
+        /// <param name="content">a string formed like 
+        /// TCPMessage;user.name;user.id;user.name;user.id;message 
+        /// </param>
+        /// <returns>A new message object or null when exception occurs</returns>
         internal static Message ParseTCPMessage(string content)
         {
             string[] temp = content.Split(';');
-            if (temp.Length != 5) {
+            Debug.WriteLine(content);
+            if (temp.Length >= 6) {
                 try {
-                    User from = new User(temp[0]);
-                    from.id = long.Parse(temp[1]);
-                    User to = new User(temp[2]);
-                    to.id = long.Parse(temp[3]);
-                    return new Message(from, to, temp[4]);
+                    User from = new User(temp[1]);
+                    from.id = long.Parse(temp[2]);
+                    User to = new User(temp[3]);
+                    to.id = long.Parse(temp[4]);
+                    string message = "";
+                    for (int i = 5; i < temp.Length; i++)
+                    {
+                        message += temp[i];
+                    }
+                    return new Message(from, to, temp[5]);
                 } catch (FormatException fe )
                 {
                     Debug.WriteLine("Number has not the correct format! "+fe.StackTrace);
@@ -91,6 +115,10 @@ namespace CSharpChatClient
                 catch (ArgumentException ae)
                 {
                     Debug.WriteLine("Wrong argument for parsing! " + ae.StackTrace);
+                }
+                catch (IndexOutOfRangeException ioore)
+                {
+                    Debug.WriteLine("Sorry, big mistake! " + ioore.StackTrace);
                 }
             } 
             return null;
