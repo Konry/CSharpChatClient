@@ -8,7 +8,7 @@ namespace CSharpChatClient.Model
 {
     class UserList
     {
-        LinkedList<User> userList = null;
+        public LinkedList<User> userList { get; }
 
         public UserList()
         {
@@ -19,7 +19,7 @@ namespace CSharpChatClient.Model
         {
             foreach ( User u in userList)
             {
-                if(user.name == u.name && user.ipAddress == u.ipAddress)
+                if(user.Equals(u))
                 {
                     return false;
                 }
@@ -32,7 +32,7 @@ namespace CSharpChatClient.Model
         {
             foreach (User u in userList)
             {
-                if (user.name == u.name && user.ipAddress == u.ipAddress)
+                if (user.Equals(u))
                 {
                     userList.Remove(user);
                     return true;

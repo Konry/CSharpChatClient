@@ -15,7 +15,7 @@ namespace CSharpChatClient
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
         private static ManualResetEvent receiveDone = new ManualResetEvent(false);
         private static ManualResetEvent sendDone = new ManualResetEvent(false);
-        public Socket client { get; set;}
+        public Socket client { get; set; }
         private bool connected = false;
 
         public TcpMessageClient()
@@ -25,7 +25,10 @@ namespace CSharpChatClient
 
         ~TcpMessageClient()
         {
-            client.Close();
+            if (client != null)
+            {
+                client.Close();
+            }
         }
 
         public void ConnectToIp(IPAddress ipAddress, int port)
@@ -41,7 +44,7 @@ namespace CSharpChatClient
             connected = true;
 
             /* Send a first message + TRY Connect to the remote */
-            SendConnectMessage(ipAddress, port);
+            SendConnectMessage(Configuration.localUser, ipAddress, port);
 
             /* Receive loop ? hopefully */
             Receive(client);
@@ -57,10 +60,10 @@ namespace CSharpChatClient
             Send(client, message);
         }
 
-        private void SendConnectMessage(IPAddress ipAddress, int port)
+        private void SendConnectMessage(User user, IPAddress ipAddress, int port)
         {
-            Debug.WriteLine("TRY Connect to " + ipAddress.ToString() + ":" + port);
-            Send(client, "TRY Connect to " + ipAddress.ToString() + ":" + port);
+            Debug.WriteLine("TRYConnectTo;" + user.name + ";" + ipAddress.ToString() + ";" + port);
+            Send(client, "TRYConnectTo;" + user.name + ";" + ipAddress.ToString() + ";" + port);
         }
 
         private void ConnectCallback(IAsyncResult ar)
@@ -98,7 +101,7 @@ namespace CSharpChatClient
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Error in Receive "+e.ToString());
+                Debug.WriteLine("Error in Receive " + e.ToString());
             }
         }
 
@@ -135,7 +138,7 @@ namespace CSharpChatClient
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Error in ReceiveCallback "+e.ToString());
+                Debug.WriteLine("Error in ReceiveCallback " + e.ToString());
             }
         }
 
@@ -165,7 +168,7 @@ namespace CSharpChatClient
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Error in SendCallback "+e.ToString());
+                Debug.WriteLine("Error in SendCallback " + e.ToString());
             }
         }
     }

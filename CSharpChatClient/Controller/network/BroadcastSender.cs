@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSharpChatClient.Controller.Netzwerk;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -12,18 +13,13 @@ namespace CSharpChatClient
     * The Broadcast Sender sends a Live Message every x seconds;
     *
     */
-    public class BroadcastSender
+    public class BroadcastSender : IBroadcastInterface
     {
         private int PORT_NUMBER = Configuration.PORT_UDP_BROADCAST;
         private static System.Timers.Timer timer;
 
-        private int tcpPortNumber;
-        private User user;
-
-        public BroadcastSender(User user, int tcpPortNumber)
+        public BroadcastSender()
         {
-            this.tcpPortNumber = tcpPortNumber;
-            this.user = user;
             InitializeTimer();
         }
 
@@ -31,15 +27,6 @@ namespace CSharpChatClient
         {
             Stop();
         }
-
-        private void InitializeTimer()
-        {
-            timer = new System.Timers.Timer(Configuration.BROADCAST_TIMER_INTERVAL_MSEC);
-            timer.Elapsed += OnTimedEvent;
-            timer.AutoReset = true;
-            SendMessage(true);
-        }
-
 
         public void Start()
         {
@@ -52,17 +39,17 @@ namespace CSharpChatClient
             SendMessage(false);
         }
 
+        private void InitializeTimer()
+        {
+            timer = new System.Timers.Timer(Configuration.BROADCAST_TIMER_INTERVAL_MSEC);
+            timer.Elapsed += OnTimedEvent;
+            timer.AutoReset = true;
+            SendMessage(true);
+        }
+
         private void SendMessage(bool online)
         {
-            String message = "Heartbeat:User:" + user.name + ";Port:" + tcpPortNumber;
-            if (online)
-            {
-                SendBroadcastMessage(message + ";live");
-            }
-            else
-            {
-                SendBroadcastMessage(message + ";off");
-            }
+            SendBroadcastMessage(NetworkMessage.GenerateHeartbeatMessage(online));
         }
 
         private void SendBroadcastMessage(string message)

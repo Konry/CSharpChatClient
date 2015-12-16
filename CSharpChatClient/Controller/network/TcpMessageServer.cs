@@ -1,23 +1,23 @@
-﻿using CSharpChatClient.Model;
+﻿using System.Runtime.CompilerServices;
+using CSharpChatClient.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using CSharpChatClient.Controller.Netzwerk;
 
+[assembly: InternalsVisibleTo("TestTcpMessageServer")]
 namespace CSharpChatClient
 {
+    
     public class TcpMessageServer
     {
         public static ManualResetEvent serverBlock = new ManualResetEvent(false);
         private bool enabled = true;
-
         private Thread thread = null;
-
         private Socket server = null;
         //private Socket client = null;
 
@@ -39,7 +39,6 @@ namespace CSharpChatClient
         private void Initialize()
         {
             connectionList = new LinkedList<UserConnection>();
-            Start();
         }
 
         public void Start()
@@ -151,42 +150,21 @@ namespace CSharpChatClient
                 // more data.
                 content = state.sb.ToString();
 
-                if (!isNewContact(content)) {
+                if (!Message.IsNewContact(content)) {
                     /* TODO Handle here the incoming data from an other client */
-                    NetworkService.IncomingTCPDataFromServer(content);
+                    NetworkService.IncomingMessageFromServer(Message.ParseTCPMessage(content));
                 } else
                 {
-                    /* Add the new contact to the connection list */
-                    bool isAlreadyInList = false;
-                    foreach (UserConnection uc in connectionList)
-                    {
-                        if (uc.socket.Equals(handle))
-                        {
-                            isAlreadyInList = true;
-                            break;
-                        }
-                    }
-                    if (isAlreadyInList)
-                    {
-                        connectionList.AddLast(new UserConnection(new User("temporary"), handle));
-                    }
-
+                    AddSocketToList(handle);
                 }
 
                 // Echo the data back to the client. TODO optional, normally remove this.
                 Send(handle, content);
 
-                // ReceiveData
+                // Again ReceiveData
                 handle.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
                 new AsyncCallback(ReadCallback), state);
             }
-        }
-
-        private bool isNewContact(string content)
-        {
-            
-            /* TODO parse the content for the username, the ip and the port -> content of first message */
-            throw new NotImplementedException();
         }
 
         private static void Send(Socket handler, string data)
@@ -220,7 +198,24 @@ namespace CSharpChatClient
             }
         }
 
-        
+        private void AddSocketToList(Socket handle)
+        {
+            /* Add the new contact to the connection list */
+            bool isAlreadyInList = false;
+            foreach (UserConnection uc in connectionList)
+            {
+                if (uc.socket.Equals(handle))
+                {
+                    isAlreadyInList = true;
+                    break;
+                }
+            }
+            if (!isAlreadyInList)
+            {
+                connectionList.AddLast(new UserConnection(new User("temporary"), handle));
+            }
+        }
 
+        
     }
 }

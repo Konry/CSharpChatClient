@@ -85,6 +85,8 @@
             this.richTextBox1.Size = new System.Drawing.Size(380, 35);
             this.richTextBox1.TabIndex = 5;
             this.richTextBox1.Text = "";
+            this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
+            this.richTextBox1.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnKeyUpHandler);
             // 
             // ChatForm
             // 

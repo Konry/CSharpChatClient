@@ -1,4 +1,5 @@
-﻿using CSharpChatClient.Model;
+﻿using CSharpChatClient.controller;
+using CSharpChatClient.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,46 +15,47 @@ namespace CSharpChatClient
     {
         TcpMessageClient tcpClient = null;
         TcpMessageServer tcpServer = null;
+
         BroadcastReceiver broadReceiver = null;
         BroadcastSender broadSender = null;
 
-        private int tcpPort = -1;
-        private User user = null;
-        private UserList onlineUserList = null;
+        LinkedList<UserConnection> connectionList = null;
 
-        public NetworkService(User user)
+        //private UserList onlineUserList = null;
+        private ProgramController control = null;
+
+        public NetworkService(ProgramController control)
         {
-            this.user = user;
+            this.control = control;
             Initialize();
         }
 
         private void Initialize()
         {
-            if(user == null)
+            FillNetworkConfiguration();
+            if (Configuration.localUser == null)
             {
-                user = new User("I have no name", );
+                Configuration.localUser = new User("");
             }
+
             tcpServer = new TcpMessageServer();
             tcpClient = new TcpMessageClient();
-            TestSelfconnect();
+            //TestSelfconnect();
 
-            tcpClient.Send("Test");
+            //tcpClient.Send("Test");
 
             broadReceiver = new BroadcastReceiver();
-
-            broadSender = new BroadcastSender(user, tcpPort);
+            broadSender = new BroadcastSender();
             broadSender.Start();
         }
 
-        public void TestSelfconnect()
-        {
-            tcpClient.ConnectToIp(IPAddress.Parse("192.168.23.110"), Configuration.PORT_TCP[1]);
-        }
-
-        public void Send(User fromUser, User toUser, string message)
+        public void Send(Message message)
         {
             /* is there already an open port to the */
-
+            foreach(UserConnection uc in connectionList)
+            {
+                //if()
+            }
         }
 
         private string buildTCPMessage(User fromUser, User toUser, string message)
@@ -67,6 +69,11 @@ namespace CSharpChatClient
             IPAddress ipAddress = GetLocalIPAddress(ipHostInfo);
             Configuration.localIpAddress = ipAddress;
             Configuration.selectedTcpPort = Configuration.PORT_TCP[GetAvaiableTCPPortIndex()];
+        }
+
+        internal void SendMessage(Message text)
+        {
+
         }
 
         private IPAddress GetLocalIPAddress(IPHostEntry host)
@@ -118,7 +125,7 @@ namespace CSharpChatClient
             return isAvailable;
         }
 
-        internal static void IncomingTCPDataFromServer(string content)
+        internal static void IncomingMessageFromServer(Message content)
         {
             throw new NotImplementedException();
         }
