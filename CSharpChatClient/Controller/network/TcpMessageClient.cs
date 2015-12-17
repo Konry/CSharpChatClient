@@ -17,9 +17,11 @@ namespace CSharpChatClient
         private static ManualResetEvent sendDone = new ManualResetEvent(false);
         public Socket client { get; set; }
         private bool connected = false;
+        private NetworkService netService = null;
 
-        public TcpMessageClient()
+        public TcpMessageClient(NetworkService netService)
         {
+            this.netService = netService;
             connected = false;
         }
 

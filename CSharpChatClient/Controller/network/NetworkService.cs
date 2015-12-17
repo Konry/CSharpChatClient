@@ -43,10 +43,10 @@ namespace CSharpChatClient
                 }
             }
 
-            tcpServer = new TcpMessageServer();
-            tcpClient = new TcpMessageClient();
+            tcpServer = new TcpMessageServer(this);
+            tcpClient = new TcpMessageClient(this);
 
-            broadReceiver = new BroadcastReceiver();
+            broadReceiver = new BroadcastReceiver(this);
             broadSender = new BroadcastSender();
         }
 
@@ -136,9 +136,27 @@ namespace CSharpChatClient
             return isAvailable;
         }
 
-        internal static void IncomingMessageFromServer(Message content)
+        internal void IncomingMessageFromServer(Message content)
         {
-            throw new NotImplementedException();
+            //controller.
+        }
+
+        internal void IncomingMessageFromClient(Message content)
+        {
+            Debug.WriteLine("broadcast: " + content.ToString());
+        }
+
+        internal void IncomingBroadcastMessage(Message content)
+        {
+            Debug.WriteLine("broadcast: " + content);
+            ExternalUser exUser = ExternalUser.ParseFromMessage(content);
+            if (exUser != null && content.MessageType.StartsWith("HeartbeatLive"))
+            {
+                control.graphicControl.BroadcastAdd(exUser);
+            } else if (exUser != null && content.MessageType.StartsWith("HeartbeatOffline"))
+            {
+                control.graphicControl.BroadcastRemove(exUser);
+            }
         }
     }
 }

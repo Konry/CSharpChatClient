@@ -11,11 +11,12 @@ namespace CSharpChatClient
     public class BroadcastReceiver
     {
         private int PORT_NUMBER = Configuration.PORT_UDP_BROADCAST;
-        private UdpClient client;
+        private NetworkService netService = null;
+        private UdpClient client = null;
 
-        public BroadcastReceiver()
+        public BroadcastReceiver(NetworkService netService)
         {
-            
+            this.netService = netService;
         }
 
         private void Initialize()
@@ -41,6 +42,8 @@ namespace CSharpChatClient
 
             //Process codes
             String s = Encoding.UTF8.GetString(received);
+
+            netService.IncomingBroadcastMessage(Message.ParseBroadcastMessage(s));
 
             client.BeginReceive(new AsyncCallback(receive), null);
 

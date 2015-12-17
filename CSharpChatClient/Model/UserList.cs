@@ -8,16 +8,16 @@ namespace CSharpChatClient.Model
 {
     class UserList
     {
-        public LinkedList<User> userList { get; }
+        public LinkedList<ExternalUser> userList { get; }
 
         public UserList()
         {
-            userList = new LinkedList<User>();
+            userList = new LinkedList<ExternalUser>();
         }
 
-        public bool AddUser(User user)
+        public bool AddUser(ExternalUser user)
         {
-            foreach ( User u in userList)
+            foreach (ExternalUser u in userList)
             {
                 if(user.Equals(u))
                 {
@@ -28,9 +28,9 @@ namespace CSharpChatClient.Model
             return true;
         }
 
-        public bool RemoveUser(User user)
+        public bool RemoveUser(ExternalUser user)
         {
-            foreach (User u in userList)
+            foreach (ExternalUser u in userList)
             {
                 if (user.Equals(u))
                 {

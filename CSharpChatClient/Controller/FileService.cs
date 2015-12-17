@@ -32,14 +32,39 @@ namespace CSharpChatClient
         //    for()
         //}
 
+        private void UpdateUserIDFile()
+        {
+            try
+            {
+                using (StreamWriter sw = new StreamWriter("user.cfg"))
+                {
+                    sw.WriteLine(Configuration.localUser.Name);
+                    sw.WriteLine(Configuration.localUser.Id);
+                    sw.Close();
+                }
+            }
+            catch (IOException ex)
+            {
+                Debug.WriteLine("Schreiben nicht möglich, bitte prüfen Sie ihre Rechte! " + ex.StackTrace);
+            }
+            catch (ObjectDisposedException ex)
+            {
+                Debug.WriteLine("Datei konnte aufgrund eines internen Fehlers nicht geschrieben werden! " + ex.StackTrace);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Unbekannte Exeption wurde gefangen! " + ex.StackTrace);
+            }
+        }
+
         private void WriteUserIDFile()
         {
             try {
                 long id = GenerateUserID();
-                Configuration.localUser.id = id;
+                Configuration.localUser.Id = id;
                 using (StreamWriter sw = new StreamWriter("user.cfg"))
                 {
-                    sw.WriteLine(Configuration.localUser.name);
+                    sw.WriteLine(Configuration.localUser.Name);
                     sw.WriteLine(id);
                     sw.Close();
                 }
@@ -71,7 +96,7 @@ namespace CSharpChatClient
                         long id = long.Parse(split[1]);
                         Debug.WriteLine(id);
                         User user = new User(split[0]);
-                        user.id = id;
+                        user.Id = id;
                         sr.Close();
                         return user;
                     }
@@ -113,7 +138,7 @@ namespace CSharpChatClient
 
         internal void UpdateUserName()
         {
-            WriteUserIDFile();
+            UpdateUserIDFile();
         }
 
         private static long GenerateUserID()

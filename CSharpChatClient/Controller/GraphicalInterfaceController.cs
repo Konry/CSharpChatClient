@@ -18,6 +18,9 @@ namespace CSharpChatClient.Controller
         private User currentlyActiveChatUser = null;
         private MessageHistory messageHistory = null;
 
+        private HashSet<ExternalUser> onlineChatPartner = null;
+        //private 
+
         public GraphicalInterfaceController(ProgramController programControl, ChatForm chatForm, NetworkService networkService)
         {
             this.programControl = programControl;
@@ -29,6 +32,7 @@ namespace CSharpChatClient.Controller
         private void Initialize()
         {
             messageHistory = new MessageHistory();
+            onlineChatPartner = new HashSet<ExternalUser>();
 
             /* TODO load history from file */
             //messageHistory.FillUpMessageHistory(programControl.fileService.ReadHistoryFile());
@@ -46,15 +50,15 @@ namespace CSharpChatClient.Controller
             }
             else
             {
-                if (username.Equals("") && Configuration.localUser.name.Equals(""))
+                if (username.Equals("") && Configuration.localUser.Name.Equals(""))
                 {
                     username = GenerateRandomName();
                 }
                 else if(username.Equals(""))
                 {
-                    username = Configuration.localUser.name;
+                    username = Configuration.localUser.Name;
                 }
-                Configuration.localUser.name = username;
+                Configuration.localUser.Name = username;
             }
             chatForm.UpdateUsernameLabel(username);
             programControl.fileService.UpdateUserName();
@@ -82,6 +86,39 @@ namespace CSharpChatClient.Controller
             {
                 Debug.WriteLine("Fehler: Die letzte Nachricht war nicht vom aktuellen Benutzer");
             }
+        }
+
+        internal void BroadcastRemove(ExternalUser exUser)
+        {
+            bool updateGui = onlineChatPartner.Remove(exUser);
+            if (updateGui)
+            {
+                ExternalUser[] namesOfOnlineChatPartner = new ExternalUser[onlineChatPartner.Count];
+                int index = 0;
+                foreach (ExternalUser ex in onlineChatPartner)
+                {
+                    namesOfOnlineChatPartner[index++] = ex;
+                }
+                chatForm.UpdateListOfClients(namesOfOnlineChatPartner);
+            }
+        }
+
+        internal void BroadcastAdd(ExternalUser exUser)
+        {
+            bool updateGui = onlineChatPartner.Add(exUser);
+            if (updateGui)
+            {
+                ExternalUser[] namesOfOnlineChatPartner = new ExternalUser[onlineChatPartner.Count];
+                int index = 0;
+                foreach (ExternalUser ex in onlineChatPartner)
+                {
+                    namesOfOnlineChatPartner[index++] = ex;
+                }
+                chatForm.UpdateListOfClients(namesOfOnlineChatPartner);
+            }
+
+            Debug.WriteLine("ADD broadcast " + updateGui);
+            //onlineChatPartner.Remove
         }
     }
 }

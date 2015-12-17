@@ -8,7 +8,6 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-[assembly: InternalsVisibleTo("TestTcpMessageServer")]
 namespace CSharpChatClient
 {
     
@@ -17,14 +16,16 @@ namespace CSharpChatClient
         public static ManualResetEvent serverBlock = new ManualResetEvent(false);
         private Thread thread = null;
         private volatile bool shouldStop;
+        private NetworkService netService = null;
 
         private Socket server = null;
         //private Socket client = null;
 
         private LinkedList<UserConnection> connectionList = null;
 
-        public TcpMessageServer()
+        public TcpMessageServer(NetworkService netService)
         {
+            this.netService = netService;
             Initialize();
         }
 
@@ -152,7 +153,7 @@ namespace CSharpChatClient
 
                 if (!Message.IsNewContact(content)) {
                     /* TODO Handle here the incoming data from an other client */
-                    NetworkService.IncomingMessageFromServer(Message.ParseTCPMessage(content));
+                    netService.IncomingMessageFromServer(Message.ParseTCPMessage(content));
                 } else
                 {
                     AddSocketToList(handle);

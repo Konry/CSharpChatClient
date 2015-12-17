@@ -13,11 +13,11 @@ namespace CSharpChatClient.Test
         public void TestGenerateConnectMessage()
         {
             User user = new User("TestUser");
-            String correctResult = "TRYConnectTo;TestUser;-1;127.0.0.1;12345";
+            String correctResult = "TCPConnectTo;TestUser;-1;127.0.0.1;12345";
             Assert.AreEqual(correctResult, Message.GenerateConnectMessage(user, IPAddress.Parse("127.0.0.1"), 12345));
 
             user = new User("TestUser");
-            correctResult = "TRYConnectTo;TestUser;-1;127.0.0.1;" + Configuration.DEFAULT_TCP_PORT;
+            correctResult = "TCPConnectTo;TestUser;-1;127.0.0.1;" + Configuration.DEFAULT_TCP_PORT;
             Assert.AreEqual(correctResult, Message.GenerateConnectMessage(user, IPAddress.Parse("127.0.0.1"), 51110));
         }
 
@@ -25,11 +25,11 @@ namespace CSharpChatClient.Test
         public void TestGenerateConnectMessageUserOnly()
         {
             User user = new User("TestUser");
-            String correctResult = "TRYConnectTo;TestUser;-1;127.0.0.1;12345";
+            String correctResult = "TCPConnectTo;TestUser;-1;127.0.0.1;12345";
             Assert.AreEqual(correctResult, Message.GenerateConnectMessage(user, IPAddress.Parse("127.0.0.1"), 12345));
 
             //user = new User("TestUser");
-            //correctResult = "TRYConnectTo;TestUser;127.0.0.1;" + Configuration.DEFAULT_TCP_PORT;
+            //correctResult = "TCPConnectTo;TestUser;127.0.0.1;" + Configuration.DEFAULT_TCP_PORT;
             //Assert.AreEqual(correctResult, NetworkMessage.GenerateConnectMessage(user, IPAddress.Parse("127.0.0.1"), 12345));
         }
 
@@ -37,9 +37,9 @@ namespace CSharpChatClient.Test
         public void TestHeartbeatMessage()
         {
             User user = new User("TestUser");
-            String correctResult = "Heartbeat;TestUser;-1;127.0.0.1;12345;live";
+            String correctResult = "HeartbeatLive;TestUser;-1;127.0.0.1;12345";
             Assert.AreEqual(correctResult, Message.GenerateHeartbeatMessage(user, IPAddress.Parse("127.0.0.1"), 12345, true));
-            correctResult = "Heartbeat;TestUser;-1;127.0.0.1;12345;offline";
+            correctResult = "HeartbeatOffline;TestUser;-1;127.0.0.1;12345";
             Assert.AreEqual(correctResult, Message.GenerateHeartbeatMessage(user, IPAddress.Parse("127.0.0.1"), 12345, false));
         }
 
@@ -65,10 +65,10 @@ namespace CSharpChatClient.Test
             mess.ToUser = toUser;
             String correctResult = "TCPMessage;FromUser;-1;ToUser;-1;This is the message";
             Debug.WriteLine(Message.ParseTCPMessage(Message.GenerateTCPMessage(mess)).MessageContent);
-            Assert.AreEqual(mess.FromUser.name, Message.ParseTCPMessage(Message.GenerateTCPMessage(mess)).FromUser.name);
-            Assert.AreEqual(mess.FromUser.id, Message.ParseTCPMessage(Message.GenerateTCPMessage(mess)).FromUser.id);
-            Assert.AreEqual(mess.ToUser.name, Message.ParseTCPMessage(Message.GenerateTCPMessage(mess)).ToUser.name);
-            Assert.AreEqual(mess.ToUser.id, Message.ParseTCPMessage(Message.GenerateTCPMessage(mess)).ToUser.id);
+            Assert.AreEqual(mess.FromUser.Name, Message.ParseTCPMessage(Message.GenerateTCPMessage(mess)).FromUser.Name);
+            Assert.AreEqual(mess.FromUser.Id, Message.ParseTCPMessage(Message.GenerateTCPMessage(mess)).FromUser.Id);
+            Assert.AreEqual(mess.ToUser.Name, Message.ParseTCPMessage(Message.GenerateTCPMessage(mess)).ToUser.Name);
+            Assert.AreEqual(mess.ToUser.Id, Message.ParseTCPMessage(Message.GenerateTCPMessage(mess)).ToUser.Id);
             Assert.AreEqual(mess.MessageContent, Message.ParseTCPMessage(Message.GenerateTCPMessage(mess)).MessageContent);
         }
 

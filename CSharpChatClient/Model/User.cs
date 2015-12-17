@@ -8,18 +8,31 @@ namespace CSharpChatClient
 {
     public class User
     {
-        public string name { get; set; }
-        public long id { get; set; }
+        protected string _name { get; set; }
+        protected long _id { get; set; }
         //public IPAddress ipAddress { get; set; }
         //public int port { get; set; }
 
         public User(string name)
         {
-            this.name = name;
-            this.id = -1;
+            this._name = name;
+            this._id = -1;
             //this.ipAddress = IPAddress.Parse("127.0.0.1");
             //this.port = Configuration.DEFAULT_TCP_PORT;
         }
+
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; }
+        }
+
+        public long Id
+        {
+            get { return _id; }
+            set { _id = value; }
+        }
+
 
         //public User(string name, IPAddress ipAddress)
         //{
@@ -37,7 +50,7 @@ namespace CSharpChatClient
 
         public bool Equals(User user)
         {
-            if(this.name.Equals(user.name) && this.id.Equals(user.id))
+            if(this._name.Equals(user._name) && this._id.Equals(user._id))
             {
                 return true;
             }

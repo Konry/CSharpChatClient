@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using CSharpChatClient.Controller;
 using CSharpChatClient.controller;
+using CSharpChatClient.Model;
 
 namespace CSharpChatClient
 {
@@ -23,6 +24,9 @@ namespace CSharpChatClient
 
         private GraphicalInterfaceController graphicControl = null;
 
+        public static ExternalUserList exUserList = null;
+        Timer timer = new Timer();
+
         public ChatForm()
         {
             InitializeController();
@@ -30,7 +34,7 @@ namespace CSharpChatClient
             InitializeComponent();
             InitializeContent();
 
-            if (Configuration.localUser.name.Equals(""))
+            if (Configuration.localUser.Name.Equals(""))
             {
                 GetInitialUsername();
             } else
@@ -51,6 +55,9 @@ namespace CSharpChatClient
 
             SendButton.Enabled = false;
             richTextBox1.Multiline = false;
+
+            exUserList = new ExternalUserList();
+            //this.Load += new RoutedEventHandler(ChatForm_Load);
         }
         
         private void GetInitialUsername()
@@ -61,7 +68,7 @@ namespace CSharpChatClient
         
         private void SetOtherUsername()
         {
-            string username = ShowEnterUsernameBox("Der Benutzername ist "+Configuration.localUser.name+ ", wenn nicht einfach neuen eingeben:");
+            string username = ShowEnterUsernameBox("Der Benutzername ist "+Configuration.localUser.Name+ ", wenn nicht einfach neuen eingeben:");
             graphicControl.ChangeUsername(username);
         }
 
@@ -87,7 +94,21 @@ namespace CSharpChatClient
 
         private void ChatForm_Load(object sender, EventArgs e)
         {
-            Debug.WriteLine("Initiate ChatForm!");
+            Debug.WriteLine("Initiate ChatForm! "+exUserList.Count);
+            timer.Interval = 10000;
+            timer.Tick += new EventHandler(LoadAvaiableConnectionsList);
+            //AvailableConnectionsList.DataSource = exUserList;
+            foreach(ExternalUser exUser in exUserList)
+            {
+                if (!AvailableConnectionsList.Items.Contains(exUser.Name)) { 
+                    AvailableConnectionsList.Items.Add(exUser.Name);
+                }
+            }
+        }
+
+        private void LoadAvaiableConnectionsList(object sender, EventArgs e)
+        {
+
         }
 
         private void MessageFlowBox_TextChanged(object sender, EventArgs e)
@@ -139,6 +160,17 @@ namespace CSharpChatClient
                 return "";
             }
             return result == DialogResult.OK ? textBox.Text : "";
+        }
+
+        internal void UpdateListOfClients(ExternalUser[] namesOfOnlineChatPartner)
+        {
+            exUserList.Clear();
+            foreach( ExternalUser online in namesOfOnlineChatPartner)
+            {
+                exUserList.Add(online);
+            }
+            //AvailableConnectionsList.Items.Clear();
+            //AvailableConnectionsList.Items.AddRange(namesOfOnlineChatPartner);
         }
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)

@@ -64,6 +64,7 @@
             this.AvailableConnectionsList.Size = new System.Drawing.Size(93, 176);
             this.AvailableConnectionsList.TabIndex = 2;
             this.AvailableConnectionsList.SelectedIndexChanged += new System.EventHandler(this.AvailableConnectionsList_SelectedIndexChanged);
+            this.AvailableConnectionsList.Click += new System.EventHandler(this.ChatForm_Load);
             // 
             // MessageFlowBox
             // 
