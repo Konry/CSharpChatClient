@@ -1,8 +1,5 @@
-﻿using System.Runtime.CompilerServices;
-using CSharpChatClient.Model;
+﻿using CSharpChatClient.Model;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -80,39 +77,24 @@ namespace CSharpChatClient.Controller.Network
 
         private void StartListening()
         {
-            Debug.WriteLine("Start Listening");
-            // Data buffer for incoming data.
             byte[] bytes = new Byte[1024];
 
             IPEndPoint localEndPoint = null;
 
-
             localEndPoint = new IPEndPoint(Configuration.localIpAddress, Configuration.selectedTcpPort);
             Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-            // Create a TCP/IP socket.
             try
             {
+                // Binds the socket to the local address
                 Socket.Bind(localEndPoint);
                 Socket.Listen(100);
                 while (!shouldStop)
                 {
-                    //}
-                    //catch (SocketException e)
-                    //{
-                    //    localEndPoint = new IPEndPoint(Configuration.localIpAddress, Configuration.PORT_TCP[1]);
-                    //    Configuration.selectedTcpPort = Configuration.PORT_TCP[1];
-                    //    server.Bind(localEndPoint);
-                    //    server.Listen(100);
-                    //}
-                    //Debug.WriteLine(Configuration.selectedTcpPort + " checkTcpPortAvaibility " + NetworkService.CheckTcpPortAvailability(Configuration.localIpAddress, Configuration.selectedTcpPort));
-
-
                     // Set the event to nonsignaled state.
                     serverBlock.Reset();
 
                     // Start an asynchronous socket to listen for connections.
-                    Debug.WriteLine("Waiting for a connection...");
                     Socket.BeginAccept(
                         new AsyncCallback(AcceptCallback),
                         Socket);
@@ -120,21 +102,18 @@ namespace CSharpChatClient.Controller.Network
                     // Wait until a connection is made before continuing.
                     serverBlock.WaitOne();
                 }
-                //}
 
             }
             catch (Exception e)
             {
-                Debug.WriteLine("StartListening " + e.ToString());
+                Logger.LogException("StartListening ", e);
             }
-            Debug.WriteLine("END Listening");
         }
 
 
 
         private void AcceptCallback(IAsyncResult ar)
         {
-            Debug.WriteLine("Accept");
             try
             {
                     // Signal the main thread to continue.
@@ -155,14 +134,12 @@ namespace CSharpChatClient.Controller.Network
             }
             catch (ObjectDisposedException ode)
             {
-                Debug.WriteLine("Catched ObjectDisposedException");
-                /*ignore object disposed exception*/
+                Logger.LogException("Catched ObjectDisposedException", ode);
             }
             catch (Exception e) when (e is ArgumentException || e is SocketException || e is InvalidOperationException || e is NotSupportedException)
             {
-                Debug.WriteLine("Catched other specific exception");
+                Logger.LogException("Catched other specific exception", e);
             }
-            Debug.WriteLine("Socket Closed");
         }
 
         private void ReadCallback(IAsyncResult ar)
@@ -177,17 +154,15 @@ namespace CSharpChatClient.Controller.Network
 
                 int bytesRead = state.workSocket.EndReceive(ar);
 
-                Debug.WriteLine("Incoming " + content + " " + bytesRead);
+                Logger.LogInfo("Server incoming " + content + " " + bytesRead);
                 if (bytesRead > 0)
                 {
                     // There  might be more data, so store the data received so far.
-                    state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
+                    //state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
 
-                    // Check for end-of-file tag. If it is not there, read 
-                    // more data.
-                    content = state.sb.ToString();
+                    content = Encoding.ASCII.GetString(state.buffer, 0, bytesRead);
 
-                    if (Message.IsNewContact(content))
+                    if (Message.IsNewContactMessage(content))
                     {
                         if (netService.AcceptIncomingConnectionFromServer())
                         {
@@ -195,11 +170,6 @@ namespace CSharpChatClient.Controller.Network
                             netService.AddSocketToList(handle, Message.ParseNewContactMessage(content));
                             Send(handle, Message.GenerateConnectMessage(Configuration.localUser, Configuration.localIpAddress, Configuration.selectedTcpPort));
                             sendDone.Set();
-                           // server = handle;
-                        }
-                        else
-                        {
-                            Debug.WriteLine("Verbindung schon vorhanden.");
                         }
                     }
                     else
@@ -221,56 +191,23 @@ namespace CSharpChatClient.Controller.Network
                 else
                 {
                     /* socket closed*/
-                    Debug.WriteLine("End of Socket");
+                    Logger.LogInfo("TCP-Server - Socket closed by Client.");
                     netService.CloseConnectionFromServer();
                     receiveDone.Set();
                 }
             }
             catch (ObjectDisposedException ode)
             {
-                Debug.WriteLine("Catched ObjectDisposedException " + ode.StackTrace);
-                //    /*ignore object disposed exception*/
+                Logger.LogException("Catched ReadCallback ", ode);
             }
             catch (SocketException se)
             {
-                Debug.WriteLine("Catched SocketException " + se.StackTrace);
+                Logger.LogException("Catched ReadCallback ", se);
             }
-            catch (NullReferenceException se)
+            catch (NullReferenceException nre)
             {
-                Debug.WriteLine("Catched System.NullReferenceException " + se.StackTrace);
+                Logger.LogException("Catched NullReferenceException ", nre);
             }
         }
-
-        //private static void Send(Socket handler, string data)
-        //{
-        //    // Convert the string data to byte data using ASCII encoding.
-        //    byte[] byteData = Encoding.ASCII.GetBytes(data);
-
-        //    // Begin sending the data to the remote device.
-        //    handler.BeginSend(byteData, 0, byteData.Length, 0,
-        //        new AsyncCallback(SendCallback), handler);
-        //}
-
-        //private static void SendCallback(IAsyncResult ar)
-        //{
-        //    try
-        //    {
-        //        // Retrieve the socket from the state object.
-        //        Socket handler = (Socket)ar.AsyncState;
-
-        //        // Complete sending the data to the remote device.
-        //        int bytesSent = handler.EndSend(ar);
-        //        Debug.WriteLine("Sent {0} bytes to client.", bytesSent);
-
-        //        //handler.Shutdown(SocketShutdown.Both);
-        //        //handler.Close();
-        //        sendDone.Set();
-
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Debug.WriteLine(e.ToString());
-        //    }
-        //}
     }
 }

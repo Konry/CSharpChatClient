@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CSharpChatClient.Controller;
+using System;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CSharpChatClient.Model
 {
     public class ExternalUser : User, INotifyPropertyChanged
     {
-        private IPAddress _ipAddress { get; set; }
-        private int _port { get; set; }
+        private IPAddress ipAddress;
+        private int port;
 
         public ExternalUser(string name) : base(name)
         {
@@ -31,26 +27,25 @@ namespace CSharpChatClient.Model
             this.Port = port;
         }
 
-
         public int Port
         {
-            get { return _port; }
-            set { _port = value; NotifyPropertyChanged("Port"); }
+            get { return port; }
+            set { port = value; NotifyPropertyChanged("Port"); }
         }
         public IPAddress IpAddress
         {
-            get { return _ipAddress; }
-            set { _ipAddress = value; NotifyPropertyChanged("IpAddress"); }
+            get { return ipAddress; }
+            set { ipAddress = value; NotifyPropertyChanged("IpAddress"); }
         }
         public new string Name
         {
-            get { return _name; }
-            set { _name = value; NotifyPropertyChanged("Name"); }
+            get { return name; }
+            set { name = value; NotifyPropertyChanged("Name"); }
         }
         public new long Id
         {
-            get { return _id; }
-            set { _id = value; NotifyPropertyChanged("Id"); }
+            get { return id; }
+            set { id = value; NotifyPropertyChanged("Id"); }
         }
 
         public bool Equals(ExternalUser user)
@@ -58,24 +53,30 @@ namespace CSharpChatClient.Model
             return base.Equals(user);
         }
 
+
+        /// <summary>
+        /// Parses from a tcp connect <see cref="Message"/> the external user and their port and ip address
+        /// </summary>
+        /// <param name="message">Needs an TCP-connect message, more information at <see cref="Message"/></param>
+        /// <returns>The external user out of this message</returns>
         public static ExternalUser ParseFromMessage(Message message)
         {
             try
             {
                 ExternalUser exUser = new ExternalUser(message.FromUser);
                 String[] split = message.MessageContent.Split(';');
-                exUser._ipAddress = IPAddress.Parse(split[0]);
-                exUser._port = int.Parse(split[1]);
+                exUser.ipAddress = IPAddress.Parse(split[0]);
+                exUser.port = int.Parse(split[1]);
                 return exUser;
             } catch (FormatException fe)
             {
-                Debug.WriteLine("FormatException while parsing a broadcast message." + fe.StackTrace);
+                Logger.LogException("FormatException while parsing a broadcast message. ", fe);
             } catch (ArgumentException ae)
             {
-                Debug.WriteLine("ArgumentException while parsing a broadcast message." + ae.StackTrace);
+                Logger.LogException("ArgumentException while parsing a broadcast message. ", ae);
             } catch (OverflowException oe)
             {
-                Debug.WriteLine("OverflowException while parsing a broadcast message." + oe.StackTrace);
+                Logger.LogException("OverflowException while parsing a broadcast message. ", oe);
             }
             return null;
         }

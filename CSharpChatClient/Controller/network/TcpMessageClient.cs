@@ -130,10 +130,9 @@ namespace CSharpChatClient.Controller.Network
 
         private void SendConnectMessage(User user, IPAddress ipAddress, int port)
         {
-            Debug.WriteLine("Send Connect Message " + Message.GenerateConnectMessage(user, ipAddress, port));
+            Logger.LogInfo("Send Connect Message " + Message.GenerateConnectMessage(user, ipAddress, port));
             Send(Socket, Message.GenerateConnectMessage(user, ipAddress, port));
             sendDone.Set();
-            Debug.WriteLine("Send Connect Message DONE");
         }
 
         private void ConnectCallback(IAsyncResult ar)
@@ -146,8 +145,7 @@ namespace CSharpChatClient.Controller.Network
                 // Complete the connection.
                 client.EndConnect(ar);
 
-                Debug.WriteLine("Socket connected to {0}",
-                    client.RemoteEndPoint.ToString());
+                Logger.LogInfo("Socket connected to "+ client.RemoteEndPoint.ToString());
 
                 // Signal that the connection has been made.
                 connectDone.Set();
@@ -178,11 +176,11 @@ namespace CSharpChatClient.Controller.Network
             }
             catch (ObjectDisposedException ode)
             {
-                Debug.WriteLine("Catched ObjectDisposedException");
+                Logger.LogException("Catched ObjectDisposedException", ode);
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Error in Receive " + e.ToString());
+                Logger.LogException("Catched other exception", e);
             }
         }
 
@@ -213,7 +211,7 @@ namespace CSharpChatClient.Controller.Network
                         {
                             netService.IncomingMessageFromClient(Message.ParseTCPMessage(content));
                         }
-                        else if (Message.IsNewContact(content))
+                        else if (Message.IsNewContactMessage(content))
                         {
                             netService.SetConnectionInformation(Message.ParseNewContactMessage(content));
                         }
@@ -225,7 +223,7 @@ namespace CSharpChatClient.Controller.Network
                 }
                 else {
                     // All the data has arrived; Socket can be closed
-                    Debug.WriteLine("End of Socket");
+                    Logger.LogInfo("TCP-Client - Socket closed by Server.");
                     netService.CloseConnectionFromClient();
                     // Signal that all bytes have been received.
                     receiveDone.Set();
@@ -234,41 +232,14 @@ namespace CSharpChatClient.Controller.Network
             catch(SocketException se)
             {
                 Disconnect();
+                Logger.LogException("Socket from Remote has been closed abruptly.", se, Logger.LogState.INFO);
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Error in ReceiveCallback " + e.ToString());
+                Logger.LogException("ReceiveCallback ", e);
             }
         }
 
-        private void Send(Socket client, String data)
-        {
-            // Convert the string data to byte data using ASCII encoding.
-            byte[] byteData = Encoding.ASCII.GetBytes(data);
-
-            // Begin sending the data to the remote device.
-            client.BeginSend(byteData, 0, byteData.Length, 0,
-                new AsyncCallback(SendCallback), client);
-        }
-
-        private void SendCallback(IAsyncResult ar)
-        {
-            try
-            {
-                // Retrieve the socket from the state object.
-                Socket client = (Socket)ar.AsyncState;
-
-                // Complete sending the data to the remote device.
-                int bytesSent = client.EndSend(ar);
-                Debug.WriteLine("Sent {0} bytes to server.", bytesSent);
-
-                // Signal that all bytes have been sent.
-                sendDone.Set();
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine("Error in SendCallback " + e.ToString());
-            }
-        }
+        
     }
 }

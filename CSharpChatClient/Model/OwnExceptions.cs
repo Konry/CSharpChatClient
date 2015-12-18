@@ -9,7 +9,7 @@ namespace CSharpChatClient
     class ClientException : Exception
     {
 
-        public ClientException()
+        public ClientException() : base()
         {
 
         }
@@ -24,22 +24,24 @@ namespace CSharpChatClient
 
         }
 
-        public class PortIsNotFreeException : ClientException {
-            public PortIsNotFreeException()
-            {
+    }
 
-            }
+    public class PortIsNotFreeException : Exception
+    {
+        public PortIsNotFreeException()
+        {
 
-            public PortIsNotFreeException(string message) : base(message)
-            {
+        }
 
-            }
+        public PortIsNotFreeException(string message) : base(message)
+        {
 
-            public PortIsNotFreeException(string message, Exception inner)
-        : base(message, inner)
-            {
+        }
 
-            }
+        public PortIsNotFreeException(string message, Exception inner)
+    : base(message, inner)
+        {
+
         }
     }
 }

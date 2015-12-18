@@ -69,7 +69,7 @@ namespace CSharpChatClient.Controller
                 Configuration.localUser.Name = username;
             }
             chatForm.UpdateUsernameLabel(username);
-            programControl.fileService.UpdateUserName();
+            programControl.FileService.UpdateUserName();
         }
 
         private static string GenerateRandomName()
@@ -189,7 +189,7 @@ namespace CSharpChatClient.Controller
                     ExternalUser ex = new ExternalUser("#ManualConnect");
                     ex.IpAddress = IPAddress.Parse(split[0]);
                     ex.Port = int.Parse(split[1]);
-                    if (programControl.networkService.ManualConnectToExUser(ex))
+                    if (programControl.NetworkService.ManualConnectToExUser(ex))
                     {
 
                     }

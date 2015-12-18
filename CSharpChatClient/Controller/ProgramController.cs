@@ -11,10 +11,10 @@ namespace CSharpChatClient.controller
 {
     public class ProgramController
     {
-        public ChatForm chatForm { get; set; }
-        public GraphicalInterfaceController graphicControl { get; set; }
-        public NetworkService networkService { get; set; }
-        public FileService fileService {get; set;}
+        private ChatForm chatForm;
+        private GraphicalInterfaceController graphicControl;
+        private NetworkService networkService;
+        private FileService fileService;
 
         public ProgramController(ChatForm chatForm)
         {
@@ -35,6 +35,29 @@ namespace CSharpChatClient.controller
         internal void Stop()
         {
             networkService.Stop();
+            Logger.Log("Moin");
         }
+
+        public ChatForm ChatForm
+        {
+            get { return chatForm; }
+            //set { chatForm = value; }
+        }
+        public GraphicalInterfaceController GraphicControl
+        {
+            get { return graphicControl; }
+            //set { graphicControl = value; }
+        }
+        public NetworkService NetworkService
+        {
+            get { return networkService; }
+            //set { networkService = value; }
+        }
+        public FileService FileService
+        {
+            get { return fileService; }
+            //set { fileService = value; }
+        }
+
     }
 }

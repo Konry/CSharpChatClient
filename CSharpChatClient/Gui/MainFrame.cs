@@ -58,7 +58,7 @@ namespace CSharpChatClient
         private void InitializeController()
         {
             programControl = new ProgramController(this);
-            this.graphicControl = programControl.graphicControl;
+            this.graphicControl = programControl.GraphicControl;
         }
 
         private void InitializeContent()

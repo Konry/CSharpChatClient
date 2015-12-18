@@ -8,49 +8,35 @@ namespace CSharpChatClient
 {
     public class User
     {
-        protected string _name { get; set; }
-        protected long _id { get; set; }
-        //public IPAddress ipAddress { get; set; }
-        //public int port { get; set; }
+        protected string name { get; set; }
+        protected long id { get; set; }
 
         public User(string name)
         {
-            this._name = name;
-            this._id = -1;
-            //this.ipAddress = IPAddress.Parse("127.0.0.1");
-            //this.port = Configuration.DEFAULT_TCP_PORT;
+            this.name = name;
+            this.id = -1;
         }
 
         public string Name
         {
-            get { return _name; }
-            set { _name = value; }
+            get { return name; }
+            set { name = value; }
         }
 
         public long Id
         {
-            get { return _id; }
-            set { _id = value; }
+            get { return id; }
+            set { id = value; }
         }
 
-
-        //public User(string name, IPAddress ipAddress)
-        //{
-        //    this.name = name;
-        //    //this.ipAddress = ipAddress;
-        //    //this.port = Configuration.DEFAULT_TCP_PORT;
-        //}
-
-        //public User(string name, IPAddress ipAddress, int port)
-        //{
-        //    this.name = name;
-        //    this.ipAddress = ipAddress;
-        //    this.port = port;
-        //}
-
+        /// <summary>
+        /// Check the equality of the user with an other one, depending on their name and their id
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>true for equality</returns>
         public bool Equals(User user)
         {
-            if(this._name.Equals(user._name) && this._id.Equals(user._id))
+            if(this.name.Equals(user.name) && this.id.Equals(user.id))
             {
                 return true;
             }

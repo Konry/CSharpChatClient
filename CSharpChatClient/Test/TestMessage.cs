@@ -76,8 +76,8 @@ namespace CSharpChatClient.Test
         public void TestIsNewContact()
         {
             User user = new User("TestUser");
-            Assert.AreEqual(true, Message.IsNewContact(Message.GenerateConnectMessage(user, IPAddress.Parse("127.0.0.1"), 12345)));
-            Assert.AreEqual(false, Message.IsNewContact("Test"));
+            Assert.AreEqual(true, Message.IsNewContactMessage(Message.GenerateConnectMessage(user, IPAddress.Parse("127.0.0.1"), 12345)));
+            Assert.AreEqual(false, Message.IsNewContactMessage("Test"));
         }
 
 

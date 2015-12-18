@@ -86,6 +86,7 @@
   <ItemGroup>
     <Compile Include="Controller\FileLogger.cs" />
     <Compile Include="Controller\GraphicalInterfaceController.cs" />
+    <Compile Include="Controller\Logger.cs" />
     <Compile Include="Controller\Network\TcpCommunication.cs" />
     <Compile Include="Controller\ProgramController.cs" />
     <Compile Include="Model\ConnectionList.cs" />
@@ -93,8 +94,6 @@
     <Compile Include="Model\ExternalUserList.cs" />
     <Compile Include="Model\MessageHistory.cs" />
     <Compile Include="Model\User.cs" />
-    <Compile Include="Controller\Network\BroadcastReceiver.cs" />
-    <Compile Include="Controller\Network\BroadcastSender.cs" />
     <Compile Include="Model\OwnExceptions.cs" />
     <Compile Include="Model\Configuration.cs" />
     <Compile Include="Controller\FileService.cs" />

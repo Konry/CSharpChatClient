@@ -1,33 +1,27 @@
 ﻿using CSharpChatClient.controller;
+using CSharpChatClient.Controller;
 using CSharpChatClient.Controller.Network;
 using CSharpChatClient.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Threading;
 
 namespace CSharpChatClient
 {
     public class NetworkService
     {
-        public static CancellationTokenSource cts;
-
-        TcpMessageClient tcpClient = null;
-        TcpMessageServer tcpServer = null;
-
-        BroadcastReceiver broadReceiver = null;
-        BroadcastSender broadSender = null;
-
-        private LinkedList<UserConnection> _connectionList = null;
-
-        //private UserList onlineUserList = null;
         private ProgramController control = null;
 
-        private bool _connectionOverClient = false;
-        private bool _connectionOverServer = false;
+        private TcpMessageClient tcpClient = null;
+        private TcpMessageServer tcpServer = null;
+
+        private LinkedList<UserConnection> connectionList = null;
+
+        private bool connectionOverClient = false;
+        private bool connectionOverServer = false;
+
         private Object incomingConnectionLock = new Object();
 
         public NetworkService(ProgramController control)
@@ -36,35 +30,14 @@ namespace CSharpChatClient
             Initialize();
         }
 
-
-        public bool ConnectionOverClient
-        {
-            get { return _connectionOverClient; }
-            set { _connectionOverClient = value; }
-        }
-
-        public bool ConnectionOverServer
-        {
-            get { return _connectionOverServer; }
-            set { _connectionOverServer = value; }
-        }
-
-        public LinkedList<UserConnection> ConnectionList
-        {
-            get { return _connectionList; }
-            set { _connectionList = value; }
-        }
-
         private void Initialize()
         {
-            cts = new CancellationTokenSource();
-
             ConnectionList = new LinkedList<UserConnection>();
 
             FillNetworkConfiguration();
             if (Configuration.localUser == null)
             {
-                User user = control.fileService.ReadUserCfgFile();
+                User user = control.FileService.ReadUserCfgFile();
                 if (user != null)
                 {
                     Configuration.localUser = user;
@@ -77,57 +50,35 @@ namespace CSharpChatClient
 
             tcpServer = new TcpMessageServer(this);
             tcpClient = new TcpMessageClient(this);
+        }
 
-            try
-            {
-                broadReceiver = new BroadcastReceiver(this);
-                broadSender = new BroadcastSender();
-            }
-            catch (Exception e)
-            {
+        public bool ConnectionOverClient
+        {
+            get { return connectionOverClient; }
+            set { connectionOverClient = value; }
+        }
 
-            }
+        public bool ConnectionOverServer
+        {
+            get { return connectionOverServer; }
+            set { connectionOverServer = value; }
+        }
+
+        public LinkedList<UserConnection> ConnectionList
+        {
+            get { return connectionList; }
+            set { connectionList = value; }
         }
 
         public void Start()
         {
-            try
-            {
-                broadReceiver.Start();
-                broadSender.Start();
-            }
-            catch (Exception e)
-            {
-
-            }
             tcpServer.Start();
         }
 
         public void Stop()
         {
-            try
-            {
-                broadReceiver.Stop();
-                broadSender.Stop();
-            }
-            catch (Exception e)
-            {
-
-            }
             tcpServer.Stop();
             tcpClient.Cancel();
-        }
-
-        public void Send(Message message)
-        {
-            /* is there already an open port to the */
-            foreach (UserConnection uc in ConnectionList)
-            {
-                if (message.ToUser.Equals(uc.user))
-                {
-
-                }
-            }
         }
 
         private void FillNetworkConfiguration()
@@ -142,6 +93,7 @@ namespace CSharpChatClient
         {
             if (ConnectionOverClient)
             {
+                Logger.LogInfo("Send Tcp Message " + text);
                 tcpClient.Send(Message.GenerateTCPMessage(text));
             }
             else if (ConnectionOverServer)
@@ -150,12 +102,19 @@ namespace CSharpChatClient
             }
             else
             {
-                Debug.WriteLine("There is currently no connection");
+                Logger.LogError("There is currently no connection!");
                 return false;
             }
             return true;
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="host"></param>
+        /// <exception cref="Exception">Throws a </exception>
+        /// <returns></returns>
         private IPAddress GetLocalIPAddress(IPHostEntry host)
         {
             int index = 0;
@@ -177,17 +136,8 @@ namespace CSharpChatClient
             {
                 if (CheckTcpPortAvailability(Configuration.localIpAddress, Configuration.PORT_TCP[index]))
                 {
-                    //return index;
                     Debug.WriteLine("Select index " + index);
                     break;
-                    //if (index >= Configuration.PORT_TCP.Length)
-                    //{
-                    //    return 0;
-                    //}
-                    //else
-                    //{
-                    //    return index;
-                    //}
                 }
             }
             return index;
@@ -226,21 +176,21 @@ namespace CSharpChatClient
 
         internal void IncomingMessageFromServer(Message content)
         {
-            Debug.WriteLine("Incoming IncomingMessageFromServer " + content.FromUser.Equals(control.graphicControl.CurrentlyActiveChatUser) + " " + control.graphicControl.CurrentlyActiveChatUser == null);
+            Debug.WriteLine("Incoming IncomingMessageFromServer " + content.FromUser.Equals(control.GraphicControl.CurrentlyActiveChatUser) + " " + control.GraphicControl.CurrentlyActiveChatUser == null);
 
-            if (content.FromUser.Equals(control.graphicControl.CurrentlyActiveChatUser) || control.graphicControl.CurrentlyActiveChatUser == null)
+            if (content.FromUser.Equals(control.GraphicControl.CurrentlyActiveChatUser) || control.GraphicControl.CurrentlyActiveChatUser == null)
             {
-                control.graphicControl.ReceiveMessage(content);
+                control.GraphicControl.ReceiveMessage(content);
             }
         }
 
         internal void IncomingMessageFromClient(Message content)
         {
             //Debug.WriteLine("Incoming IncomingMessageFromClient "+ content.FromUser.Equals(control.graphicControl.CurrentlyActiveChatUser)+" "+ control.graphicControl.CurrentlyActiveChatUser == null);
-            if (content.FromUser.Equals(control.graphicControl.CurrentlyActiveChatUser) ||
-                control.graphicControl.CurrentlyActiveChatUser == null)
+            if (content.FromUser.Equals(control.GraphicControl.CurrentlyActiveChatUser) ||
+                control.GraphicControl.CurrentlyActiveChatUser == null)
             {
-                control.graphicControl.ReceiveMessage(content);
+                control.GraphicControl.ReceiveMessage(content);
             }
         }
 
@@ -261,7 +211,7 @@ namespace CSharpChatClient
 
         internal void SetConnectionInformation(Message message)
         {
-            control.graphicControl.InitiateCurrentlyActiveUser(message);
+            control.GraphicControl.InitiateCurrentlyActiveUser(message);
         }
 
         internal void CloseConnectionFromServer()
@@ -272,7 +222,7 @@ namespace CSharpChatClient
                 UserConnection toRemove = null;
                 foreach (UserConnection ex in ConnectionList)
                 {
-                    if (ex.Equals(control.graphicControl.CurrentlyActiveChatUser))
+                    if (ex.Equals(control.GraphicControl.CurrentlyActiveChatUser))
                     {
                         isInside = true;
                         toRemove = ex;
@@ -283,14 +233,14 @@ namespace CSharpChatClient
                     ConnectionList.Remove(toRemove);
                 }
 
-                control.graphicControl.CurrentlyActiveChatUser = null;
+                control.GraphicControl.CurrentlyActiveChatUser = null;
                 ConnectionOverServer = false;
             }
         }
 
         internal void CloseConnectionFromClient()
         {
-            control.graphicControl.CurrentlyActiveChatUser = null;
+            control.GraphicControl.CurrentlyActiveChatUser = null;
             ConnectionOverClient = false;
         }
 
@@ -299,11 +249,11 @@ namespace CSharpChatClient
             ExternalUser exUser = ExternalUser.ParseFromMessage(content);
             if (exUser != null && content.MessageType.StartsWith("HeartbeatLive"))
             {
-                control.graphicControl.BroadcastAdd(exUser);
+                control.GraphicControl.BroadcastAdd(exUser);
             }
             else if (exUser != null && content.MessageType.StartsWith("HeartbeatOffline"))
             {
-                control.graphicControl.BroadcastRemove(exUser);
+                control.GraphicControl.BroadcastRemove(exUser);
             }
         }
 
@@ -314,7 +264,7 @@ namespace CSharpChatClient
                 if (!ConnectionOverClient && !ConnectionOverServer)
                 {
                     ConnectionOverServer = true;
-                    control.graphicControl.CurrentlyActiveChatUser = new ExternalUser(tcpAcceptMessage.FromUser);
+                    control.GraphicControl.CurrentlyActiveChatUser = new ExternalUser(tcpAcceptMessage.FromUser);
                 }
             }
         }
@@ -324,7 +274,7 @@ namespace CSharpChatClient
             bool success = false;
             lock (incomingConnectionLock)
             {
-                if (control.graphicControl.CurrentlyActiveChatUser != null && ex.Equals(control.graphicControl.CurrentlyActiveChatUser)) { return false; }
+                if (control.GraphicControl.CurrentlyActiveChatUser != null && ex.Equals(control.GraphicControl.CurrentlyActiveChatUser)) { return false; }
                 if (!ConnectionOverServer)
                 {
                     success = tcpClient.ReConnect(ex.IpAddress, ex.Port);

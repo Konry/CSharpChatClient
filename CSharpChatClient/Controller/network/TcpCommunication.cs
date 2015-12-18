@@ -46,7 +46,7 @@ namespace CSharpChatClient.Controller.Network
             }
             catch (Exception e)
             {
-                Debug.WriteLine("Error in SendCallback " + e.ToString());
+                Logger.LogException("Error in SendCallback ", e);
             }
         }
     }
