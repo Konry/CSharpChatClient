@@ -8,14 +8,14 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace CSharpChatClient
+namespace CSharpChatClient.Controller.Network
 {
-    public class TcpMessageClient
+    public class TcpMessageClient : TcpCommunication
     {
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
         private static ManualResetEvent receiveDone = new ManualResetEvent(false);
         private static ManualResetEvent sendDone = new ManualResetEvent(false);
-        public Socket client { get; set; }
+
         private bool connected = false;
         private NetworkService netService = null;
 
@@ -31,18 +31,18 @@ namespace CSharpChatClient
         ~TcpMessageClient()
         {
             connected = false;
-            if (client != null)
+            if (Socket != null)
             {
                 try
                 {
-                    client.Disconnect(false);
+                    Socket.Disconnect(false);
                 }
                 catch (ObjectDisposedException ode)
                 {
                     Debug.WriteLine("Catched ObjectDisposedException");
                     /*throw away*/
                 }
-                client.Close();
+                Socket.Close();
             }
             if (thread != null)
             {
@@ -50,50 +50,56 @@ namespace CSharpChatClient
             }
         }
 
-        public void Connect(IPAddress ipAddress, int port)
+        public bool Connect(IPAddress ipAddress, int port)
         {
             try
             {
                 if (connected)
                 {
-                    return;
+                    return true;
                 }
                 shouldStop = false;
+                connected = true;
                 IPEndPoint remoteEnd = new IPEndPoint(ipAddress, port);
-                client = new Socket(AddressFamily.InterNetwork,
+                Socket = new Socket(AddressFamily.InterNetwork,
                     SocketType.Stream, ProtocolType.Tcp);
 
                 /* connect to the selected ipaddress */
-                client.BeginConnect(remoteEnd, new AsyncCallback(ConnectCallback), client);
+                Socket.BeginConnect(remoteEnd, new AsyncCallback(ConnectCallback), Socket);
                 connectDone.WaitOne();
-                connected = true;
 
                 thread = new Thread(StartReceiving);
                 /* Send a first message + TRY Connect to the remote */
                 SendConnectMessage(Configuration.localUser, ipAddress, port);
                 thread.Start();
+                return true;
             }
             catch (System.ObjectDisposedException ode)
             {
                 Debug.WriteLine("Catched ObjectDisposedException");
             }
+            catch (SocketException se)
+            {
+                return false;
+            }
+            return false;
         }
 
-        public void ReConnect(IPAddress ipAddress, int port)
+        public bool ReConnect(IPAddress ipAddress, int port)
         {
             Disconnect();
-            Connect(ipAddress, port);
+            return Connect(ipAddress, port);
         }
 
         public void Disconnect()
         {
             shouldStop = true;
             connected = false;
-            if (client != null)
+            if (Socket != null)
             {
                 try
                 {
-                    client.Disconnect(true);
+                    Socket.Disconnect(true);
                 }
                 catch (ObjectDisposedException ode)
                 {
@@ -106,9 +112,9 @@ namespace CSharpChatClient
         public void Cancel()
         {
             shouldStop = true;
-            if (client != null)
+            if (Socket != null)
             {
-                client.Close();
+                Socket.Close();
             }
             if (thread != null)
             {
@@ -118,14 +124,14 @@ namespace CSharpChatClient
 
         public void Send(string message)
         {
-            Send(client, message);
+            Send(Socket, message);
             sendDone.Set();
         }
 
         private void SendConnectMessage(User user, IPAddress ipAddress, int port)
         {
             Debug.WriteLine("Send Connect Message " + Message.GenerateConnectMessage(user, ipAddress, port));
-            Send(client, Message.GenerateConnectMessage(user, ipAddress, port));
+            Send(Socket, Message.GenerateConnectMessage(user, ipAddress, port));
             sendDone.Set();
             Debug.WriteLine("Send Connect Message DONE");
         }
@@ -154,7 +160,7 @@ namespace CSharpChatClient
 
         private void StartReceiving()
         {
-            Receive(client);
+            Receive(Socket);
         }
 
         private void Receive(Socket client)
@@ -224,6 +230,10 @@ namespace CSharpChatClient
                     // Signal that all bytes have been received.
                     receiveDone.Set();
                 }
+            }
+            catch(SocketException se)
+            {
+                Disconnect();
             }
             catch (Exception e)
             {

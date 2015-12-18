@@ -56,8 +56,6 @@
             // 
             resources.ApplyResources(this.availableConnectionsList, "availableConnectionsList");
             this.availableConnectionsList.DataBindings.Add(new System.Windows.Forms.Binding("SelectedValue", this.externalUserListBindingSource, "Name", true));
-            this.availableConnectionsList.DataSource = this.externalUserListBindingSource;
-            this.availableConnectionsList.DisplayMember = "Name";
             this.availableConnectionsList.FormattingEnabled = true;
             this.availableConnectionsList.Name = "availableConnectionsList";
             this.availableConnectionsList.ValueMember = "Id";

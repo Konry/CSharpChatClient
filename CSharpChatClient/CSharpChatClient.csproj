@@ -86,6 +86,7 @@
   <ItemGroup>
     <Compile Include="Controller\FileLogger.cs" />
     <Compile Include="Controller\GraphicalInterfaceController.cs" />
+    <Compile Include="Controller\Network\TcpCommunication.cs" />
     <Compile Include="Controller\ProgramController.cs" />
     <Compile Include="Model\ConnectionList.cs" />
     <Compile Include="Model\ExternalUser.cs" />

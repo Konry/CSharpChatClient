@@ -1,4 +1,5 @@
 ﻿using CSharpChatClient.controller;
+using CSharpChatClient.Controller.Network;
 using CSharpChatClient.Model;
 using System;
 using System.Collections.Generic;
@@ -176,8 +177,9 @@ namespace CSharpChatClient
             {
                 if (CheckTcpPortAvailability(Configuration.localIpAddress, Configuration.PORT_TCP[index]))
                 {
-                    return index;
+                    //return index;
                     Debug.WriteLine("Select index " + index);
+                    break;
                     //if (index >= Configuration.PORT_TCP.Length)
                     //{
                     //    return 0;
@@ -201,17 +203,20 @@ namespace CSharpChatClient
                 if (sock.Connected == true)  // Port is in use and connection is successful
                     availability = true;
                 sock.Close();
-
+                return true;
             }
             catch (System.Net.Sockets.SocketException ex)
             {
                 if (ex.ErrorCode == 10061)  // Port is unused and could not establish connection 
+                {
                     Debug.WriteLine("Port is Open!");
+                    return true;
+                }
                 else
                     Debug.WriteLine(ex.Message);
             }
-            catch (Exception ex) when (ex is ArgumentNullException || ex is ArgumentOutOfRangeException || 
-            ex is ObjectDisposedException || ex is NotSupportedException || ex is ArgumentException|| 
+            catch (Exception ex) when (ex is ArgumentNullException || ex is ArgumentOutOfRangeException ||
+            ex is ObjectDisposedException || ex is NotSupportedException || ex is ArgumentException ||
             ex is InvalidOperationException)
             {
                 Debug.WriteLine(ex.Message);
@@ -261,23 +266,26 @@ namespace CSharpChatClient
 
         internal void CloseConnectionFromServer()
         {
-            bool isInside = false;
-            UserConnection toRemove = null;
-            foreach (UserConnection ex in ConnectionList)
+            if (ConnectionOverServer)
             {
-                if (ex.Equals(control.graphicControl.CurrentlyActiveChatUser))
+                bool isInside = false;
+                UserConnection toRemove = null;
+                foreach (UserConnection ex in ConnectionList)
                 {
-                    isInside = true;
-                    toRemove = ex;
+                    if (ex.Equals(control.graphicControl.CurrentlyActiveChatUser))
+                    {
+                        isInside = true;
+                        toRemove = ex;
+                    }
                 }
-            }
-            if (isInside)
-            {
-                ConnectionList.Remove(toRemove);
-            }
+                if (isInside)
+                {
+                    ConnectionList.Remove(toRemove);
+                }
 
-            control.graphicControl.CurrentlyActiveChatUser = null;
-            ConnectionOverServer = false;
+                control.graphicControl.CurrentlyActiveChatUser = null;
+                ConnectionOverServer = false;
+            }
         }
 
         internal void CloseConnectionFromClient()
@@ -311,17 +319,22 @@ namespace CSharpChatClient
             }
         }
 
-        internal void ManualConnectToExUser(ExternalUser ex)
+        internal bool ManualConnectToExUser(ExternalUser ex)
         {
+            bool success = false;
             lock (incomingConnectionLock)
             {
-                if (control.graphicControl.CurrentlyActiveChatUser != null && ex.Equals(control.graphicControl.CurrentlyActiveChatUser)) { return; }
+                if (control.graphicControl.CurrentlyActiveChatUser != null && ex.Equals(control.graphicControl.CurrentlyActiveChatUser)) { return false; }
                 if (!ConnectionOverServer)
                 {
-                    tcpClient.ReConnect(ex.IpAddress, ex.Port);
-                    ConnectionOverClient = true;
+                    success = tcpClient.ReConnect(ex.IpAddress, ex.Port);
+                    if (success)
+                    {
+                        ConnectionOverClient = true;
+                    }
                 }
             }
+            return success;
         }
 
         internal void ManuelDisconnectFromExUser(ExternalUser ex)

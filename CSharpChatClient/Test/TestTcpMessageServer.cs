@@ -13,7 +13,7 @@ namespace CSharpChatClient.Test
     {
 
         [Test] 
-        public void TestPrivateMethod()
+        public void TestReconnectClient()
         {
 
         }

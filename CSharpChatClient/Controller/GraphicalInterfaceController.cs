@@ -189,7 +189,10 @@ namespace CSharpChatClient.Controller
                     ExternalUser ex = new ExternalUser("#ManualConnect");
                     ex.IpAddress = IPAddress.Parse(split[0]);
                     ex.Port = int.Parse(split[1]);
-                    programControl.networkService.ManualConnectToExUser(ex);
+                    if (programControl.networkService.ManualConnectToExUser(ex))
+                    {
+
+                    }
                     _currentlyActiveChatUser = ex;
                 }
                 catch (Exception e)

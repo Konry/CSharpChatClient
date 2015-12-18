@@ -171,9 +171,6 @@
   <data name="&gt;&gt;messageFlowBox.Type" xml:space="preserve">
     <value>System.Windows.Forms.RichTextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;enterTextBox.Name" xml:space="preserve">
-    <value>enterTextBox</value>
-  </data>
   <data name="&gt;&gt;messageFlowBox.ZOrder" xml:space="preserve">
     <value>8</value>
   </data>
@@ -204,20 +201,23 @@
   <data name="&gt;&gt;labelIpAddress.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="availableConnectionsList.Location" type="System.Drawing.Point, System.Drawing">
-    <value>399, 31</value>
-  </data>
   <data name="labelPortValue.TabIndex" type="System.Int32, mscorlib">
     <value>11</value>
   </data>
   <data name="&gt;&gt;externalUserListBindingSource.Type" xml:space="preserve">
     <value>System.Windows.Forms.BindingSource, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="buttonClearHistory.Text" xml:space="preserve">
+    <value />
+  </data>
   <data name="&gt;&gt;labelUserName.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="labelPort.TabIndex" type="System.Int32, mscorlib">
     <value>10</value>
+  </data>
+  <data name="labelUserName.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
   </data>
   <data name="buttonClearHistory.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -253,6 +253,9 @@
   <data name="&gt;&gt;externalUserListBindingSource.Name" xml:space="preserve">
     <value>externalUserListBindingSource</value>
   </data>
+  <data name="&gt;&gt;labelIpAddress.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
   <data name="&gt;&gt;labelConnectedWith.ZOrder" xml:space="preserve">
     <value>6</value>
   </data>
@@ -270,6 +273,9 @@
   </data>
   <data name="&gt;&gt;labelIpAddressValue.ZOrder" xml:space="preserve">
     <value>3</value>
+  </data>
+  <data name="&gt;&gt;labelPortValue.Parent" xml:space="preserve">
+    <value>$this</value>
   </data>
   <data name="&gt;&gt;labelIpAddress.ZOrder" xml:space="preserve">
     <value>4</value>
@@ -291,6 +297,9 @@
   </data>
   <data name="labelConnectedWithValue.Location" type="System.Drawing.Point, System.Drawing">
     <value>219, 256</value>
+  </data>
+  <data name="buttonClearHistory.Location" type="System.Drawing.Point, System.Drawing">
+    <value>13, 255</value>
   </data>
   <data name="&gt;&gt;labelPort.Name" xml:space="preserve">
     <value>labelPort</value>
@@ -319,8 +328,8 @@
   <data name="labelPortValue.Size" type="System.Drawing.Size, System.Drawing">
     <value>37, 13</value>
   </data>
-  <data name="enterTextBox.ScrollBars" type="System.Windows.Forms.RichTextBoxScrollBars, System.Windows.Forms">
-    <value>Vertical</value>
+  <data name="&gt;&gt;labelConnectedWith.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="enterTextBox.Size" type="System.Drawing.Size, System.Drawing">
     <value>380, 35</value>
@@ -346,17 +355,14 @@
   <data name="&gt;&gt;labelConnectedWithValue.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="buttonClearHistory.Text" xml:space="preserve">
-    <value />
+  <data name="enterTextBox.ScrollBars" type="System.Windows.Forms.RichTextBoxScrollBars, System.Windows.Forms">
+    <value>Vertical</value>
   </data>
   <data name="sendButton.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
   </data>
   <data name="messageFlowBox.Location" type="System.Drawing.Point, System.Drawing">
     <value>12, 12</value>
-  </data>
-  <data name="labelIpAddressValue.TabIndex" type="System.Int32, mscorlib">
-    <value>9</value>
   </data>
   <data name="availableConnectionsList.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -370,8 +376,8 @@
   <data name="availableConnectionsList.IntegralHeight" type="System.Boolean, mscorlib">
     <value>False</value>
   </data>
-  <data name="&gt;&gt;labelIpAddress.Parent" xml:space="preserve">
-    <value>$this</value>
+  <data name="&gt;&gt;enterTextBox.Name" xml:space="preserve">
+    <value>enterTextBox</value>
   </data>
   <data name="labelConnectedWith.TabIndex" type="System.Int32, mscorlib">
     <value>6</value>
@@ -382,8 +388,8 @@
   <data name="sendButton.Size" type="System.Drawing.Size, System.Drawing">
     <value>93, 23</value>
   </data>
-  <data name="&gt;&gt;$this.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;buttonClearHistory.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;labelPortValue.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -400,14 +406,8 @@
   <data name="enterTextBox.Text" xml:space="preserve">
     <value />
   </data>
-  <data name="labelIpAddress.Text" xml:space="preserve">
-    <value>IPAdresse:</value>
-  </data>
   <data name="&gt;&gt;labelPortValue.ZOrder" xml:space="preserve">
     <value>1</value>
-  </data>
-  <data name="availableConnectionsList.Size" type="System.Drawing.Size, System.Drawing">
-    <value>112, 176</value>
   </data>
   <data name="&gt;&gt;labelUserName.Parent" xml:space="preserve">
     <value>$this</value>
@@ -427,17 +427,20 @@
   <data name="labelIpAddress.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
   </data>
+  <data name="labelPortValue.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
   <data name="labelConnectedWithValue.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
   </data>
   <data name="$this.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="labelPortValue.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
+  <data name="labelIpAddressValue.TabIndex" type="System.Int32, mscorlib">
+    <value>9</value>
   </data>
-  <data name="sendButton.Text" xml:space="preserve">
-    <value />
+  <data name="availableConnectionsList.Location" type="System.Drawing.Point, System.Drawing">
+    <value>399, 31</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Visual C# Chat</value>
@@ -451,17 +454,17 @@
   <data name="labelUserName.Size" type="System.Drawing.Size, System.Drawing">
     <value>58, 13</value>
   </data>
-  <data name="labelUserName.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
+  <data name="availableConnectionsList.Size" type="System.Drawing.Size, System.Drawing">
+    <value>112, 176</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
     <value>515, 287</value>
   </data>
-  <data name="buttonClearHistory.Location" type="System.Drawing.Point, System.Drawing">
-    <value>13, 255</value>
+  <data name="labelIpAddress.Text" xml:space="preserve">
+    <value>IPAdresse:</value>
   </data>
-  <data name="&gt;&gt;labelConnectedWith.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;$this.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Form, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;enterTextBox.Parent" xml:space="preserve">
     <value>$this</value>
@@ -472,17 +475,14 @@
   <data name="labelConnectedWithValue.Text" xml:space="preserve">
     <value>Niemandem</value>
   </data>
-  <data name="&gt;&gt;labelPortValue.Parent" xml:space="preserve">
-    <value>$this</value>
-  </data>
-  <data name="labelPort.Location" type="System.Drawing.Point, System.Drawing">
-    <value>460, 256</value>
+  <data name="sendButton.Text" xml:space="preserve">
+    <value />
   </data>
   <data name="&gt;&gt;enterTextBox.Type" xml:space="preserve">
     <value>System.Windows.Forms.RichTextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;buttonClearHistory.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="labelPort.Location" type="System.Drawing.Point, System.Drawing">
+    <value>460, 256</value>
   </data>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
     <value>96, 96</value>

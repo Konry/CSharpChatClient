@@ -8,21 +8,19 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace CSharpChatClient
+namespace CSharpChatClient.Controller.Network
 {
 
-    public class TcpMessageServer
+    public class TcpMessageServer : TcpCommunication
     {
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
         private static ManualResetEvent receiveDone = new ManualResetEvent(false);
-        private static ManualResetEvent sendDone = new ManualResetEvent(false);
 
         public static ManualResetEvent serverBlock = new ManualResetEvent(false);
         private Thread thread = null;
         private volatile bool shouldStop;
         private NetworkService netService = null;
 
-        private Socket server = null;
         //private Socket client = null;
 
         public TcpMessageServer(NetworkService netService)
@@ -33,9 +31,9 @@ namespace CSharpChatClient
 
         ~TcpMessageServer()
         {
-            if (server != null)
+            if (Socket != null)
             {
-                server.Close();
+                Socket.Close();
             }
             thread.Abort();
         }
@@ -61,7 +59,7 @@ namespace CSharpChatClient
         public void Stop()
         {
             shouldStop = true;
-            server.Close();
+            Socket.Close();
             if (thread != null)
             {
                 thread.Abort();
@@ -75,6 +73,7 @@ namespace CSharpChatClient
                 if (uc.user.Equals(user))
                 {
                     Send(uc.socket, message);
+                    sendDone.Set();
                 }
             }
         }
@@ -89,41 +88,38 @@ namespace CSharpChatClient
 
 
             localEndPoint = new IPEndPoint(Configuration.localIpAddress, Configuration.selectedTcpPort);
-            Debug.WriteLine("Continue;");
+            Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             // Create a TCP/IP socket.
-
             try
             {
-                //while (!shouldStop)
-                // {
-                server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                try
+                Socket.Bind(localEndPoint);
+                Socket.Listen(100);
+                while (!shouldStop)
                 {
-                    server.Bind(localEndPoint);
-                    server.Listen(100);
+                    //}
+                    //catch (SocketException e)
+                    //{
+                    //    localEndPoint = new IPEndPoint(Configuration.localIpAddress, Configuration.PORT_TCP[1]);
+                    //    Configuration.selectedTcpPort = Configuration.PORT_TCP[1];
+                    //    server.Bind(localEndPoint);
+                    //    server.Listen(100);
+                    //}
+                    //Debug.WriteLine(Configuration.selectedTcpPort + " checkTcpPortAvaibility " + NetworkService.CheckTcpPortAvailability(Configuration.localIpAddress, Configuration.selectedTcpPort));
+
+
+                    // Set the event to nonsignaled state.
+                    serverBlock.Reset();
+
+                    // Start an asynchronous socket to listen for connections.
+                    Debug.WriteLine("Waiting for a connection...");
+                    Socket.BeginAccept(
+                        new AsyncCallback(AcceptCallback),
+                        Socket);
+
+                    // Wait until a connection is made before continuing.
+                    serverBlock.WaitOne();
                 }
-                catch (SocketException e)
-                {
-                    localEndPoint = new IPEndPoint(Configuration.localIpAddress, Configuration.PORT_TCP[1]);
-                    Configuration.selectedTcpPort = Configuration.PORT_TCP[1];
-                    server.Bind(localEndPoint);
-                    server.Listen(100);
-                }
-                Debug.WriteLine(Configuration.selectedTcpPort + " checkTcpPortAvaibility " + NetworkService.CheckTcpPortAvailability(Configuration.localIpAddress, Configuration.selectedTcpPort));
-
-
-                // Set the event to nonsignaled state.
-                serverBlock.Reset();
-
-                // Start an asynchronous socket to listen for connections.
-                Debug.WriteLine("Waiting for a connection...");
-                server.BeginAccept(
-                    new AsyncCallback(AcceptCallback),
-                    server);
-
-                // Wait until a connection is made before continuing.
-                serverBlock.WaitOne();
                 //}
 
             }
@@ -141,8 +137,6 @@ namespace CSharpChatClient
             Debug.WriteLine("Accept");
             try
             {
-                while (!shouldStop)
-                {
                     // Signal the main thread to continue.
                     serverBlock.Set();
 
@@ -156,7 +150,7 @@ namespace CSharpChatClient
 
                     handle.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
                         new AsyncCallback(ReadCallback), state);
-                }
+                    //receiveDone.WaitOne();
 
             }
             catch (ObjectDisposedException ode)
@@ -181,14 +175,9 @@ namespace CSharpChatClient
                 TcpDataObject state = (TcpDataObject)ar.AsyncState;
                 Socket handle = state.workSocket;
 
-                if (handle == null)
-                {
-                    Debug.WriteLine("Socket closed");
-                }
-
                 int bytesRead = state.workSocket.EndReceive(ar);
 
-                //Debug.WriteLine("Incoming " + content + " "+ bytesRead);
+                Debug.WriteLine("Incoming " + content + " " + bytesRead);
                 if (bytesRead > 0)
                 {
                     // There  might be more data, so store the data received so far.
@@ -205,7 +194,8 @@ namespace CSharpChatClient
                             netService.IncomingConnectionFromServer(Message.ParseNewContactMessage(content));
                             netService.AddSocketToList(handle, Message.ParseNewContactMessage(content));
                             Send(handle, Message.GenerateConnectMessage(Configuration.localUser, Configuration.localIpAddress, Configuration.selectedTcpPort));
-                            server = handle;
+                            sendDone.Set();
+                           // server = handle;
                         }
                         else
                         {
@@ -233,7 +223,7 @@ namespace CSharpChatClient
                     /* socket closed*/
                     Debug.WriteLine("End of Socket");
                     netService.CloseConnectionFromServer();
-                    return;
+                    receiveDone.Set();
                 }
             }
             catch (ObjectDisposedException ode)
@@ -251,35 +241,36 @@ namespace CSharpChatClient
             }
         }
 
-        private static void Send(Socket handler, string data)
-        {
-            // Convert the string data to byte data using ASCII encoding.
-            byte[] byteData = Encoding.ASCII.GetBytes(data);
+        //private static void Send(Socket handler, string data)
+        //{
+        //    // Convert the string data to byte data using ASCII encoding.
+        //    byte[] byteData = Encoding.ASCII.GetBytes(data);
 
-            // Begin sending the data to the remote device.
-            handler.BeginSend(byteData, 0, byteData.Length, 0,
-                new AsyncCallback(SendCallback), handler);
-        }
+        //    // Begin sending the data to the remote device.
+        //    handler.BeginSend(byteData, 0, byteData.Length, 0,
+        //        new AsyncCallback(SendCallback), handler);
+        //}
 
-        private static void SendCallback(IAsyncResult ar)
-        {
-            try
-            {
-                // Retrieve the socket from the state object.
-                Socket handler = (Socket)ar.AsyncState;
+        //private static void SendCallback(IAsyncResult ar)
+        //{
+        //    try
+        //    {
+        //        // Retrieve the socket from the state object.
+        //        Socket handler = (Socket)ar.AsyncState;
 
-                // Complete sending the data to the remote device.
-                int bytesSent = handler.EndSend(ar);
-                Debug.WriteLine("Sent {0} bytes to client.", bytesSent);
+        //        // Complete sending the data to the remote device.
+        //        int bytesSent = handler.EndSend(ar);
+        //        Debug.WriteLine("Sent {0} bytes to client.", bytesSent);
 
-                //handler.Shutdown(SocketShutdown.Both);
-                //handler.Close();
+        //        //handler.Shutdown(SocketShutdown.Both);
+        //        //handler.Close();
+        //        sendDone.Set();
 
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.ToString());
-            }
-        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Debug.WriteLine(e.ToString());
+        //    }
+        //}
     }
 }
