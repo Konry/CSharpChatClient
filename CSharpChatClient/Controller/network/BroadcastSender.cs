@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -11,12 +12,19 @@ namespace CSharpChatClient
     */
     public class BroadcastSender 
     {
-        private int PORT_NUMBER = Configuration.PORT_UDP_BROADCAST;
         private static System.Timers.Timer timer;
+        private UdpClient udpClient = new UdpClient();
+        IPEndPoint endpoint = null;
 
         public BroadcastSender()
         {
+            Initialize();
             InitializeTimer();
+        }
+
+        private void Initialize()
+        {
+            endpoint = new IPEndPoint(IPAddress.Parse("255.255.255.255"), Configuration.PORT_UDP_BROADCAST);
         }
 
         ~BroadcastSender()
@@ -33,6 +41,7 @@ namespace CSharpChatClient
         {
             timer.Enabled = false;
             SendMessage(false);
+            udpClient.Close();
         }
 
         private void InitializeTimer()
@@ -50,12 +59,16 @@ namespace CSharpChatClient
 
         private void SendBroadcastMessage(string message)
         {
-            UdpClient client = new UdpClient();
-            IPEndPoint endpoint = new IPEndPoint(IPAddress.Parse("255.255.255.255"), PORT_NUMBER);
-            byte[] bytes = Encoding.ASCII.GetBytes(message);
-            client.Send(bytes, bytes.Length, endpoint);
-            client.Close();
-            //Debug.WriteLine("Broadcast Message %s is send!", message);
+            try
+            {
+                byte[] bytes = Encoding.ASCII.GetBytes(message);
+                udpClient.Send(bytes, bytes.Length, endpoint);
+            }
+            catch (System.ObjectDisposedException ode)
+            {
+                Debug.WriteLine("Catched ObjectDisposedException");
+            }
+
         }
 
         private void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)

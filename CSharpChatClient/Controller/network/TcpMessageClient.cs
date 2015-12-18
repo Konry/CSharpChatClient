@@ -19,6 +19,9 @@ namespace CSharpChatClient
         private bool connected = false;
         private NetworkService netService = null;
 
+        private Thread thread = null;
+        private volatile bool shouldStop = false;
+
         public TcpMessageClient(NetworkService netService)
         {
             this.netService = netService;
@@ -27,34 +30,90 @@ namespace CSharpChatClient
 
         ~TcpMessageClient()
         {
+            connected = false;
             if (client != null)
             {
+                try
+                {
+                    client.Disconnect(false);
+                }
+                catch (ObjectDisposedException ode)
+                {
+                    Debug.WriteLine("Catched ObjectDisposedException");
+                    /*throw away*/
+                }
                 client.Close();
+            }
+            if (thread != null)
+            {
+                thread.Abort();
             }
         }
 
         public void Connect(IPAddress ipAddress, int port)
         {
+            try
+            {
+                if (connected)
+                {
+                    return;
+                }
+                shouldStop = false;
+                IPEndPoint remoteEnd = new IPEndPoint(ipAddress, port);
+                client = new Socket(AddressFamily.InterNetwork,
+                    SocketType.Stream, ProtocolType.Tcp);
+
+                /* connect to the selected ipaddress */
+                client.BeginConnect(remoteEnd, new AsyncCallback(ConnectCallback), client);
+                connectDone.WaitOne();
+                connected = true;
+
+                thread = new Thread(StartReceiving);
+                /* Send a first message + TRY Connect to the remote */
+                SendConnectMessage(Configuration.localUser, ipAddress, port);
+                thread.Start();
+            }
+            catch (System.ObjectDisposedException ode)
+            {
+                Debug.WriteLine("Catched ObjectDisposedException");
+            }
+        }
+
+        public void ReConnect(IPAddress ipAddress, int port)
+        {
             Disconnect();
-            IPEndPoint remoteEnd = new IPEndPoint(ipAddress, port);
-            client = new Socket(AddressFamily.InterNetwork,
-                SocketType.Stream, ProtocolType.Tcp);
-
-            /* connect to the selected ipaddress */
-            client.BeginConnect(remoteEnd, new AsyncCallback(ConnectCallback), client);
-            connectDone.WaitOne();
-            connected = true;
-
-            /* Send a first message + TRY Connect to the remote */
-            SendConnectMessage(Configuration.localUser, ipAddress, port);
-
-            /* Receive loop ? hopefully */
-            Receive(client);
+            Connect(ipAddress, port);
         }
 
         public void Disconnect()
         {
+            shouldStop = true;
             connected = false;
+            if (client != null)
+            {
+                try
+                {
+                    client.Disconnect(true);
+                }
+                catch (ObjectDisposedException ode)
+                {
+                    Debug.WriteLine("Catched ObjectDisposedException");
+                    /*throw away*/
+                }
+            }
+        }
+
+        public void Cancel()
+        {
+            shouldStop = true;
+            if (client != null)
+            {
+                client.Close();
+            }
+            if (thread != null)
+            {
+                thread.Abort();
+            }
         }
 
         public void Send(string message)
@@ -64,8 +123,9 @@ namespace CSharpChatClient
 
         private void SendConnectMessage(User user, IPAddress ipAddress, int port)
         {
-            Debug.WriteLine(Message.GenerateConnectMessage(user, ipAddress, port));
+            Debug.WriteLine("Send Connect Message " + Message.GenerateConnectMessage(user, ipAddress, port));
             Send(client, Message.GenerateConnectMessage(user, ipAddress, port));
+            Debug.WriteLine("Send Connect Message DONE");
         }
 
         private void ConnectCallback(IAsyncResult ar)
@@ -90,16 +150,30 @@ namespace CSharpChatClient
             }
         }
 
+        private void StartReceiving()
+        {
+            while (!shouldStop)
+            {
+                Receive(client);
+            }
+        }
+
         private void Receive(Socket client)
         {
             try
             {
+                receiveDone.Reset();
                 // Create the state object.
                 TcpDataObject state = new TcpDataObject();
                 state.workSocket = client;
 
                 // Begin receiving the data from the remote device.
                 client.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0, new AsyncCallback(ReceiveCallback), state);
+                receiveDone.WaitOne();
+            }
+            catch (ObjectDisposedException ode)
+            {
+                Debug.WriteLine("Catched ObjectDisposedException");
             }
             catch (Exception e)
             {
@@ -109,6 +183,7 @@ namespace CSharpChatClient
 
         private void ReceiveCallback(IAsyncResult ar)
         {
+            String content = String.Empty;
             try
             {
                 // Retrieve the state object and the client socket 
@@ -124,19 +199,27 @@ namespace CSharpChatClient
                     // There might be more data, so store the data received so far.
                     state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
 
-                    // Get the rest of the data.
-                    if (connected)
+                    content = state.sb.ToString();
+                    Debug.WriteLine(content);
+
+                    if (!content.Equals(""))
                     {
-                        client.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
-                            new AsyncCallback(ReceiveCallback), state);
+                        if (Message.IsTCPMessage(content))
+                        {
+                            netService.IncomingMessageFromClient(Message.ParseTCPMessage(content));
+                        } else if (Message.IsNewContact(content))
+                        {
+                            netService.SetConnectionInformation(Message.ParseNewContactMessage(content));
+                        }
                     }
+                    // Get the rest of the data.
+                    state.sb.Clear();
+                    client.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
+                        new AsyncCallback(ReceiveCallback), state);
                 }
                 else {
-                    // All the data has arrived; put it in response.
-                    if (state.sb.Length > 1)
-                    {
-                        Debug.WriteLine(state.sb.ToString());
-                    }
+                    // All the data has arrived; Socket can be closed
+
                     // Signal that all bytes have been received.
                     receiveDone.Set();
                 }

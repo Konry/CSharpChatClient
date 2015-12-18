@@ -14,15 +14,23 @@ namespace CSharpChatClient.Model
         private IPAddress _ipAddress { get; set; }
         private int _port { get; set; }
 
-        ExternalUser(string name) : base(name)
+        public ExternalUser(string name) : base(name)
         {
 
         }
 
-        ExternalUser(User user) : this(user.Name)
+        public ExternalUser(User user) : this(user.Name)
         {
             this.Id = user.Id;
         }
+
+        public ExternalUser(User user, IPAddress ipAddress, int port) : this(user.Name)
+        {
+            this.Id = user.Id;
+            this.IpAddress = ipAddress;
+            this.Port = port;
+        }
+
 
         public int Port
         {
@@ -52,11 +60,10 @@ namespace CSharpChatClient.Model
 
         public static ExternalUser ParseFromMessage(Message message)
         {
-            ExternalUser exUser = new ExternalUser(message.FromUser);
-            try {
+            try
+            {
+                ExternalUser exUser = new ExternalUser(message.FromUser);
                 String[] split = message.MessageContent.Split(';');
-                Debug.WriteLine(message.MessageContent);
-                Debug.WriteLine(split[0]);
                 exUser._ipAddress = IPAddress.Parse(split[0]);
                 exUser._port = int.Parse(split[1]);
                 return exUser;

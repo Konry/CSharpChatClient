@@ -10,9 +10,9 @@ namespace CSharpChatClient
 {
     public class BroadcastReceiver
     {
-        private int PORT_NUMBER = Configuration.PORT_UDP_BROADCAST;
         private NetworkService netService = null;
         private UdpClient client = null;
+        IPEndPoint remoteIpEndPoint = null;
 
         public BroadcastReceiver(NetworkService netService)
         {
@@ -21,13 +21,21 @@ namespace CSharpChatClient
 
         private void Initialize()
         {
-            client = new UdpClient(PORT_NUMBER);
+            client = new UdpClient(Configuration.PORT_UDP_BROADCAST);
+            remoteIpEndPoint = new IPEndPoint(IPAddress.Any, Configuration.PORT_UDP_BROADCAST);
         }
 
         public void Start()
         {
             Initialize();
-            client.BeginReceive(new AsyncCallback(receive), null);
+            try
+            {
+                client.BeginReceive(new AsyncCallback(receive), null);
+            }
+            catch (System.ObjectDisposedException ode)
+            {
+                Debug.WriteLine("Catched ObjectDisposedException");
+            }
         }
 
         public void Stop()
@@ -37,19 +45,26 @@ namespace CSharpChatClient
 
         private void receive(IAsyncResult res)
         {
-            IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, PORT_NUMBER);
-            byte[] received = client.EndReceive(res, ref RemoteIpEndPoint);
+            try
+            {
+                byte[] received = client.EndReceive(res, ref remoteIpEndPoint);
 
-            //Process codes
-            String s = Encoding.UTF8.GetString(received);
+                //Process codes
+                String s = Encoding.UTF8.GetString(received);
 
-            netService.IncomingBroadcastMessage(Message.ParseBroadcastMessage(s));
+                netService.IncomingBroadcastMessage(Message.ParseNewContactMessage(s));
 
-            client.BeginReceive(new AsyncCallback(receive), null);
+                client.BeginReceive(new AsyncCallback(receive), null);
 
-            /*TODO Handle the output afterwarts -> Send to internal handler of date */
+                /*TODO Handle the output afterwarts -> Send to internal handler of date */
 
-            //Debug.WriteLine(s);
+                //Debug.WriteLine(s);
+            }
+            catch (ObjectDisposedException ode)
+            {
+                Debug.WriteLine("Catched ObjectDisposedException");
+                /*ignore object disposed exception*/
+            }
         }
     }
 }

@@ -45,10 +45,6 @@ namespace CSharpChatClient
             return FromUser.Name + "," + FromUser.Id + " - " + ToUser.Name + "," + ToUser.Id + ":" + MessageContent;
         }
 
-        public static string GenerateConnectMessage(User user, IPAddress ipAddress, int port)
-        {
-            return "TCPConnectTo;" + user.Name + ";" + user.Id + ";" + ipAddress.ToString() + ";" + port;
-        }
 
         public static string GenerateHeartbeatMessage(bool online)
         {
@@ -69,6 +65,11 @@ namespace CSharpChatClient
             return "Heartbeat"+modus+";" + user.Name + ";" + user.Id + ";" + ipAddress.ToString() + ";" + port;
         }
 
+        public static string GenerateConnectMessage(User user, IPAddress ipAddress, int port)
+        {
+            return "TCPConnectTo;" + user.Name + ";" + user.Id + ";" + ipAddress.ToString() + ";" + port;
+        }
+
         public static string GenerateTCPMessage(Message message)
         {
             return "TCPMessage;" + message.FromUser.Name + ";" + message.FromUser.Id + ";" + message.ToUser.Name + ";" + message.ToUser.Id + ";" + message.MessageContent;
@@ -77,8 +78,7 @@ namespace CSharpChatClient
 
         public static bool IsNewContact(string content)
         {
-            string[] stringArray = content.Split(';');
-            if (stringArray[0].Equals("TCPConnectTo"))
+            if (content.StartsWith("TCPConnectTo;"))
             {
                 return true;
             }
@@ -145,10 +145,9 @@ namespace CSharpChatClient
             return null;
         }
 
-        internal static Message ParseBroadcastMessage(string content)
+        internal static Message ParseNewContactMessage(string content)
         {
             string[] temp = content.Split(';');
-            Debug.WriteLine(content);
             if (temp.Length >= 5)
             {
                 try

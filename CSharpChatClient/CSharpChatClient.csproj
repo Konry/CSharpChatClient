@@ -112,6 +112,9 @@
     <Compile Include="Model\TcpDataObject.cs" />
     <Compile Include="Test\TestMessage.cs" />
     <Compile Include="Test\TestTcpMessageServer.cs" />
+    <EmbeddedResource Include="Gui\MainFrame.de-DE.resx">
+      <DependentUpon>MainFrame.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Gui\MainFrame.resx">
       <DependentUpon>MainFrame.cs</DependentUpon>
     </EmbeddedResource>
@@ -123,9 +126,11 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="ClassDiagramOverview.cd" />
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\CSharpChatClient.Model.ExternalUserList.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -155,6 +160,18 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="icons\blue-mail-send-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="icons\delete-24px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="icons\delete-32px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="icons\blue-mail-send-32px.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

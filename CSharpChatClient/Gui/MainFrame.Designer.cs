@@ -28,83 +28,127 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.SendButton = new System.Windows.Forms.Button();
-            this.UserNameLabel = new System.Windows.Forms.Label();
-            this.AvailableConnectionsList = new System.Windows.Forms.ListBox();
-            this.MessageFlowBox = new System.Windows.Forms.RichTextBox();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChatForm));
+            this.labelUserName = new System.Windows.Forms.Label();
+            this.availableConnectionsList = new System.Windows.Forms.ListBox();
+            this.externalUserListBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.messageFlowBox = new System.Windows.Forms.RichTextBox();
+            this.enterTextBox = new System.Windows.Forms.RichTextBox();
+            this.labelConnectedWith = new System.Windows.Forms.Label();
+            this.labelConnectedWithValue = new System.Windows.Forms.Label();
+            this.labelIpAddress = new System.Windows.Forms.Label();
+            this.labelIpAddressValue = new System.Windows.Forms.Label();
+            this.labelPortValue = new System.Windows.Forms.Label();
+            this.labelPort = new System.Windows.Forms.Label();
+            this.buttonClearHistory = new System.Windows.Forms.Button();
+            this.sendButton = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.externalUserListBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
-            // SendButton
+            // labelUserName
             // 
-            this.SendButton.Location = new System.Drawing.Point(399, 226);
-            this.SendButton.Name = "SendButton";
-            this.SendButton.Size = new System.Drawing.Size(93, 23);
-            this.SendButton.TabIndex = 0;
-            this.SendButton.Text = "Send";
-            this.SendButton.UseVisualStyleBackColor = true;
-            this.SendButton.Click += new System.EventHandler(this.SendButton_Click);
+            resources.ApplyResources(this.labelUserName, "labelUserName");
+            this.labelUserName.Name = "labelUserName";
+            this.labelUserName.Click += new System.EventHandler(this.UserNameLabel_Click);
             // 
-            // UserNameLabel
+            // availableConnectionsList
             // 
-            this.UserNameLabel.AutoSize = true;
-            this.UserNameLabel.Location = new System.Drawing.Point(416, 12);
-            this.UserNameLabel.Name = "UserNameLabel";
-            this.UserNameLabel.Size = new System.Drawing.Size(58, 13);
-            this.UserNameLabel.TabIndex = 1;
-            this.UserNameLabel.Text = "Own name";
-            this.UserNameLabel.Click += new System.EventHandler(this.UserNameLabel_Click);
+            resources.ApplyResources(this.availableConnectionsList, "availableConnectionsList");
+            this.availableConnectionsList.DataBindings.Add(new System.Windows.Forms.Binding("SelectedValue", this.externalUserListBindingSource, "Name", true));
+            this.availableConnectionsList.DataSource = this.externalUserListBindingSource;
+            this.availableConnectionsList.DisplayMember = "Name";
+            this.availableConnectionsList.FormattingEnabled = true;
+            this.availableConnectionsList.Name = "availableConnectionsList";
+            this.availableConnectionsList.ValueMember = "Id";
+            this.availableConnectionsList.Click += new System.EventHandler(this.ChatForm_Load);
+            this.availableConnectionsList.SelectedIndexChanged += new System.EventHandler(this.AvailableConnectionsList_SelectedIndexChanged);
             // 
-            // AvailableConnectionsList
+            // externalUserListBindingSource
             // 
-            this.AvailableConnectionsList.FormattingEnabled = true;
-            this.AvailableConnectionsList.IntegralHeight = false;
-            this.AvailableConnectionsList.Location = new System.Drawing.Point(399, 31);
-            this.AvailableConnectionsList.Name = "AvailableConnectionsList";
-            this.AvailableConnectionsList.Size = new System.Drawing.Size(93, 176);
-            this.AvailableConnectionsList.TabIndex = 2;
-            this.AvailableConnectionsList.SelectedIndexChanged += new System.EventHandler(this.AvailableConnectionsList_SelectedIndexChanged);
-            this.AvailableConnectionsList.Click += new System.EventHandler(this.ChatForm_Load);
+            this.externalUserListBindingSource.DataSource = typeof(CSharpChatClient.Model.ExternalUserList);
             // 
-            // MessageFlowBox
+            // messageFlowBox
             // 
-            this.MessageFlowBox.AcceptsTab = true;
-            this.MessageFlowBox.Location = new System.Drawing.Point(12, 12);
-            this.MessageFlowBox.Name = "MessageFlowBox";
-            this.MessageFlowBox.ReadOnly = true;
-            this.MessageFlowBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.ForcedVertical;
-            this.MessageFlowBox.Size = new System.Drawing.Size(381, 184);
-            this.MessageFlowBox.TabIndex = 4;
-            this.MessageFlowBox.Text = "";
-            this.MessageFlowBox.TextChanged += new System.EventHandler(this.MessageFlowBox_TextChanged);
+            this.messageFlowBox.AcceptsTab = true;
+            resources.ApplyResources(this.messageFlowBox, "messageFlowBox");
+            this.messageFlowBox.Name = "messageFlowBox";
+            this.messageFlowBox.ReadOnly = true;
+            this.messageFlowBox.TextChanged += new System.EventHandler(this.MessageFlowBox_TextChanged);
             // 
-            // richTextBox1
+            // enterTextBox
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(13, 214);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-            this.richTextBox1.Size = new System.Drawing.Size(380, 35);
-            this.richTextBox1.TabIndex = 5;
-            this.richTextBox1.Text = "";
-            this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
-            this.richTextBox1.KeyUp += new System.Windows.Forms.KeyEventHandler(this.OnKeyUpHandler);
+            resources.ApplyResources(this.enterTextBox, "enterTextBox");
+            this.enterTextBox.Name = "enterTextBox";
+            this.enterTextBox.TextChanged += new System.EventHandler(this.enterTextBox_TextChanged);
+            this.enterTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.enterTextBox_OnKeyUpHandler);
+            // 
+            // labelConnectedWith
+            // 
+            resources.ApplyResources(this.labelConnectedWith, "labelConnectedWith");
+            this.labelConnectedWith.Name = "labelConnectedWith";
+            // 
+            // labelConnectedWithValue
+            // 
+            resources.ApplyResources(this.labelConnectedWithValue, "labelConnectedWithValue");
+            this.labelConnectedWithValue.Name = "labelConnectedWithValue";
+            this.labelConnectedWithValue.Click += new System.EventHandler(this.labelConnectedWithValue_Click);
+            // 
+            // labelIpAddress
+            // 
+            resources.ApplyResources(this.labelIpAddress, "labelIpAddress");
+            this.labelIpAddress.Name = "labelIpAddress";
+            // 
+            // labelIpAddressValue
+            // 
+            resources.ApplyResources(this.labelIpAddressValue, "labelIpAddressValue");
+            this.labelIpAddressValue.Name = "labelIpAddressValue";
+            // 
+            // labelPortValue
+            // 
+            resources.ApplyResources(this.labelPortValue, "labelPortValue");
+            this.labelPortValue.Name = "labelPortValue";
+            // 
+            // labelPort
+            // 
+            resources.ApplyResources(this.labelPort, "labelPort");
+            this.labelPort.Name = "labelPort";
+            // 
+            // buttonClearHistory
+            // 
+            resources.ApplyResources(this.buttonClearHistory, "buttonClearHistory");
+            this.buttonClearHistory.Image = global::CSharpChatClient.Properties.Resources.delete_32px;
+            this.buttonClearHistory.Name = "buttonClearHistory";
+            this.buttonClearHistory.UseVisualStyleBackColor = true;
+            this.buttonClearHistory.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // sendButton
+            // 
+            resources.ApplyResources(this.sendButton, "sendButton");
+            this.sendButton.Image = global::CSharpChatClient.Properties.Resources.blue_mail_send_32px;
+            this.sendButton.Name = "sendButton";
+            this.sendButton.UseVisualStyleBackColor = true;
+            this.sendButton.Click += new System.EventHandler(this.SendButton_Click);
             // 
             // ChatForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.AutoSize = true;
-            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(504, 261);
-            this.Controls.Add(this.richTextBox1);
-            this.Controls.Add(this.MessageFlowBox);
-            this.Controls.Add(this.AvailableConnectionsList);
-            this.Controls.Add(this.UserNameLabel);
-            this.Controls.Add(this.SendButton);
-            this.MinimumSize = new System.Drawing.Size(520, 300);
+            this.Controls.Add(this.buttonClearHistory);
+            this.Controls.Add(this.labelPortValue);
+            this.Controls.Add(this.labelPort);
+            this.Controls.Add(this.labelIpAddressValue);
+            this.Controls.Add(this.labelIpAddress);
+            this.Controls.Add(this.labelConnectedWithValue);
+            this.Controls.Add(this.labelConnectedWith);
+            this.Controls.Add(this.enterTextBox);
+            this.Controls.Add(this.messageFlowBox);
+            this.Controls.Add(this.availableConnectionsList);
+            this.Controls.Add(this.labelUserName);
+            this.Controls.Add(this.sendButton);
             this.Name = "ChatForm";
-            this.Text = "Visual C# Chat";
             this.Load += new System.EventHandler(this.ChatForm_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.externalUserListBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -112,11 +156,19 @@
 
         #endregion
 
-        private System.Windows.Forms.Button SendButton;
-        private System.Windows.Forms.Label UserNameLabel;
-        private System.Windows.Forms.ListBox AvailableConnectionsList;
-        private System.Windows.Forms.RichTextBox MessageFlowBox;
-        private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.Button sendButton;
+        private System.Windows.Forms.ListBox availableConnectionsList;
+        private System.Windows.Forms.RichTextBox messageFlowBox;
+        private System.Windows.Forms.RichTextBox enterTextBox;
+        private System.Windows.Forms.Label labelUserName;
+        private System.Windows.Forms.Label labelConnectedWith;
+        private System.Windows.Forms.Label labelConnectedWithValue;
+        private System.Windows.Forms.Label labelIpAddress;
+        private System.Windows.Forms.Label labelIpAddressValue;
+        private System.Windows.Forms.Label labelPortValue;
+        private System.Windows.Forms.Label labelPort;
+        private System.Windows.Forms.Button buttonClearHistory;
+        private System.Windows.Forms.BindingSource externalUserListBindingSource;
     }
 }
 

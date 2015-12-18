@@ -32,5 +32,9 @@ namespace CSharpChatClient.controller
             networkService.Start();
         }
 
+        internal void Stop()
+        {
+            networkService.Stop();
+        }
     }
 }

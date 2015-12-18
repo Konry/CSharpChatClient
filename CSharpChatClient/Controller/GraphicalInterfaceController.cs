@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,10 +16,11 @@ namespace CSharpChatClient.Controller
         private ProgramController programControl = null;
         private NetworkService networkService = null;
 
-        private User currentlyActiveChatUser = null;
-        private MessageHistory messageHistory = null;
+        private ExternalUser _currentlyActiveChatUser = null;
+        internal MessageHistory messageHistory = null;
 
-        private HashSet<ExternalUser> onlineChatPartner = null;
+        private LinkedList<ExternalUser> onlineChatPartner = null;
+        private LinkedList<ExternalUser> offlineChatPartner = null;
         //private 
 
         public GraphicalInterfaceController(ProgramController programControl, ChatForm chatForm, NetworkService networkService)
@@ -26,16 +28,22 @@ namespace CSharpChatClient.Controller
             this.programControl = programControl;
             this.chatForm = chatForm;
             this.networkService = networkService;
-            Initialize(); 
+            Initialize();
         }
 
         private void Initialize()
         {
             messageHistory = new MessageHistory();
-            onlineChatPartner = new HashSet<ExternalUser>();
+            onlineChatPartner = new LinkedList<ExternalUser>();
 
             /* TODO load history from file */
             //messageHistory.FillUpMessageHistory(programControl.fileService.ReadHistoryFile());
+        }
+
+        public ExternalUser CurrentlyActiveChatUser
+        {
+            get { return _currentlyActiveChatUser; }
+            set { _currentlyActiveChatUser = value; chatForm.NotifyConnectedWithChange(); }
         }
 
         internal void ChangeUsername(string username)
@@ -45,7 +53,7 @@ namespace CSharpChatClient.Controller
                 if (username.Equals(""))
                 {
                     username = GenerateRandomName();
-                } 
+                }
                 Configuration.localUser = new User(username);
             }
             else
@@ -54,7 +62,7 @@ namespace CSharpChatClient.Controller
                 {
                     username = GenerateRandomName();
                 }
-                else if(username.Equals(""))
+                else if (username.Equals(""))
                 {
                     username = Configuration.localUser.Name;
                 }
@@ -72,17 +80,35 @@ namespace CSharpChatClient.Controller
 
         internal void SendMessage(string text)
         {
-            Message message = new Message(Configuration.localUser, currentlyActiveChatUser, text);
+            Message message = new Message(Configuration.localUser, CurrentlyActiveChatUser, text);
 
-            networkService.SendMessage(message);
-            messageHistory.AddMessage(message);
+            bool success = networkService.SendMessage(message, CurrentlyActiveChatUser);
+            if (success)
+            {
+                messageHistory.AddMessage(message);
+                chatForm.UpdateMessageHistory();
+            }
+        }
+
+        internal void InitiateCurrentlyActiveUser(Message message)
+        {
+            if (CurrentlyActiveChatUser.Name.StartsWith("#ManualConnect") || CurrentlyActiveChatUser.Name.StartsWith("#AutoConnect"))
+            {
+                CurrentlyActiveChatUser.Name = message.FromUser.Name;
+                CurrentlyActiveChatUser.Id = message.FromUser.Id;
+                chatForm.NotifyConnectedWithChange();
+            }
         }
 
         internal void ReceiveMessage(Message message)
         {
-            if(message.FromUser.Equals(currentlyActiveChatUser)){
+            
+            if (message.FromUser.Equals(CurrentlyActiveChatUser))
+            {
                 messageHistory.AddMessage(message);
-            } else
+                chatForm.UpdateMessageHistory();
+            }
+            else
             {
                 Debug.WriteLine("Fehler: Die letzte Nachricht war nicht vom aktuellen Benutzer");
             }
@@ -90,35 +116,87 @@ namespace CSharpChatClient.Controller
 
         internal void BroadcastRemove(ExternalUser exUser)
         {
-            bool updateGui = onlineChatPartner.Remove(exUser);
+            bool updateGui = false;
+            ExternalUser toRemove = null;
+            foreach (ExternalUser ex in onlineChatPartner)
+            {
+                if (ex.Equals(exUser))
+                {
+                    updateGui = true;
+                    toRemove = ex;
+                    break;
+                }
+            }
+
             if (updateGui)
             {
+                onlineChatPartner.Remove(toRemove);
                 ExternalUser[] namesOfOnlineChatPartner = new ExternalUser[onlineChatPartner.Count];
                 int index = 0;
                 foreach (ExternalUser ex in onlineChatPartner)
                 {
+                    Debug.WriteLine("names " + ex.Name);
                     namesOfOnlineChatPartner[index++] = ex;
                 }
-                chatForm.UpdateListOfClients(namesOfOnlineChatPartner);
+                chatForm.RemoveItemFromListOfClients(namesOfOnlineChatPartner);
             }
         }
 
         internal void BroadcastAdd(ExternalUser exUser)
         {
-            bool updateGui = onlineChatPartner.Add(exUser);
+            if (exUser.Equals(new ExternalUser(Configuration.localUser, Configuration.localIpAddress, Configuration.selectedTcpPort)))
+            {
+                return;
+            }
+            bool updateGui = true;
+            foreach (ExternalUser ex in onlineChatPartner)
+            {
+                if (ex.Equals(exUser))
+                {
+                    updateGui = false;
+                    break;
+                }
+            }
+
             if (updateGui)
             {
+                onlineChatPartner.AddLast(exUser);
                 ExternalUser[] namesOfOnlineChatPartner = new ExternalUser[onlineChatPartner.Count];
                 int index = 0;
                 foreach (ExternalUser ex in onlineChatPartner)
                 {
                     namesOfOnlineChatPartner[index++] = ex;
                 }
-                chatForm.UpdateListOfClients(namesOfOnlineChatPartner);
+                chatForm.AddItemFromListOfClients(namesOfOnlineChatPartner);
             }
 
-            Debug.WriteLine("ADD broadcast " + updateGui);
             //onlineChatPartner.Remove
+        }
+
+        internal void ManuelConnectToIPAndPort(string ipAndPort)
+        {
+            if (ipAndPort == "")
+            {
+                return;
+            }
+            else
+            {
+                String[] split = ipAndPort.Split(':');
+                try
+                {
+                    Debug.WriteLine("ipandport: " + split[0]);
+                    Debug.WriteLine("ipandport: " + split[1]);
+                    ExternalUser ex = new ExternalUser("#ManualConnect");
+                    ex.IpAddress = IPAddress.Parse(split[0]);
+                    ex.Port = int.Parse(split[1]);
+                    programControl.networkService.ManualConnectToExUser(ex);
+                    _currentlyActiveChatUser = ex;
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine("Fehlerhafter String " + e.StackTrace);
+                }
+            }
         }
     }
 }

@@ -9,10 +9,12 @@ namespace CSharpChatClient.Model
     public class MessageHistory
     {
         public LinkedList<Message> listOfMessages{ get; }
+        public StringBuilder stringBuilder { get; }
 
         public MessageHistory()
         {
             listOfMessages = new LinkedList<Message>();
+            stringBuilder = new StringBuilder();
         }
 
         public void FillUpMessageHistory(Message[] rawHistory)
@@ -26,11 +28,13 @@ namespace CSharpChatClient.Model
         public void AddMessage(Message message)
         {
             listOfMessages.AddLast(message);
+            stringBuilder.Append(message.FromUser.Name+": " + message.MessageContent + "\r\n");
         }
 
         public void ClearHistory()
         {
             listOfMessages.Clear();
+            stringBuilder.Clear();
         }
         
     }

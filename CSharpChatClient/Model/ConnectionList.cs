@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace CSharpChatClient.Model
 {
-    class UserConnection
+    public class UserConnection
     {
-        public User user
+        public ExternalUser user
         {
             get; set;
         }
@@ -19,7 +19,7 @@ namespace CSharpChatClient.Model
             get; set;
         }
 
-        public UserConnection(User user, Socket socket)
+        public UserConnection(ExternalUser user, Socket socket)
         {
             this.user = user;
             this.socket = socket;
