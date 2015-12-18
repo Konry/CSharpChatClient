@@ -89,7 +89,7 @@ namespace CSharpChatClient
 
 
             localEndPoint = new IPEndPoint(Configuration.localIpAddress, Configuration.selectedTcpPort);
-                Debug.WriteLine("Continue;");
+            Debug.WriteLine("Continue;");
 
             // Create a TCP/IP socket.
 
@@ -97,8 +97,7 @@ namespace CSharpChatClient
             {
                 //while (!shouldStop)
                 // {
-                server = new Socket(AddressFamily.InterNetwork,
-                SocketType.Stream, ProtocolType.Tcp);
+                server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 try
                 {
                     server.Bind(localEndPoint);
@@ -111,7 +110,7 @@ namespace CSharpChatClient
                     server.Bind(localEndPoint);
                     server.Listen(100);
                 }
-                Debug.WriteLine(Configuration.selectedTcpPort + " checkTcpPortAvaibility " + NetworkService.checkTcpPortAvaibility(Configuration.selectedTcpPort));
+                Debug.WriteLine(Configuration.selectedTcpPort + " checkTcpPortAvaibility " + NetworkService.CheckTcpPortAvailability(Configuration.localIpAddress, Configuration.selectedTcpPort));
 
 
                 // Set the event to nonsignaled state.

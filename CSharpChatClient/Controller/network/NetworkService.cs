@@ -174,7 +174,7 @@ namespace CSharpChatClient
             int index = 0;
             for (index = 0; index < Configuration.PORT_TCP.Length; index++)
             {
-                if (checkTcpPortAvaibility(Configuration.PORT_TCP[index]))
+                if (CheckTcpPortAvailability(Configuration.localIpAddress, Configuration.PORT_TCP[index]))
                 {
                     return index;
                     Debug.WriteLine("Select index " + index);
@@ -191,26 +191,32 @@ namespace CSharpChatClient
             return index;
         }
 
-        internal static bool checkTcpPortAvaibility(int port)
+        internal static bool CheckTcpPortAvailability(IPAddress ipAddress, int port)
         {
-            bool isAvailable = true;
-
-            IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
-            TcpConnectionInformation[] tcpConnectionInfoArray = ipGlobalProperties.GetActiveTcpConnections();
-
-            foreach (TcpConnectionInformation tcpi in tcpConnectionInfoArray)
+            bool availability = false;
+            try
             {
-                if (tcpi.LocalEndPoint.Port == port)
-                {
-                    isAvailable = false;
-                    break;
-                }
+                System.Net.Sockets.Socket sock = new System.Net.Sockets.Socket(System.Net.Sockets.AddressFamily.InterNetwork, System.Net.Sockets.SocketType.Stream, System.Net.Sockets.ProtocolType.Tcp);
+                sock.Connect(ipAddress, port);
+                if (sock.Connected == true)  // Port is in use and connection is successful
+                    availability = true;
+                sock.Close();
+
             }
-            if (isAvailable)
+            catch (System.Net.Sockets.SocketException ex)
             {
-                Debug.WriteLine("Port: " + port + " is selected");
+                if (ex.ErrorCode == 10061)  // Port is unused and could not establish connection 
+                    Debug.WriteLine("Port is Open!");
+                else
+                    Debug.WriteLine(ex.Message);
             }
-            return isAvailable;
+            catch (Exception ex) when (ex is ArgumentNullException || ex is ArgumentOutOfRangeException || 
+            ex is ObjectDisposedException || ex is NotSupportedException || ex is ArgumentException|| 
+            ex is InvalidOperationException)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+            return availability;
         }
 
         internal void IncomingMessageFromServer(Message content)

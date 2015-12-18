@@ -8,5 +8,6 @@ namespace CSharpChatClient.Controller
 {
     class FileLogger
     {
+        
     }
 }

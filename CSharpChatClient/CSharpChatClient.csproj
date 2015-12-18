@@ -84,6 +84,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controller\FileLogger.cs" />
     <Compile Include="Controller\GraphicalInterfaceController.cs" />
     <Compile Include="Controller\ProgramController.cs" />
     <Compile Include="Model\ConnectionList.cs" />

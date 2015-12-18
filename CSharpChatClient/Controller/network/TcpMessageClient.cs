@@ -119,12 +119,14 @@ namespace CSharpChatClient
         public void Send(string message)
         {
             Send(client, message);
+            sendDone.Set();
         }
 
         private void SendConnectMessage(User user, IPAddress ipAddress, int port)
         {
             Debug.WriteLine("Send Connect Message " + Message.GenerateConnectMessage(user, ipAddress, port));
             Send(client, Message.GenerateConnectMessage(user, ipAddress, port));
+            sendDone.Set();
             Debug.WriteLine("Send Connect Message DONE");
         }
 
@@ -152,17 +154,14 @@ namespace CSharpChatClient
 
         private void StartReceiving()
         {
-            while (!shouldStop)
-            {
-                Receive(client);
-            }
+            Receive(client);
         }
 
         private void Receive(Socket client)
         {
             try
             {
-                receiveDone.Reset();
+                //receiveDone.Reset();
                 // Create the state object.
                 TcpDataObject state = new TcpDataObject();
                 state.workSocket = client;
@@ -207,7 +206,8 @@ namespace CSharpChatClient
                         if (Message.IsTCPMessage(content))
                         {
                             netService.IncomingMessageFromClient(Message.ParseTCPMessage(content));
-                        } else if (Message.IsNewContact(content))
+                        }
+                        else if (Message.IsNewContact(content))
                         {
                             netService.SetConnectionInformation(Message.ParseNewContactMessage(content));
                         }
@@ -219,7 +219,8 @@ namespace CSharpChatClient
                 }
                 else {
                     // All the data has arrived; Socket can be closed
-
+                    Debug.WriteLine("End of Socket");
+                    netService.CloseConnectionFromClient();
                     // Signal that all bytes have been received.
                     receiveDone.Set();
                 }
