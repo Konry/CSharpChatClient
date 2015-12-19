@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CSharpChatClient.Model
 {
     public class MessageHistory
     {
-        public LinkedList<Message> listOfMessages{ get; }
-        public StringBuilder stringBuilder { get; }
+        private LinkedList<Message> listOfMessages;
+        private StringBuilder stringBuilder;
 
         public MessageHistory()
         {
@@ -19,7 +16,7 @@ namespace CSharpChatClient.Model
 
         public void FillUpMessageHistory(Message[] rawHistory)
         {
-            foreach(Message message in rawHistory)
+            foreach (Message message in rawHistory)
             {
                 listOfMessages.AddLast(message);
             }
@@ -28,7 +25,7 @@ namespace CSharpChatClient.Model
         public void AddMessage(Message message)
         {
             listOfMessages.AddLast(message);
-            stringBuilder.Append(message.FromUser.Name+": " + message.MessageContent + "\r\n");
+            stringBuilder.Append(message.FromUser.Name + ": " + message.MessageContent + "\r\n");
         }
 
         public void ClearHistory()
@@ -36,6 +33,15 @@ namespace CSharpChatClient.Model
             listOfMessages.Clear();
             stringBuilder.Clear();
         }
-        
+
+        public LinkedList<Message> ListOfMessages
+        {
+            get { return listOfMessages; }
+        }
+
+        public StringBuilder StringBuilder
+        {
+            get { return stringBuilder; }
+        }
     }
 }

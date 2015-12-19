@@ -1,10 +1,4 @@
-﻿using CSharpChatClient.Controller;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System;
 using System.Windows.Forms;
 
 namespace CSharpChatClient

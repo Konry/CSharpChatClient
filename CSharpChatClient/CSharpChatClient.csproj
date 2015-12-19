@@ -84,7 +84,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controller\FileLogger.cs" />
     <Compile Include="Controller\GraphicalInterfaceController.cs" />
     <Compile Include="Controller\Logger.cs" />
     <Compile Include="Controller\Network\TcpCommunication.cs" />

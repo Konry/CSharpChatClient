@@ -4,7 +4,6 @@ using CSharpChatClient.Controller.Network;
 using CSharpChatClient.Model;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 

@@ -67,9 +67,9 @@ namespace CSharpChatClient.Controller.Network
         {
             foreach (UserConnection uc in netService.ConnectionList)
             {
-                if (uc.user.Equals(user))
+                if (uc.User.Equals(user))
                 {
-                    Send(uc.socket, message);
+                    Send(uc.Socket, message);
                     sendDone.Set();
                 }
             }
@@ -180,7 +180,7 @@ namespace CSharpChatClient.Controller.Network
 
                     // Echo the data back to the client. TODO optional, normally remove this.
                     //Send(handle, Message.GenerateConnectMessage(Configuration.localUser, Configuration.localIpAddress, Configuration.selectedTcpPort));
-                    state.sb.Clear();
+                    //state.sb.Clear();
 
                     // Again ReceiveData
 

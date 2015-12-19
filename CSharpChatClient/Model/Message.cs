@@ -1,13 +1,13 @@
 ﻿using CSharpChatClient.Controller;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Net;
-using System.Text;
 
 namespace CSharpChatClient
 {
+
+    /// <summary>
+    /// The Message is used for message transfer in the application and between different applications.
+    /// </summary>
     public class Message
     {
         private string messageType;
@@ -33,26 +33,6 @@ namespace CSharpChatClient
             this.MessageType = MessageType;
         }
 
-
-        public static string GenerateHeartbeatMessage(bool online)
-        {
-            return GenerateHeartbeatMessage(Configuration.localUser, Configuration.localIpAddress, Configuration.selectedTcpPort, online);
-        }
-
-        public static string GenerateHeartbeatMessage(User user, IPAddress ipAddress, int port, bool online)
-        {
-            string modus = "";
-            if (online)
-            {
-                modus += "Live";
-            }
-            else
-            {
-                modus += "Offline";
-            }
-            return "Heartbeat" + modus + ";" + user.Name + ";" + user.Id + ";" + ipAddress.ToString() + ";" + port;
-        }
-
         public static string GenerateConnectMessage(User user, IPAddress ipAddress, int port)
         {
             return "TCPConnectTo;" + user.Name + ";" + user.Id + ";" + ipAddress.ToString() + ";" + port;
@@ -61,31 +41,38 @@ namespace CSharpChatClient
         public static string GenerateTCPMessage(Message message)
         {
             return "TCPMessage;" + message.FromUser.Name + ";" + message.FromUser.Id + ";" + message.ToUser.Name + ";" + message.ToUser.Id + ";" + message.MessageContent;
-            //return message.MessageContent;
         }
 
+        /// <summary>
+        /// Check if the message begins with TCPConnectTo and has more than 5 elements seperated by semicolon
+        /// </summary>
         public static bool IsNewContactMessage(string content)
         {
             if (content.StartsWith("TCPConnectTo;"))
             {
-                return true;
+                string[] temp = content.Split(';');
+                if (temp.Length >= 5)
+                {
+                    return true;
+                }
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
+        /// <summary>
+        /// Check if the message begins with TCPMessage and has more than 6 elements seperated by semicolon
+        /// </summary>
         public static bool IsTCPMessage(string content)
         {
             if (content.StartsWith("TCPMessage;"))
             {
-                return true;
+                string[] temp = content.Split(';');
+                if (temp.Length >= 6)
+                {
+                    return true;
+                }
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
 
@@ -100,7 +87,6 @@ namespace CSharpChatClient
         internal static Message ParseTCPMessage(string content)
         {
             string[] temp = content.Split(';');
-            Debug.WriteLine(content);
             if (temp.Length >= 6)
             {
                 try

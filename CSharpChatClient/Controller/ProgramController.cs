@@ -1,11 +1,4 @@
 ﻿using CSharpChatClient.Controller;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CSharpChatClient.controller
 {
@@ -24,18 +17,19 @@ namespace CSharpChatClient.controller
 
         private void InitiateController()
         {
-            Debug.WriteLine("\n\nNew Program start");
+            Logger.LogInfo("New Program start");
             fileService = new FileService(this);
             networkService = new NetworkService(this);
             graphicControl = new GraphicalInterfaceController(this, chatForm, networkService);
 
+            Logger.LogInfo("Start network service.");
             networkService.Start();
         }
 
         internal void Stop()
         {
+            Logger.LogInfo("Stop program controller.");
             networkService.Stop();
-            Logger.Log("Moin");
         }
 
         public ChatForm ChatForm

@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -14,7 +10,7 @@ namespace CSharpChatClient.Controller.Network
     {
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
         private static ManualResetEvent receiveDone = new ManualResetEvent(false);
-        private static ManualResetEvent sendDone = new ManualResetEvent(false);
+        //private static ManualResetEvent sendDone = new ManualResetEvent(false);
 
         private bool connected = false;
         private NetworkService netService = null;
@@ -200,9 +196,9 @@ namespace CSharpChatClient.Controller.Network
                 if (bytesRead > 0)
                 {
                     // There might be more data, so store the data received so far.
-                    state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
+                    //state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
 
-                    content = state.sb.ToString();
+                    content = Encoding.ASCII.GetString(state.buffer, 0, bytesRead);
                     Debug.WriteLine(content);
 
                     if (!content.Equals(""))
@@ -217,7 +213,7 @@ namespace CSharpChatClient.Controller.Network
                         }
                     }
                     // Get the rest of the data.
-                    state.sb.Clear();
+                    //state.sb.Clear();
                     client.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
                         new AsyncCallback(ReceiveCallback), state);
                 }

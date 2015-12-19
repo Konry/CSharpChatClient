@@ -5,6 +5,10 @@ using System.Net;
 
 namespace CSharpChatClient.Model
 {
+
+    /// <summary>
+    /// The ExternalUser extends the User by the address information and port information.
+    /// </summary>
     public class ExternalUser : User, INotifyPropertyChanged
     {
         private IPAddress ipAddress;
@@ -27,32 +31,10 @@ namespace CSharpChatClient.Model
             this.Port = port;
         }
 
-        public int Port
-        {
-            get { return port; }
-            set { port = value; NotifyPropertyChanged("Port"); }
-        }
-        public IPAddress IpAddress
-        {
-            get { return ipAddress; }
-            set { ipAddress = value; NotifyPropertyChanged("IpAddress"); }
-        }
-        public new string Name
-        {
-            get { return name; }
-            set { name = value; NotifyPropertyChanged("Name"); }
-        }
-        public new long Id
-        {
-            get { return id; }
-            set { id = value; NotifyPropertyChanged("Id"); }
-        }
-
         public bool Equals(ExternalUser user)
         {
             return base.Equals(user);
         }
-
 
         /// <summary>
         /// Parses from a tcp connect <see cref="Message"/> the external user and their port and ip address
@@ -68,17 +50,34 @@ namespace CSharpChatClient.Model
                 exUser.ipAddress = IPAddress.Parse(split[0]);
                 exUser.port = int.Parse(split[1]);
                 return exUser;
-            } catch (FormatException fe)
+            } catch (Exception ex)
             {
-                Logger.LogException("FormatException while parsing a broadcast message. ", fe);
-            } catch (ArgumentException ae)
-            {
-                Logger.LogException("ArgumentException while parsing a broadcast message. ", ae);
-            } catch (OverflowException oe)
-            {
-                Logger.LogException("OverflowException while parsing a broadcast message. ", oe);
+                Logger.LogException("Exception while parsing a message. ", ex);
             }
             return null;
+        }
+        public int Port
+        {
+            get { return port; }
+            set { port = value; NotifyPropertyChanged("Port"); }
+        }
+
+        public IPAddress IpAddress
+        {
+            get { return ipAddress; }
+            set { ipAddress = value; NotifyPropertyChanged("IpAddress"); }
+        }
+
+        public new string Name
+        {
+            get { return name; }
+            set { name = value; NotifyPropertyChanged("Name"); }
+        }
+
+        public new long Id
+        {
+            get { return id; }
+            set { id = value; NotifyPropertyChanged("Id"); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -89,5 +88,6 @@ namespace CSharpChatClient.Model
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
     }
 }

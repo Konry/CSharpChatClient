@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using CSharpChatClient.controller;
 using System.IO;
-using System.Diagnostics;
-using System.Windows.Forms;
+using CSharpChatClient.Controller;
 
 namespace CSharpChatClient
 {
@@ -26,12 +22,6 @@ namespace CSharpChatClient
             }
         }
 
-
-        //private void RenameUserHistory()
-        //{
-        //    for()
-        //}
-
         private void UpdateUserIDFile()
         {
             try
@@ -45,21 +35,22 @@ namespace CSharpChatClient
             }
             catch (IOException ex)
             {
-                Debug.WriteLine("Schreiben nicht möglich, bitte prüfen Sie ihre Rechte! " + ex.StackTrace);
+                Logger.LogException("Schreiben nicht möglich, bitte prüfen Sie ihre Rechte! ", ex);
             }
             catch (ObjectDisposedException ex)
             {
-                Debug.WriteLine("Datei konnte aufgrund eines internen Fehlers nicht geschrieben werden! " + ex.StackTrace);
+                Logger.LogException("Datei konnte aufgrund eines internen Fehlers nicht geschrieben werden! ", ex);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Unbekannte Exeption wurde gefangen! " + ex.StackTrace);
+                Logger.LogException("Unbekannte Exeption wurde gefangen! ", ex);
             }
         }
 
         private void WriteUserIDFile()
         {
-            try {
+            try
+            {
                 long id = GenerateUserID();
                 Configuration.localUser.Id = id;
                 using (StreamWriter sw = new StreamWriter("user.cfg"))
@@ -68,16 +59,18 @@ namespace CSharpChatClient
                     sw.WriteLine(id);
                     sw.Close();
                 }
-            }catch(IOException ex)
+            }
+            catch (IOException ex)
             {
-                Debug.WriteLine("Schreiben nicht möglich, bitte prüfen Sie ihre Rechte! " + ex.StackTrace);
-            } catch (ObjectDisposedException ex)
+                Logger.LogException("Schreiben nicht möglich, bitte prüfen Sie ihre Rechte! ", ex);
+            }
+            catch (ObjectDisposedException ex)
             {
-                Debug.WriteLine("Datei konnte aufgrund eines internen Fehlers nicht geschrieben werden! " + ex.StackTrace);
+                Logger.LogException("Datei konnte aufgrund eines internen Fehlers nicht geschrieben werden! ", ex);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Unbekannte Exeption wurde gefangen! "+ex.StackTrace);
+                Logger.LogException("Unbekannte Exeption wurde gefangen! ", ex);
             }
         }
 
@@ -94,7 +87,6 @@ namespace CSharpChatClient
                         String[] split = line.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
 
                         long id = long.Parse(split[1]);
-                        Debug.WriteLine(id);
                         User user = new User(split[0]);
                         user.Id = id;
                         sr.Close();
@@ -105,19 +97,19 @@ namespace CSharpChatClient
             }
             catch (FileNotFoundException ex)
             {
-                Debug.WriteLine("Datei konnte nicht gelesen werden! " + ex.StackTrace);
+                Logger.LogException("Datei konnte nicht gelesen werden! ", ex);
             }
             catch (IOException ex)
             {
-                Debug.WriteLine("Schreiben nicht möglich, bitte prüfen Sie ihre Rechte! " + ex.StackTrace);
+                Logger.LogException("Schreiben nicht möglich, bitte prüfen Sie ihre Rechte! ", ex);
             }
             catch (ObjectDisposedException ex)
             {
-                Debug.WriteLine("Datei konnte aufgrund eines internen Fehlers nicht geschrieben werden! " + ex.StackTrace);
+                Logger.LogException("Datei konnte aufgrund eines internen Fehlers nicht geschrieben werden! ", ex);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Unbekannte Exeption wurde gefangen! " + ex.StackTrace);
+                Logger.LogException("Unbekannte Exeption wurde gefangen! ", ex);
             }
             return null;
         }
@@ -129,7 +121,7 @@ namespace CSharpChatClient
 
         private bool HasUserCfgFile()
         {
-            if(ReadUserCfgFile() != null)
+            if (ReadUserCfgFile() != null)
             {
                 return true;
             }

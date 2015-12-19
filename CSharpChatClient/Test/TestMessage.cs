@@ -32,17 +32,7 @@ namespace CSharpChatClient.Test
             //correctResult = "TCPConnectTo;TestUser;127.0.0.1;" + Configuration.DEFAULT_TCP_PORT;
             //Assert.AreEqual(correctResult, NetworkMessage.GenerateConnectMessage(user, IPAddress.Parse("127.0.0.1"), 12345));
         }
-
-        [Test]
-        public void TestHeartbeatMessage()
-        {
-            User user = new User("TestUser");
-            String correctResult = "HeartbeatLive;TestUser;-1;127.0.0.1;12345";
-            Assert.AreEqual(correctResult, Message.GenerateHeartbeatMessage(user, IPAddress.Parse("127.0.0.1"), 12345, true));
-            correctResult = "HeartbeatOffline;TestUser;-1;127.0.0.1;12345";
-            Assert.AreEqual(correctResult, Message.GenerateHeartbeatMessage(user, IPAddress.Parse("127.0.0.1"), 12345, false));
-        }
-
+        
         [Test]
         public void TestGenerateTCPMessage()
         {

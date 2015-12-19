@@ -78,8 +78,8 @@
             // 
             resources.ApplyResources(this.enterTextBox, "enterTextBox");
             this.enterTextBox.Name = "enterTextBox";
-            this.enterTextBox.TextChanged += new System.EventHandler(this.enterTextBox_TextChanged);
-            this.enterTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.enterTextBox_OnKeyUpHandler);
+            this.enterTextBox.TextChanged += new System.EventHandler(this.EnterTextBox_TextChanged);
+            this.enterTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.EnterTextBox_OnKeyUpHandler);
             // 
             // labelConnectedWith
             // 
