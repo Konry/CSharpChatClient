@@ -17,6 +17,10 @@ namespace CSharpChatClient.Controller.Network
             set { socket = value; }
         }
 
+        /// <summary>
+        /// Sends a message to the selected socket handler.
+        /// </summary>
+        /// <param name="data">The string to send over the network</param>
         protected void Send(Socket handler, String data)
         {
             // Convert the string data to byte data using ASCII encoding.

@@ -167,10 +167,13 @@ namespace CSharpChatClient.Controller.Network
                             sendDone.Set();
                         }
                     }
-                    else
+                    else if(Message.IsTCPMessage(content))
                     {
                         /* TODO Handle here the incoming data from an other client */
                         netService.IncomingMessageFromServer(Message.ParseTCPMessage(content));
+                    } else if (Message.IsNotifyMessage(content))
+                    {
+
                     }
 
                     // Echo the data back to the client. TODO optional, normally remove this.

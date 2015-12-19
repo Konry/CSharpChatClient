@@ -53,7 +53,7 @@ namespace CSharpChatClient.Test
             Message mess = new Message("This is the message");
             mess.FromUser = fromUser;
             mess.ToUser = toUser;
-            String correctResult = "TCPMessage;FromUser;-1;ToUser;-1;This is the message";
+            //String correctResult = "TCPMessage;FromUser;-1;ToUser;-1;This is the message";
             Debug.WriteLine(Message.ParseTCPMessage(Message.GenerateTCPMessage(mess)).MessageContent);
             Assert.AreEqual(mess.FromUser.Name, Message.ParseTCPMessage(Message.GenerateTCPMessage(mess)).FromUser.Name);
             Assert.AreEqual(mess.FromUser.Id, Message.ParseTCPMessage(Message.GenerateTCPMessage(mess)).FromUser.Id);

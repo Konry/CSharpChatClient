@@ -146,11 +146,13 @@ namespace CSharpChatClient
             bool availability = false;
             try
             {
-                System.Net.Sockets.Socket sock = new System.Net.Sockets.Socket(System.Net.Sockets.AddressFamily.InterNetwork, System.Net.Sockets.SocketType.Stream, System.Net.Sockets.ProtocolType.Tcp);
-                sock.Connect(ipAddress, port);
-                if (sock.Connected == true)  // Port is in use and connection is successful
+                //System.Net.Sockets.Socket sock = new System.Net.Sockets.Socket(System.Net.Sockets.AddressFamily.InterNetwork, System.Net.Sockets.SocketType.Stream, System.Net.Sockets.ProtocolType.Tcp);
+                IPEndPoint localEndpoint = new IPEndPoint(ipAddress, port);
+                TcpClient tcpClient = new TcpClient();
+                tcpClient.Connect(localEndpoint);
+                if (tcpClient.Connected == true)  // Port is in use and connection is successful
                     availability = true;
-                sock.Close();
+                tcpClient.Close();
                 return true;
             }
             catch (System.Net.Sockets.SocketException ex)
@@ -158,6 +160,7 @@ namespace CSharpChatClient
                 Logger.LogException("CheckTcpPortAvailability Socket", ex);
                 if (ex.ErrorCode == 10061)  // Port is unused and could not establish connection
                 {
+                    Logger.LogInfo("CheckTcpPortAvailability Socket ErrorCode");
                     return true;
                 }
             }

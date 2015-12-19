@@ -42,6 +42,11 @@ namespace CSharpChatClient
             return "TCPMessage;" + message.FromUser.Name + ";" + message.FromUser.Id + ";" + message.ToUser.Name + ";" + message.ToUser.Id + ";" + message.MessageContent;
         }
 
+        public static string GenerateTCPNotify(Message message)
+        {
+            return "TCPNotify;" + message.FromUser.Name + ";" + message.FromUser.Id + ";" + message.MessageContent;
+        }
+
         /// <summary>
         /// Check if the message begins with TCPConnectTo and has more than 5 elements seperated by semicolon
         /// </summary>
@@ -67,6 +72,19 @@ namespace CSharpChatClient
             {
                 string[] temp = content.Split(';');
                 if (temp.Length >= 6)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        internal static bool IsNotifyMessage(string content)
+        {
+            if (content.StartsWith("TCPNotify;"))
+            {
+                string[] temp = content.Split(';');
+                if (temp.Length >= 3)
                 {
                     return true;
                 }
@@ -134,6 +152,30 @@ namespace CSharpChatClient
             return null;
         }
 
+        internal static Message ParseTCPNotifyMessage(string content)
+        {
+            string[] temp = content.Split(';');
+            if (temp.Length >= 5)
+            {
+                try
+                {
+                    User from = new User(temp[1]);
+                    from.Id = long.Parse(temp[2]);
+                    string message = "";
+                    for (int i = 3; i < temp.Length; i++)
+                    {
+                        message += temp[i];
+                    }
+                    return new Message(from, null, message, temp[0]);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogException("ParseTCPMessage", ex);
+                }
+            }
+            return null;
+        }
+
         override
         public string ToString()
         {
@@ -179,5 +221,6 @@ namespace CSharpChatClient
             get { return toUser; }
             set { toUser = value; }
         }
+
     }
 }

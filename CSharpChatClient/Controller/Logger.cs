@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace CSharpChatClient.Controller
@@ -28,7 +29,7 @@ namespace CSharpChatClient.Controller
             writer.WriteLine("  :");
             writer.WriteLine("-------------------------------");
         }
-
+        
         public static void LogTrace(string logMessage)
         {
             Log(logMessage, LogState.TRACE);
@@ -66,8 +67,10 @@ namespace CSharpChatClient.Controller
             {
                 string logLevel = string.Empty;
                 logLevel = GetStateString(state);
-
-                writer.WriteLine("\r\n{0} \t- {1} - {2}", DateTime.Now.ToString("s"), logLevel, logMessage);
+                string temp = "\r\n"+ DateTime.Now.ToString("s") + " \t- "+ logLevel + " - "+ logMessage;
+                Debug.WriteLine(temp);
+                writer.WriteLineAsync(temp);
+                //writer.FlushAsync();
             }
         }
 

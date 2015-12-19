@@ -173,7 +173,7 @@ namespace CSharpChatClient
             }
         }
 
-        private void UsernameLabel_UpdateText(string username)
+        internal void UsernameLabel_UpdateText(string username)
         {
             labelUserName.Text = username;
         }
@@ -192,14 +192,6 @@ namespace CSharpChatClient
         internal void NotifyConnectedWithChange()
         {
             labelConnectedWithValue.BeginInvoke(new ConnectedWithLabelDelegate(LabelConnectedWith_UpdateText));
-        }
-
-        /// <summary>
-        /// Notify the GUI-Thread to update the ConnectedWithLabel
-        /// </summary>
-        internal void NotifyUsernameChange(string username)
-        {
-            labelUserName.BeginInvoke(new UsernameLabelDelegate(UsernameLabel_UpdateText));
         }
 
         private void LoadAvaiableConnectionsList()

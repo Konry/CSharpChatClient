@@ -38,7 +38,8 @@ namespace CSharpChatClient.Controller
         internal void ChangeUsername(string username)
         {
             username = SetConfigurationUsername(username);
-            chatForm.NotifyUsernameChange(username);
+            chatForm.UsernameLabel_UpdateText(username);
+            //programControl.NetworkService.RenameUserNotify();
             programControl.FileService.UpdateUserName();
         }
 
