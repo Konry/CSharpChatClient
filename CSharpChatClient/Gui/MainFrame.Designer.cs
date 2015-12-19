@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.labelUserNameValue = new System.Windows.Forms.Label();
-            this.externalUserListBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.messageFlowBox = new System.Windows.Forms.RichTextBox();
             this.enterTextBox = new System.Windows.Forms.RichTextBox();
             this.labelConnectedWith = new System.Windows.Forms.Label();
@@ -42,22 +41,19 @@
             this.buttonClearHistory = new System.Windows.Forms.Button();
             this.sendButton = new System.Windows.Forms.Button();
             this.labelUserName = new System.Windows.Forms.Label();
+            this.externalUserListBindingSource = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.externalUserListBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // labelUserNameValue
             // 
             this.labelUserNameValue.AutoSize = true;
-            this.labelUserNameValue.Location = new System.Drawing.Point(444, 27);
+            this.labelUserNameValue.Location = new System.Drawing.Point(422, 25);
             this.labelUserNameValue.Name = "labelUserNameValue";
             this.labelUserNameValue.Size = new System.Drawing.Size(58, 13);
             this.labelUserNameValue.TabIndex = 1;
             this.labelUserNameValue.Text = "Own name";
-            this.labelUserNameValue.Click += new System.EventHandler(this.UserNameLabel_Click);
-            // 
-            // externalUserListBindingSource
-            // 
-            this.externalUserListBindingSource.DataSource = typeof(CSharpChatClient.Model.ExternalUserList);
+            this.labelUserNameValue.Click += new System.EventHandler(this.LabelUserNameValue_Click);
             // 
             // messageFlowBox
             // 
@@ -90,16 +86,17 @@
             this.labelConnectedWith.Size = new System.Drawing.Size(78, 13);
             this.labelConnectedWith.TabIndex = 6;
             this.labelConnectedWith.Text = "Verbunden mit:";
+            this.labelConnectedWith.Click += new System.EventHandler(this.LabelConnectedWith_Click);
             // 
             // labelConnectedWithValue
             // 
             this.labelConnectedWithValue.AutoSize = true;
-            this.labelConnectedWithValue.Location = new System.Drawing.Point(441, 65);
+            this.labelConnectedWithValue.Location = new System.Drawing.Point(422, 62);
             this.labelConnectedWithValue.Name = "labelConnectedWithValue";
             this.labelConnectedWithValue.Size = new System.Drawing.Size(63, 13);
             this.labelConnectedWithValue.TabIndex = 7;
             this.labelConnectedWithValue.Text = "Niemandem";
-            this.labelConnectedWithValue.Click += new System.EventHandler(this.labelConnectedWithValue_Click);
+            this.labelConnectedWithValue.Click += new System.EventHandler(this.LabelConnectedWithValue_Click);
             // 
             // labelIpAddress
             // 
@@ -145,7 +142,7 @@
             this.buttonClearHistory.Size = new System.Drawing.Size(38, 36);
             this.buttonClearHistory.TabIndex = 12;
             this.buttonClearHistory.UseVisualStyleBackColor = true;
-            this.buttonClearHistory.Click += new System.EventHandler(this.button1_Click);
+            this.buttonClearHistory.Click += new System.EventHandler(this.ButtonClearHistory_Click);
             // 
             // sendButton
             // 
@@ -165,6 +162,11 @@
             this.labelUserName.Size = new System.Drawing.Size(78, 13);
             this.labelUserName.TabIndex = 13;
             this.labelUserName.Text = "Benutzername:";
+            this.labelUserName.Click += new System.EventHandler(this.LabelUserName_Click);
+            // 
+            // externalUserListBindingSource
+            // 
+            this.externalUserListBindingSource.DataSource = typeof(CSharpChatClient.Model.ExternalUserList);
             // 
             // ChatForm
             // 

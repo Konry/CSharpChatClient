@@ -17,8 +17,6 @@ namespace CSharpChatClient
 
         private Object thisLock = new Object();
 
-        public delegate void AvailableConnectionsListDelegate();
-
         public delegate void MessageBoxDelegate();
 
         public delegate void ConnectedWithLabelDelegate();
@@ -92,12 +90,12 @@ namespace CSharpChatClient
             toolTips.ShowAlways = true;
 
             toolTips.SetToolTip(this.sendButton, "Sendet die Nachricht, alternativ mit der Enter Taste.");
-            toolTips.SetToolTip(this.buttonClearHistory, "Sendet die Nachricht, alternativ mit der Enter Taste.");
+            toolTips.SetToolTip(this.buttonClearHistory, "Löscht die Historie die aktuell angezeigt wird.");
         }
 
         private void AvailableConnectionsList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Debug.WriteLine("SelectedIndexChanged on SelectedIndexChanged!");
+            Logger.LogInfo("SelectedIndexChanged on SelectedIndexChanged!");
         }
 
         private void SendButton_Click(object sender, EventArgs e)
@@ -105,10 +103,20 @@ namespace CSharpChatClient
             SendMessage();
         }
 
-        private void UserNameLabel_Click(object sender, EventArgs e)
+        private void LabelUserName_Click(object sender, EventArgs e)
+        {
+            LabelUserNameValue_Click(sender, e);
+        }
+
+        private void LabelUserNameValue_Click(object sender, EventArgs e)
         {
             String username = ShowEnterUsernameBox("Sie wollen ihren Benutzernamen ändern?");
             graphicControl.ChangeUsername(username);
+        }
+
+        internal void InformUser(string v)
+        {
+            MessageBox.Show("Verbindung nicht möglich, da die Gegenseite nicht antwortet.");
         }
 
         private void MessageFlowBox_TextChanged(object sender, EventArgs e)
@@ -135,9 +143,22 @@ namespace CSharpChatClient
             if (e.KeyCode == Keys.Return)
             {
                 Debug.WriteLine("Enter Pressed");
-                SendMessage();
+                //                SendMessage();
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+                sendButton.PerformClick();
             }
         }
+
+        //private void EnterTextBox_KeyPressHandler(object sender, KeyEventArgs e)
+        //{
+        //    if (e.KeyCode == Keys.Return)
+        //    {
+        //        Debug.WriteLine("Enter Pressed");
+        //        e.Handled = true;
+        //        e.SuppressKeyPress = true;
+        //    }
+        //}
 
         private void ChatForm_OnFormClosing(object sender, EventArgs e)
         {
@@ -145,15 +166,22 @@ namespace CSharpChatClient
             Application.Exit();
         }
 
-        private void labelConnectedWithValue_Click(object sender, EventArgs e)
+
+        private void LabelConnectedWith_Click(object sender, EventArgs e)
+        {
+            LabelConnectedWithValue_Click(sender, e);
+        }
+
+        private void LabelConnectedWithValue_Click(object sender, EventArgs e)
         {
             String ipAndPort = ShowEnterIpAddressAndPort();
 
             graphicControl.ManuelConnectToIPAndPort(ipAndPort);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void ButtonClearHistory_Click(object sender, EventArgs e)
         {
+            graphicControl.ClearHistory();
         }
 
         private void MessageFlowBox_UpdateText()
@@ -172,6 +200,7 @@ namespace CSharpChatClient
                 labelConnectedWithValue.Text = "---";
             }
         }
+
 
         internal void UsernameLabel_UpdateText(string username)
         {
@@ -192,25 +221,6 @@ namespace CSharpChatClient
         internal void NotifyConnectedWithChange()
         {
             labelConnectedWithValue.BeginInvoke(new ConnectedWithLabelDelegate(LabelConnectedWith_UpdateText));
-        }
-
-        private void LoadAvaiableConnectionsList()
-        {
-            lock (thisLock)
-            {
-                //if (exUserListChanged)
-                // {
-                availableConnectionsList.Items.Clear();
-                foreach (ExternalUser exUser in exUserList)
-                {
-                    if (!availableConnectionsList.Items.Contains(exUser.Name))
-                    {
-                        availableConnectionsList.Items.Add(exUser.Name);
-                    }
-                }
-                //exUserListChanged = false;
-                //}
-            }
         }
 
         private void UpdateLabelIpAddress()
@@ -292,37 +302,6 @@ namespace CSharpChatClient
             return prompt;
         }
 
-        internal void AddItemFromListOfClients(ExternalUser[] namesOfOnlineChatPartner)
-        {
-            lock (thisLock)
-            {
-                foreach (ExternalUser online in namesOfOnlineChatPartner)
-                {
-                    if (!exUserList.Contains(online))
-                    {
-                        exUserList.Add(online);
-                    }
-                }
-                availableConnectionsList.BeginInvoke(new AvailableConnectionsListDelegate(LoadAvaiableConnectionsList));
-                //exUserListChanged = true;
-            }
-        }
-
-        internal void RemoveItemFromListOfClients(ExternalUser[] namesOfOnlineChatPartner)
-        {
-            lock (thisLock)
-            {
-                exUserList.Clear();
-                foreach (ExternalUser online in namesOfOnlineChatPartner)
-                {
-                    Debug.WriteLine("List :" + online.Name);
-                    exUserList.Add(online);
-                }
-                availableConnectionsList.BeginInvoke(new AvailableConnectionsListDelegate(LoadAvaiableConnectionsList));
-                //exUserListChanged = true;
-            }
-        }
-
         private void SendMessage()
         {
             if (enterTextBox.Text.Length > 0)
@@ -331,5 +310,6 @@ namespace CSharpChatClient
                 enterTextBox.ResetText();
             }
         }
+
     }
 }

@@ -53,6 +53,11 @@ namespace CSharpChatClient
             tcpClient = new TcpMessageClient(this);
         }
 
+        internal void RenameUsernameNotifyRemote(Message message)
+        {
+            SendNotify(message);
+        }
+
         public bool ConnectionOverClient
         {
             get { return connectionOverClient; }
@@ -78,6 +83,15 @@ namespace CSharpChatClient
 
         public void Stop()
         {
+            Message message = new Message(Configuration.localUser, null, "UserDisconnect");
+            if (ConnectionOverClient)
+            {
+                tcpClient.Send(Message.GenerateTCPNotify(message));
+            }
+            else if (connectionOverServer)
+            {
+                tcpServer.Send(Configuration.localUser, Message.GenerateTCPNotify(message));
+            }
             tcpServer.Stop();
             tcpClient.Cancel();
         }
@@ -90,16 +104,34 @@ namespace CSharpChatClient
             Configuration.selectedTcpPort = GetAvaiableTCPPort();
         }
 
-        internal bool SendMessage(Message text, ExternalUser exUser)
+        internal bool SendMessage(Message message)
         {
             if (ConnectionOverClient)
             {
-                Logger.LogInfo("Send Tcp Message " + text);
-                tcpClient.Send(Message.GenerateTCPMessage(text));
+                Logger.LogInfo("Send Tcp Message " + message);
+                tcpClient.Send(Message.GenerateTCPMessage(message));
             }
             else if (ConnectionOverServer)
             {
-                tcpServer.Send(exUser, Message.GenerateTCPMessage(text));
+                tcpServer.Send(message.ToUser, Message.GenerateTCPMessage(message));
+            }
+            else
+            {
+                Logger.LogError("There is currently no connection!");
+                return false;
+            }
+            return true;
+        }
+
+        internal bool SendNotify(Message message)
+        {
+            if (ConnectionOverClient)
+            {
+                tcpClient.Send(Message.GenerateTCPNotify(message));
+            }
+            else if (ConnectionOverServer)
+            {
+                tcpServer.Send(message.ToUser, Message.GenerateTCPNotify(message));
             }
             else
             {
@@ -218,16 +250,21 @@ namespace CSharpChatClient
             ConnectionOverClient = false;
         }
 
-        internal void IncomingBroadcastMessage(Message content)
+        internal void NoftifyFromCurrentUser(Message message)
         {
-            ExternalUser exUser = ExternalUser.ParseFromMessage(content);
-            if (exUser != null && content.MessageType.StartsWith("HeartbeatLive"))
+            if (message.MessageContent.StartsWith("UserDisconnect"))
             {
-                control.GraphicControl.BroadcastAdd(exUser);
-            }
-            else if (exUser != null && content.MessageType.StartsWith("HeartbeatOffline"))
+                if (connectionOverClient)
+                {
+                    CloseConnectionFromClient();
+                }
+                else if (connectionOverServer)
+                {
+                    CloseConnectionFromServer();
+                }
+            } else if (message.MessageContent.StartsWith("Rename:"))
             {
-                control.GraphicControl.BroadcastRemove(exUser);
+                control.GraphicControl.InitiateCurrentlyActiveUser(message);
             }
         }
 

@@ -84,6 +84,11 @@ namespace CSharpChatClient.Controller.Network
             return false;
         }
 
+        internal void CloseConnection(string v)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool ReConnect(IPAddress ipAddress, int port)
         {
             Disconnect();
@@ -213,6 +218,9 @@ namespace CSharpChatClient.Controller.Network
                         else if (Message.IsNewContactMessage(content))
                         {
                             netService.SetConnectionInformation(Message.ParseNewContactMessage(content));
+                        } else if (Message.IsNotifyMessage(content))
+                        {
+                            netService.NoftifyFromCurrentUser(Message.ParseTCPNotifyMessage(content));
                         }
                     }
                     // Get the rest of the data.

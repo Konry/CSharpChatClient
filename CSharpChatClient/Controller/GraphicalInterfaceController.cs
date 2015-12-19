@@ -37,17 +37,18 @@ namespace CSharpChatClient.Controller
 
         internal void ChangeUsername(string username)
         {
+            Message message = new Message(Configuration.localUser, CurrentlyActiveChatUser, "Rename:"+username);
             username = SetConfigurationUsername(username);
             chatForm.UsernameLabel_UpdateText(username);
-            //programControl.NetworkService.RenameUserNotify();
             programControl.FileService.UpdateUserName();
+            networkService.RenameUsernameNotifyRemote(message);
         }
 
         internal void SendMessage(string text)
         {
             Message message = new Message(Configuration.localUser, CurrentlyActiveChatUser, text);
 
-            bool success = networkService.SendMessage(message, CurrentlyActiveChatUser);
+            bool success = networkService.SendMessage(message);
             if (success)
             {
                 messageHistory.AddMessage(message);
@@ -77,65 +78,7 @@ namespace CSharpChatClient.Controller
                 Logger.LogError("Fehler: Die letzte Nachricht war nicht vom aktuellen Benutzer");
             }
         }
-
-        internal void BroadcastRemove(ExternalUser exUser)
-        {
-            bool updateGui = false;
-            ExternalUser toRemove = null;
-            foreach (ExternalUser ex in onlineChatPartner)
-            {
-                if (ex.Equals(exUser))
-                {
-                    updateGui = true;
-                    toRemove = ex;
-                    break;
-                }
-            }
-
-            if (updateGui)
-            {
-                onlineChatPartner.Remove(toRemove);
-                ExternalUser[] namesOfOnlineChatPartner = new ExternalUser[onlineChatPartner.Count];
-                int index = 0;
-                foreach (ExternalUser ex in onlineChatPartner)
-                {
-                    namesOfOnlineChatPartner[index++] = ex;
-                }
-                chatForm.RemoveItemFromListOfClients(namesOfOnlineChatPartner);
-            }
-        }
-
-        internal void BroadcastAdd(ExternalUser exUser)
-        {
-            if (exUser.Equals(new ExternalUser(Configuration.localUser, Configuration.localIpAddress, Configuration.selectedTcpPort)))
-            {
-                return;
-            }
-            bool updateGui = true;
-            foreach (ExternalUser ex in onlineChatPartner)
-            {
-                if (ex.Equals(exUser))
-                {
-                    updateGui = false;
-                    break;
-                }
-            }
-
-            if (updateGui)
-            {
-                onlineChatPartner.AddLast(exUser);
-                ExternalUser[] namesOfOnlineChatPartner = new ExternalUser[onlineChatPartner.Count];
-                int index = 0;
-                foreach (ExternalUser ex in onlineChatPartner)
-                {
-                    namesOfOnlineChatPartner[index++] = ex;
-                }
-                chatForm.AddItemFromListOfClients(namesOfOnlineChatPartner);
-            }
-
-            //onlineChatPartner.Remove
-        }
-
+        
         internal void ManuelConnectToIPAndPort(string ipAndPort)
         {
             if (ipAndPort == "")
@@ -150,8 +93,9 @@ namespace CSharpChatClient.Controller
                     ExternalUser ex = new ExternalUser("#ManualConnect");
                     ex.IpAddress = IPAddress.Parse(split[0]);
                     ex.Port = int.Parse(split[1]);
-                    if (programControl.NetworkService.ManualConnectToExUser(ex))
+                    if (!programControl.NetworkService.ManualConnectToExUser(ex))
                     {
+                        chatForm.InformUser("Verbindung nicht möglich, da die Gegenseite nicht antwortet.");
                     }
                     currentlyActiveChatUser = ex;
                 }
@@ -198,6 +142,12 @@ namespace CSharpChatClient.Controller
             }
 
             return username;
+        }
+
+        internal void ClearHistory()
+        {
+            messageHistory.ClearHistory();
+            chatForm.UpdateMessageHistory();
         }
     }
 }

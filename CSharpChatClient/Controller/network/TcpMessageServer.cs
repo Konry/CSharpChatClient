@@ -111,6 +111,11 @@ namespace CSharpChatClient.Controller.Network
             }
         }
 
+        internal void CloseConnection(User localUser, string v)
+        {
+            throw new NotImplementedException();
+        }
+
         private void AcceptCallback(IAsyncResult ar)
         {
             try
@@ -177,6 +182,7 @@ namespace CSharpChatClient.Controller.Network
                     }
                     else if (Message.IsNotifyMessage(content))
                     {
+                        netService.NoftifyFromCurrentUser(Message.ParseTCPNotifyMessage(content));
                     }
 
                     // Echo the data back to the client. TODO optional, normally remove this.
