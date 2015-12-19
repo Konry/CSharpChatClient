@@ -6,10 +6,12 @@ using System.Threading;
 
 namespace CSharpChatClient.Controller.Network
 {
-    public class TcpMessageClient : TcpCommunication
+    public class TcpMessageClient
     {
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
         private static ManualResetEvent receiveDone = new ManualResetEvent(false);
+        private static ManualResetEvent sendDone = new ManualResetEvent(false);
+        private Socket socket = null;
         //private static ManualResetEvent sendDone = new ManualResetEvent(false);
 
         private bool connected = false;
@@ -235,6 +237,53 @@ namespace CSharpChatClient.Controller.Network
             {
                 Logger.LogException("ReceiveCallback ", e);
             }
+        }
+
+        /// <summary>
+        /// Sends a message to the selected socket handler.
+        /// </summary>
+        /// <param name="data">The string to send over the network</param>
+        private void Send(Socket handler, String data)
+        {
+            // Convert the string data to byte data using ASCII encoding.
+            byte[] byteData = Encoding.ASCII.GetBytes(data);
+
+            // Begin sending the data to the remote device.
+            try
+            {
+                handler.BeginSend(byteData, 0, byteData.Length, 0,
+                    new AsyncCallback(SendCallback), handler);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogException("Message can not be send!", ex, Logger.LogState.FATAL);
+            }
+        }
+
+        private void SendCallback(IAsyncResult ar)
+        {
+            try
+            {
+                // Retrieve the socket from the state object.
+                Socket handler = (Socket)ar.AsyncState;
+
+                // Complete sending the data to the remote device.
+                int bytesSent = handler.EndSend(ar);
+                Logger.LogInfo("Sent "+ bytesSent + " bytes to server.");
+
+                // Signal that all bytes have been sent.
+                sendDone.Set();
+            }
+            catch (Exception e)
+            {
+                Logger.LogException("Error in SendCallback ", e);
+            }
+        }
+
+        public Socket Socket
+        {
+            get { return socket; }
+            set { socket = value; }
         }
     }
 }

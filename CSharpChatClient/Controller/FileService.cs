@@ -35,15 +35,11 @@ namespace CSharpChatClient
             }
             catch (IOException ex)
             {
-                Logger.LogException("Schreiben nicht möglich, bitte prüfen Sie ihre Rechte! ", ex);
-            }
-            catch (ObjectDisposedException ex)
-            {
-                Logger.LogException("Datei konnte aufgrund eines internen Fehlers nicht geschrieben werden! ", ex);
+                Logger.LogException("Writing is not possible, please check your permissions.", ex);
             }
             catch (Exception ex)
             {
-                Logger.LogException("Unbekannte Exeption wurde gefangen! ", ex);
+                Logger.LogException("File could not be written by the application.", ex);
             }
         }
 
@@ -62,15 +58,11 @@ namespace CSharpChatClient
             }
             catch (IOException ex)
             {
-                Logger.LogException("Schreiben nicht möglich, bitte prüfen Sie ihre Rechte! ", ex);
-            }
-            catch (ObjectDisposedException ex)
-            {
-                Logger.LogException("Datei konnte aufgrund eines internen Fehlers nicht geschrieben werden! ", ex);
+                Logger.LogException("Writing is not possible, please check your permissions.", ex);
             }
             catch (Exception ex)
             {
-                Logger.LogException("Unbekannte Exeption wurde gefangen! ", ex);
+                Logger.LogException("File could not be written by the application.", ex);
             }
         }
 
@@ -97,19 +89,15 @@ namespace CSharpChatClient
             }
             catch (FileNotFoundException ex)
             {
-                Logger.LogException("Datei konnte nicht gelesen werden! ", ex);
+                Logger.LogException("File could not be found by the application.", ex);
             }
             catch (IOException ex)
             {
-                Logger.LogException("Schreiben nicht möglich, bitte prüfen Sie ihre Rechte! ", ex);
-            }
-            catch (ObjectDisposedException ex)
-            {
-                Logger.LogException("Datei konnte aufgrund eines internen Fehlers nicht geschrieben werden! ", ex);
+                Logger.LogException("File could not be read by the application.", ex);
             }
             catch (Exception ex)
             {
-                Logger.LogException("Unbekannte Exeption wurde gefangen! ", ex);
+                Logger.LogException("File could not be read by the application.", ex);
             }
             return null;
         }

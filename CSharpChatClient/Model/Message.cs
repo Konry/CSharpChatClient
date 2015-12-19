@@ -221,6 +221,5 @@ namespace CSharpChatClient
             get { return toUser; }
             set { toUser = value; }
         }
-
     }
 }
