@@ -175,7 +175,7 @@ namespace CSharpChatClient
 
         internal void UsernameLabel_UpdateText(string username)
         {
-            labelUserName.Text = username;
+            labelUserNameValue.Text = username;
         }
 
         /// <summary>

@@ -4,7 +4,9 @@ using CSharpChatClient.Controller.Network;
 using CSharpChatClient.Model;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
 namespace CSharpChatClient
@@ -85,7 +87,7 @@ namespace CSharpChatClient
             IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             IPAddress ipAddress = GetLocalIPAddress(ipHostInfo);
             Configuration.localIpAddress = ipAddress;
-            Configuration.selectedTcpPort = Configuration.PORT_TCP[GetAvaiableTCPPortIndex()];
+            Configuration.selectedTcpPort = GetAvaiableTCPPort();
         }
 
         internal bool SendMessage(Message text, ExternalUser exUser)
@@ -127,50 +129,25 @@ namespace CSharpChatClient
             throw new Exception("Local IP Address Not Found!");
         }
 
-        internal static int GetAvaiableTCPPortIndex()
+        internal static int GetAvaiableTCPPort()
         {
-            int index = 0;
-            for (index = 0; index < Configuration.PORT_TCP.Length; index++)
+            int PortStartIndex = 51110;
+            int PortEndIndex = 51150;
+
+            IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
+            IPEndPoint[] tcpEndPoints = properties.GetActiveTcpListeners();
+            List<int> usedPorts = tcpEndPoints.Select(p => p.Port).ToList<int>();
+            int unusedPort = 0;
+            for (int _port = PortStartIndex; _port < PortEndIndex; _port++)
             {
-                if (CheckTcpPortAvailability(Configuration.localIpAddress, Configuration.PORT_TCP[index]))
+                if (!usedPorts.Contains(_port))
                 {
-                    Logger.LogInfo("Select port: " + Configuration.PORT_TCP[index]);
+                    unusedPort = _port;
                     break;
                 }
             }
-            return index;
-        }
-
-        internal static bool CheckTcpPortAvailability(IPAddress ipAddress, int port)
-        {
-            bool availability = false;
-            try
-            {
-                //System.Net.Sockets.Socket sock = new System.Net.Sockets.Socket(System.Net.Sockets.AddressFamily.InterNetwork, System.Net.Sockets.SocketType.Stream, System.Net.Sockets.ProtocolType.Tcp);
-                IPEndPoint localEndpoint = new IPEndPoint(ipAddress, port);
-                TcpClient tcpClient = new TcpClient();
-                tcpClient.Connect(localEndpoint);
-                if (tcpClient.Connected == true)  // Port is in use and connection is successful
-                    availability = true;
-                tcpClient.Close();
-                return true;
-            }
-            catch (System.Net.Sockets.SocketException ex)
-            {
-                Logger.LogException("CheckTcpPortAvailability Socket", ex);
-                if (ex.ErrorCode == 10061)  // Port is unused and could not establish connection
-                {
-                    Logger.LogInfo("CheckTcpPortAvailability Socket ErrorCode");
-                    return true;
-                }
-            }
-            catch (Exception ex) when (ex is ArgumentNullException || ex is ArgumentOutOfRangeException ||
-            ex is ObjectDisposedException || ex is NotSupportedException || ex is ArgumentException ||
-            ex is InvalidOperationException)
-            {
-                Logger.LogException("CheckTcpPortAvailability", ex);
-            }
-            return availability;
+            Logger.LogInfo("Unused Port: " + unusedPort);
+            return unusedPort;
         }
 
         internal void IncomingMessageFromServer(Message content)

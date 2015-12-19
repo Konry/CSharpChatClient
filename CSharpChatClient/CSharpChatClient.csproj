@@ -36,11 +36,12 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -108,7 +109,6 @@
   <ItemGroup>
     <Compile Include="Controller\GraphicalInterfaceController.cs" />
     <Compile Include="Controller\Logger.cs" />
-    <Compile Include="Controller\Network\TcpCommunication.cs" />
     <Compile Include="Controller\ProgramController.cs" />
     <Compile Include="Model\ConnectionList.cs" />
     <Compile Include="Model\ExternalUser.cs" />
@@ -134,14 +134,11 @@
     <Compile Include="Model\TcpDataObject.cs" />
     <Compile Include="Test\TestMessage.cs" />
     <Compile Include="Test\TestTcpMessageServer.cs" />
-    <EmbeddedResource Include="Gui\MainFrame.de-DE.resx">
-      <DependentUpon>MainFrame.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Gui\MainFrame.resx">
       <DependentUpon>MainFrame.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
