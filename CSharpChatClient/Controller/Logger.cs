@@ -3,7 +3,6 @@ using System.IO;
 
 namespace CSharpChatClient.Controller
 {
-
     public static class Logger
     {
         /// <summary>
@@ -55,7 +54,6 @@ namespace CSharpChatClient.Controller
             Log(logMessage, LogState.FATAL);
         }
 
-
         /// <summary>
         /// Logs directly in the from the logger created file
         /// Ignores Logs which are unter the LogState which is defined in the configuration.
@@ -72,7 +70,6 @@ namespace CSharpChatClient.Controller
                 writer.WriteLine("\r\n{0} \t- {1} - {2}", DateTime.Now.ToString("s"), logLevel, logMessage);
             }
         }
-
 
         /// <summary>
         /// The logger for Exceptions, normally a caught exception is just a warning
@@ -93,18 +90,23 @@ namespace CSharpChatClient.Controller
                 case LogState.INFO:
                     logLevel = "Info";
                     break;
+
                 case LogState.TRACE:
                     logLevel = "Trace";
                     break;
+
                 case LogState.WARNING:
                     logLevel = "Warning";
                     break;
+
                 case LogState.ERROR:
                     logLevel = "Error";
                     break;
+
                 case LogState.FATAL:
                     logLevel = "Fatal";
                     break;
+
                 default:
                     logLevel = "DEFAULT";
                     break;
@@ -112,7 +114,5 @@ namespace CSharpChatClient.Controller
 
             return logLevel;
         }
-
-
     }
 }

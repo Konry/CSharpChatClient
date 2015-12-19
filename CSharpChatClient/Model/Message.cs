@@ -4,7 +4,6 @@ using System.Net;
 
 namespace CSharpChatClient
 {
-
     /// <summary>
     /// The Message is used for message transfer in the application and between different applications.
     /// </summary>
@@ -75,13 +74,12 @@ namespace CSharpChatClient
             return false;
         }
 
-
         /// <summary>
         /// Parses a string to a message, awaits a correct formated string, can be tested with method <see cref="IsTCPMessage"/>.
         /// </summary>
-        /// 
-        /// <param name="content">a string formed like 
-        /// TCPMessage;user.name;user.id;user.name;user.id;message 
+        ///
+        /// <param name="content">a string formed like
+        /// TCPMessage;user.name;user.id;user.name;user.id;message
         /// </param>
         /// <returns>A new message object or null when exception occurs</returns>
         internal static Message ParseTCPMessage(string content)
@@ -109,7 +107,6 @@ namespace CSharpChatClient
             }
             return null;
         }
-
 
         /// <summary>
         /// Reads a message out of a well formated NewContactMessage, test before if string is correct with method <see cref="IsNewContactMessage"/>.
@@ -164,16 +161,19 @@ namespace CSharpChatClient
             get { return messageType; }
             set { messageType = value; }
         }
+
         public string MessageContent
         {
             get { return messageContent; }
             set { messageContent = value; }
         }
+
         public User FromUser
         {
             get { return fromUser; }
             set { fromUser = value; }
         }
+
         public User ToUser
         {
             get { return toUser; }

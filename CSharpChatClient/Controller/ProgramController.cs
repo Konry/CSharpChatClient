@@ -37,21 +37,23 @@ namespace CSharpChatClient.controller
             get { return chatForm; }
             //set { chatForm = value; }
         }
+
         public GraphicalInterfaceController GraphicControl
         {
             get { return graphicControl; }
             //set { graphicControl = value; }
         }
+
         public NetworkService NetworkService
         {
             get { return networkService; }
             //set { networkService = value; }
         }
+
         public FileService FileService
         {
             get { return fileService; }
             //set { fileService = value; }
         }
-
     }
 }

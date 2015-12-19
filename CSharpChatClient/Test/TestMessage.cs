@@ -5,10 +5,10 @@ namespace CSharpChatClient.Test
 {
     using NUnit.Framework;
     using System.Diagnostics;
+
     [TestFixture]
     public partial class TestMessage
     {
-
         [Test]
         public void TestGenerateConnectMessage()
         {
@@ -32,7 +32,7 @@ namespace CSharpChatClient.Test
             //correctResult = "TCPConnectTo;TestUser;127.0.0.1;" + Configuration.DEFAULT_TCP_PORT;
             //Assert.AreEqual(correctResult, NetworkMessage.GenerateConnectMessage(user, IPAddress.Parse("127.0.0.1"), 12345));
         }
-        
+
         [Test]
         public void TestGenerateTCPMessage()
         {
@@ -69,7 +69,5 @@ namespace CSharpChatClient.Test
             Assert.AreEqual(true, Message.IsNewContactMessage(Message.GenerateConnectMessage(user, IPAddress.Parse("127.0.0.1"), 12345)));
             Assert.AreEqual(false, Message.IsNewContactMessage("Test"));
         }
-
-
     }
 }

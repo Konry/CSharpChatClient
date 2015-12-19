@@ -30,7 +30,7 @@
         /// <returns>true for equality</returns>
         public bool Equals(User user)
         {
-            if(this.name.Equals(user.name) && this.id.Equals(user.id))
+            if (this.name.Equals(user.name) && this.id.Equals(user.id))
             {
                 return true;
             }

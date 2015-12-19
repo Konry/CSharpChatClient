@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace CSharpChatClient.Model
 {
-    class UserList
+    internal class UserList
     {
         public LinkedList<ExternalUser> userList { get; }
 
@@ -16,7 +16,7 @@ namespace CSharpChatClient.Model
         {
             foreach (ExternalUser u in userList)
             {
-                if(user.Equals(u))
+                if (user.Equals(u))
                 {
                     return false;
                 }
@@ -41,6 +41,7 @@ namespace CSharpChatClient.Model
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
         protected void OnPropertyChanged(string name)
         {
             PropertyChangedEventHandler handler = PropertyChanged;

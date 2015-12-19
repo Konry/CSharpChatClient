@@ -107,9 +107,8 @@ namespace CSharpChatClient
             return true;
         }
 
-
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="host"></param>
         /// <exception cref="Exception">Throws a </exception>
@@ -135,7 +134,7 @@ namespace CSharpChatClient
             {
                 if (CheckTcpPortAvailability(Configuration.localIpAddress, Configuration.PORT_TCP[index]))
                 {
-                    Debug.WriteLine("Select index " + index);
+                    Logger.LogInfo("Select port: " + Configuration.PORT_TCP[index]);
                     break;
                 }
             }
@@ -156,27 +155,23 @@ namespace CSharpChatClient
             }
             catch (System.Net.Sockets.SocketException ex)
             {
-                if (ex.ErrorCode == 10061)  // Port is unused and could not establish connection 
+                Logger.LogException("CheckTcpPortAvailability Socket", ex);
+                if (ex.ErrorCode == 10061)  // Port is unused and could not establish connection
                 {
-                    Debug.WriteLine("Port is Open!");
                     return true;
                 }
-                else
-                    Debug.WriteLine(ex.Message);
             }
             catch (Exception ex) when (ex is ArgumentNullException || ex is ArgumentOutOfRangeException ||
             ex is ObjectDisposedException || ex is NotSupportedException || ex is ArgumentException ||
             ex is InvalidOperationException)
             {
-                Debug.WriteLine(ex.Message);
+                Logger.LogException("CheckTcpPortAvailability", ex);
             }
             return availability;
         }
 
         internal void IncomingMessageFromServer(Message content)
         {
-            Debug.WriteLine("Incoming IncomingMessageFromServer " + content.FromUser.Equals(control.GraphicControl.CurrentlyActiveChatUser) + " " + control.GraphicControl.CurrentlyActiveChatUser == null);
-
             if (content.FromUser.Equals(control.GraphicControl.CurrentlyActiveChatUser) || control.GraphicControl.CurrentlyActiveChatUser == null)
             {
                 control.GraphicControl.ReceiveMessage(content);
@@ -334,7 +329,6 @@ namespace CSharpChatClient
             if (!isAlreadyInList)
             {
                 ConnectionList.AddLast(new UserConnection(exUser, handle));
-
             }
         }
     }

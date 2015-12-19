@@ -42,8 +42,6 @@ namespace CSharpChatClient.Controller
             programControl.FileService.UpdateUserName();
         }
 
-
-
         internal void SendMessage(string text)
         {
             Message message = new Message(Configuration.localUser, CurrentlyActiveChatUser, text);
@@ -68,7 +66,6 @@ namespace CSharpChatClient.Controller
 
         internal void ReceiveMessage(Message message)
         {
-            
             if (message.FromUser.Equals(CurrentlyActiveChatUser))
             {
                 messageHistory.AddMessage(message);
@@ -154,7 +151,6 @@ namespace CSharpChatClient.Controller
                     ex.Port = int.Parse(split[1]);
                     if (programControl.NetworkService.ManualConnectToExUser(ex))
                     {
-
                     }
                     currentlyActiveChatUser = ex;
                 }

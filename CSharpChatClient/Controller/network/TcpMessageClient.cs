@@ -35,7 +35,7 @@ namespace CSharpChatClient.Controller.Network
                 }
                 catch (ObjectDisposedException ode)
                 {
-                    Debug.WriteLine("Catched ObjectDisposedException");
+                    Logger.LogException("Connect ObjectDisposedException", ode);
                     /*throw away*/
                 }
                 Socket.Close();
@@ -72,10 +72,11 @@ namespace CSharpChatClient.Controller.Network
             }
             catch (System.ObjectDisposedException ode)
             {
-                Debug.WriteLine("Catched ObjectDisposedException");
+                Logger.LogException("Connect ObjectDisposedException", ode);
             }
             catch (SocketException se)
             {
+                Logger.LogException("Connect", se);
                 return false;
             }
             return false;
@@ -99,7 +100,7 @@ namespace CSharpChatClient.Controller.Network
                 }
                 catch (ObjectDisposedException ode)
                 {
-                    Debug.WriteLine("Catched ObjectDisposedException");
+                    Logger.LogException("ReConnect ObjectDisposedException", ode);
                     /*throw away*/
                 }
             }
@@ -141,14 +142,14 @@ namespace CSharpChatClient.Controller.Network
                 // Complete the connection.
                 client.EndConnect(ar);
 
-                Logger.LogInfo("Socket connected to "+ client.RemoteEndPoint.ToString());
+                Logger.LogInfo("Socket connected to " + client.RemoteEndPoint.ToString());
 
                 // Signal that the connection has been made.
                 connectDone.Set();
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e.ToString());
+                Logger.LogException("ConnectCallback", e);
             }
         }
 
@@ -185,7 +186,7 @@ namespace CSharpChatClient.Controller.Network
             String content = String.Empty;
             try
             {
-                // Retrieve the state object and the client socket 
+                // Retrieve the state object and the client socket
                 // from the asynchronous state object.
                 TcpDataObject state = (TcpDataObject)ar.AsyncState;
                 Socket client = state.workSocket;
@@ -199,7 +200,7 @@ namespace CSharpChatClient.Controller.Network
                     //state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
 
                     content = Encoding.ASCII.GetString(state.buffer, 0, bytesRead);
-                    Debug.WriteLine(content);
+                    Logger.LogInfo(content);
 
                     if (!content.Equals(""))
                     {
@@ -225,7 +226,7 @@ namespace CSharpChatClient.Controller.Network
                     receiveDone.Set();
                 }
             }
-            catch(SocketException se)
+            catch (SocketException se)
             {
                 Disconnect();
                 Logger.LogException("Socket from Remote has been closed abruptly.", se, Logger.LogState.INFO);
@@ -235,7 +236,5 @@ namespace CSharpChatClient.Controller.Network
                 Logger.LogException("ReceiveCallback ", e);
             }
         }
-
-        
     }
 }

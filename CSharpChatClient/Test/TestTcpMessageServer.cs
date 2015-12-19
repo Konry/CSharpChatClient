@@ -2,16 +2,12 @@
 
 namespace CSharpChatClient.Test
 {
-
     [TestFixture]
-    class TestTcpMessageServer
+    internal class TestTcpMessageServer
     {
-
-        [Test] 
+        [Test]
         public void TestReconnectClient()
         {
-
         }
-        
     }
 }

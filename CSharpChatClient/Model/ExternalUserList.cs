@@ -6,7 +6,6 @@ namespace CSharpChatClient.Model
     {
         public ExternalUserList() : base()
         {
-
         }
     }
 }

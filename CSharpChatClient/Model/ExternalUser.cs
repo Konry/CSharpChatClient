@@ -5,7 +5,6 @@ using System.Net;
 
 namespace CSharpChatClient.Model
 {
-
     /// <summary>
     /// The ExternalUser extends the User by the address information and port information.
     /// </summary>
@@ -16,7 +15,6 @@ namespace CSharpChatClient.Model
 
         public ExternalUser(string name) : base(name)
         {
-
         }
 
         public ExternalUser(User user) : this(user.Name)
@@ -50,12 +48,14 @@ namespace CSharpChatClient.Model
                 exUser.ipAddress = IPAddress.Parse(split[0]);
                 exUser.port = int.Parse(split[1]);
                 return exUser;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Logger.LogException("Exception while parsing a message. ", ex);
             }
             return null;
         }
+
         public int Port
         {
             get { return port; }
@@ -81,6 +81,7 @@ namespace CSharpChatClient.Model
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
         private void NotifyPropertyChanged(String propertyName)
         {
             if (PropertyChanged != null)
@@ -88,6 +89,5 @@ namespace CSharpChatClient.Model
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
-
     }
 }

@@ -2,7 +2,6 @@
 
 namespace CSharpChatClient.Model
 {
-
     /// <summary>
     /// Connects an external user with an open socket to the external user.
     /// </summary>

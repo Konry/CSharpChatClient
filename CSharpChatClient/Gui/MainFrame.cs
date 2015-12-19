@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Diagnostics;
+﻿using CSharpChatClient.controller;
 using CSharpChatClient.Controller;
-using CSharpChatClient.controller;
 using CSharpChatClient.Model;
-using System.Threading;
+using System;
+using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace CSharpChatClient
 {
@@ -26,8 +18,11 @@ namespace CSharpChatClient
         private Object thisLock = new Object();
 
         public delegate void AvailableConnectionsListDelegate();
+
         public delegate void MessageBoxDelegate();
+
         public delegate void ConnectedWithLabelDelegate();
+
         public delegate void UsernameLabelDelegate(string username);
 
         public ChatForm()
@@ -78,10 +73,10 @@ namespace CSharpChatClient
             string username = ShowEnterUsernameBox("Bitte geben Sie einen Benutzernamen an:");
             graphicControl.ChangeUsername(username);
         }
-        
+
         private void SetOtherUsername()
         {
-            string username = ShowEnterUsernameBox("Der Benutzername ist "+Configuration.localUser.Name+ ", wenn nicht einfach neuen eingeben:");
+            string username = ShowEnterUsernameBox("Der Benutzername ist " + Configuration.localUser.Name + ", wenn nicht einfach neuen eingeben:");
             graphicControl.ChangeUsername(username);
         }
 
@@ -119,7 +114,7 @@ namespace CSharpChatClient
         private void MessageFlowBox_TextChanged(object sender, EventArgs e)
         {
             // Scroll automatically down.
-            messageFlowBox.SelectionStart = messageFlowBox.Text.Length; 
+            messageFlowBox.SelectionStart = messageFlowBox.Text.Length;
             messageFlowBox.ScrollToCaret();
         }
 
@@ -128,7 +123,8 @@ namespace CSharpChatClient
             if (enterTextBox.Text.Length > 0)
             {
                 sendButton.Enabled = true;
-            } else
+            }
+            else
             {
                 sendButton.Enabled = false;
             }
@@ -158,7 +154,6 @@ namespace CSharpChatClient
 
         private void button1_Click(object sender, EventArgs e)
         {
-
         }
 
         private void MessageFlowBox_UpdateText()
@@ -182,7 +177,6 @@ namespace CSharpChatClient
         {
             labelUserName.Text = username;
         }
-
 
         /// <summary>
         /// Notitfy the GUI-Thread to update messageFlowBox Text
@@ -213,16 +207,16 @@ namespace CSharpChatClient
             lock (thisLock)
             {
                 //if (exUserListChanged)
-               // {
-                    availableConnectionsList.Items.Clear();
-                    foreach (ExternalUser exUser in exUserList)
+                // {
+                availableConnectionsList.Items.Clear();
+                foreach (ExternalUser exUser in exUserList)
+                {
+                    if (!availableConnectionsList.Items.Contains(exUser.Name))
                     {
-                        if (!availableConnectionsList.Items.Contains(exUser.Name))
-                        {
-                            availableConnectionsList.Items.Add(exUser.Name);
-                        }
+                        availableConnectionsList.Items.Add(exUser.Name);
                     }
-                    //exUserListChanged = false;
+                }
+                //exUserListChanged = false;
                 //}
             }
         }
@@ -243,7 +237,7 @@ namespace CSharpChatClient
             InitializePopUpButtons(prompt);
             InitializePopUpTextLabel(prompt, text);
 
-            TextBox textBox = new TextBox() { Left = 50, Top = 50, Width = 400 };            
+            TextBox textBox = new TextBox() { Left = 50, Top = 50, Width = 400 };
             prompt.Controls.Add(textBox);
 
             DialogResult result = prompt.ShowDialog();
@@ -253,7 +247,6 @@ namespace CSharpChatClient
             }
             return result == DialogResult.OK ? textBox.Text : "";
         }
-
 
         private string ShowEnterIpAddressAndPort()
         {
@@ -313,7 +306,8 @@ namespace CSharpChatClient
             {
                 foreach (ExternalUser online in namesOfOnlineChatPartner)
                 {
-                    if (!exUserList.Contains(online)) { 
+                    if (!exUserList.Contains(online))
+                    {
                         exUserList.Add(online);
                     }
                 }

@@ -1,7 +1,7 @@
-﻿using System;
-using CSharpChatClient.controller;
-using System.IO;
+﻿using CSharpChatClient.controller;
 using CSharpChatClient.Controller;
+using System;
+using System.IO;
 
 namespace CSharpChatClient
 {
@@ -140,7 +140,6 @@ namespace CSharpChatClient
             random.NextBytes(buffer);
             return BitConverter.ToInt64(buffer, 0);
         }
-
 
         //private bool CreateHistoryFilesDirectory()
         //{

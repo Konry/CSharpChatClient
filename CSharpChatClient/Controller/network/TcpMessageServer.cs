@@ -7,7 +7,6 @@ using System.Threading;
 
 namespace CSharpChatClient.Controller.Network
 {
-
     public class TcpMessageServer : TcpCommunication
     {
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
@@ -102,7 +101,6 @@ namespace CSharpChatClient.Controller.Network
                     // Wait until a connection is made before continuing.
                     serverBlock.WaitOne();
                 }
-
             }
             catch (Exception e)
             {
@@ -110,27 +108,24 @@ namespace CSharpChatClient.Controller.Network
             }
         }
 
-
-
         private void AcceptCallback(IAsyncResult ar)
         {
             try
             {
-                    // Signal the main thread to continue.
-                    serverBlock.Set();
+                // Signal the main thread to continue.
+                serverBlock.Set();
 
-                    // Get the socket that handles the client request.
-                    Socket listener = (Socket)ar.AsyncState;
-                    Socket handle = listener.EndAccept(ar);
+                // Get the socket that handles the client request.
+                Socket listener = (Socket)ar.AsyncState;
+                Socket handle = listener.EndAccept(ar);
 
-                    // Create the state object.
-                    TcpDataObject state = new TcpDataObject();
-                    state.workSocket = handle;
+                // Create the state object.
+                TcpDataObject state = new TcpDataObject();
+                state.workSocket = handle;
 
-                    handle.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
-                        new AsyncCallback(ReadCallback), state);
-                    //receiveDone.WaitOne();
-
+                handle.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
+                    new AsyncCallback(ReadCallback), state);
+                //receiveDone.WaitOne();
             }
             catch (ObjectDisposedException ode)
             {
@@ -186,7 +181,6 @@ namespace CSharpChatClient.Controller.Network
 
                     handle.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
                 new AsyncCallback(ReadCallback), state);
-
                 }
                 else
                 {
