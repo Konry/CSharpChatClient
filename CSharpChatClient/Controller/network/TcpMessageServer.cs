@@ -134,7 +134,7 @@ namespace CSharpChatClient.Controller.Network
 
                 handle.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
                     new AsyncCallback(ReadCallback), state);
-                receiveDone.WaitOne();
+                //receiveDone.WaitOne();
             }
             catch (ObjectDisposedException ode)
             {
@@ -157,12 +157,10 @@ namespace CSharpChatClient.Controller.Network
                 Socket handle = state.workSocket;
 
                 int bytesRead = state.workSocket.EndReceive(ar);
-
-                Logger.LogInfo("Server incoming " + content + " " + bytesRead);
                 if (bytesRead > 0)
                 {
                     content = Encoding.ASCII.GetString(state.buffer, 0, bytesRead);
-                    Logger.LogInfo(content);
+                    Logger.LogInfo("Server incoming " + content + " " + bytesRead);
                     netService.AnalyseIncomingContent(content, true, handle);
 
                     handle.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,

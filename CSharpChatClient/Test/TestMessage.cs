@@ -13,11 +13,11 @@ namespace CSharpChatClient.Test
         public void TestGenerateConnectMessage()
         {
             User user = new User("TestUser");
-            String correctResult = "TCPConnectTo;TestUser;-1;127.0.0.1;12345";
+            String correctResult = "TCPConnectTo;TestUser;-1;;;127.0.0.1;12345";
             Assert.AreEqual(correctResult, Message.GenerateConnectMessage(user, IPAddress.Parse("127.0.0.1"), 12345));
 
             user = new User("TestUser");
-            correctResult = "TCPConnectTo;TestUser;-1;127.0.0.1;" + Configuration.DEFAULT_TCP_PORT;
+            correctResult = "TCPConnectTo;TestUser;-1;;;127.0.0.1;" + Configuration.DEFAULT_TCP_PORT;
             Assert.AreEqual(correctResult, Message.GenerateConnectMessage(user, IPAddress.Parse("127.0.0.1"), 51110));
         }
 
@@ -25,7 +25,7 @@ namespace CSharpChatClient.Test
         public void TestGenerateConnectMessageUserOnly()
         {
             User user = new User("TestUser");
-            String correctResult = "TCPConnectTo;TestUser;-1;127.0.0.1;12345";
+            String correctResult = "TCPConnectTo;TestUser;-1;;;127.0.0.1;12345";
             Assert.AreEqual(correctResult, Message.GenerateConnectMessage(user, IPAddress.Parse("127.0.0.1"), 12345));
 
             //user = new User("TestUser");

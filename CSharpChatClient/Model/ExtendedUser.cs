@@ -48,6 +48,7 @@ namespace CSharpChatClient.Model
         {
             try
             {
+                Logger.LogFatal(message.MessageContent);
                 ExtendedUser exUser = new ExtendedUser(message.FromUser);
                 String[] split = message.MessageContent.Split(';');
                 exUser.ipAddress = IPAddress.Parse(split[0]);

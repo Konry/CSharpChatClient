@@ -151,6 +151,7 @@ namespace CSharpChatClient
             if (ConnectionOverClient)
             {
                 // No need to send connection message
+                tcpClient.Send(Message.GenerateConnectMessage(localExtendedUser));
             }
             else if (ConnectionOverServer)
             {
@@ -310,6 +311,10 @@ namespace CSharpChatClient
             {
                 control.GraphicControl.InitiateCurrentlyActiveUser(message);
             }
+            else if (message.MessageContent.StartsWith("Recject"))
+            {
+                control.GraphicControl.InformUser("Verbindung nicht möglich, da bereits im Chat");
+            }
         }
 
 
@@ -333,7 +338,7 @@ namespace CSharpChatClient
                 if (!ConnectionOverClient && !ConnectionOverServer)
                 {
                     ConnectionOverServer = true;
-                    control.GraphicControl.CurrentlyActiveChatUser = new ExtendedUser(tcpAcceptMessage.FromUser);
+                    control.GraphicControl.CurrentlyActiveChatUser = ExtendedUser.ParseFromMessage(tcpAcceptMessage);
                 }
             }
         }
@@ -343,8 +348,6 @@ namespace CSharpChatClient
         /// </summary>
         /// <param name="ipAddress"></param>
         /// <param name="port"></param>
-        /// <exception cref="AlreadyConnectedException">Thrown when the connection is already existing.</exception>
-        /// <exception cref="TimeoutException">Thrown when the connection could not be established.</exception>
         internal bool ManualConnectToExUser(ExtendedUser exUser)
         {
             bool success = false;
@@ -357,6 +360,7 @@ namespace CSharpChatClient
                     {
                         tcpClient.ReConnect(exUser.IpAddress, exUser.Port);
                         ConnectionOverClient = true;
+                        SendConnectMessage(ExtendedUser.ConfigurationToExtendedUser());
                     }
                     catch (TimeoutException ex)
                     {
@@ -403,23 +407,29 @@ namespace CSharpChatClient
             {
                 IncomingMessage(Message.ParseTCPMessage(content));
             }
-            else if (Message.IsNewContactMessage(content) && AcceptIncomingConnection())
+            else if (Message.IsNewContactMessage(content))
             {
                 Message contactMessage = Message.ParseNewContactMessage(content);
-                if (server)
+                if (!AcceptIncomingConnection())
                 {
-                    if (handle == null)
-                    {
-                        throw new ArgumentNullException("If the server is true the handle can not be null");
-                    }
-                    IncomingConnectionFromServer(contactMessage);
-                    AddSocketToList(contactMessage, handle);
-                    SendConnectMessage(ExtendedUser.ConfigurationToExtendedUser());
+                    SendNotifyMessage(new Message(contactMessage.ToUser, null, "Reject"));
                 }
-                else
-                {
+                else {
                     IncomingNewContactMessage(contactMessage);
-                    ConnectionOverClient = true;
+                    if (server)
+                    {
+                        if (handle == null)
+                        {
+                            throw new ArgumentNullException("If the server is true the handle can not be null");
+                        }
+                        IncomingConnectionFromServer(contactMessage);
+                        AddSocketToList(contactMessage, handle);
+                        SendConnectMessage(ExtendedUser.ConfigurationToExtendedUser());
+                    }
+                    else
+                    {
+                        ConnectionOverClient = true;
+                    }
                 }
             }
             else if (Message.IsNotifyMessage(content))

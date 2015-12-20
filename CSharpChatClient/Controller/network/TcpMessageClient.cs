@@ -84,7 +84,8 @@ namespace CSharpChatClient.Controller.Network
                 if (!Configuration.DEBUG_SESSION && !connectDone.WaitOne(5000, true))
                 {
                     throw new TimeoutException("Connection could not be established.");
-                }else
+                }
+                else
                 {
                     connectDone.WaitOne();
                 }
@@ -96,7 +97,8 @@ namespace CSharpChatClient.Controller.Network
                 if (!Configuration.DEBUG_SESSION && !receiveDone.WaitOne(5000, true))
                 {
                     throw new TimeoutException("Message receive is interrupted.");
-                }else
+                }
+                else
                 {
                     receiveDone.WaitOne();
                 }
@@ -161,10 +163,11 @@ namespace CSharpChatClient.Controller.Network
         public void Send(string message)
         {
             Send(socket, message);
-            if ( !Configuration.DEBUG_SESSION && !sendDone.WaitOne(5000, true))
+            if (!Configuration.DEBUG_SESSION && !sendDone.WaitOne(5000, true))
             {
                 throw new TimeoutException("Connection could not be established.");
-            } else
+            }
+            else
             {
                 sendDone.WaitOne();
             }
@@ -214,7 +217,8 @@ namespace CSharpChatClient.Controller.Network
                 if (!Configuration.DEBUG_SESSION && !receiveDone.WaitOne(5000, true))
                 {
                     throw new TimeoutException("Receive is interrupted.");
-                } else
+                }
+                else
                 {
                     receiveDone.WaitOne();
                 }
@@ -256,6 +260,7 @@ namespace CSharpChatClient.Controller.Network
                     Logger.LogInfo(content);
 
                     netService.AnalyseIncomingContent(content);
+
                     client.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
                         new AsyncCallback(ReceiveCallback), state);
                 }
@@ -312,7 +317,7 @@ namespace CSharpChatClient.Controller.Network
 
                 // Complete sending the data to the remote device.
                 int bytesSent = handler.EndSend(ar);
-                Logger.LogInfo("Sent "+ bytesSent + " bytes to server.");
+                Logger.LogInfo("Sent " + bytesSent + " bytes to server.");
 
                 // Signal that all bytes have been sent.
                 sendDone.Set();

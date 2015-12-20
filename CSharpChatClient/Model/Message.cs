@@ -40,7 +40,7 @@ namespace CSharpChatClient
         /// <returns></returns>
         public static string GenerateConnectMessage(User user, IPAddress ipAddress, int port)
         {
-            return "TCPConnectTo;" + user.Name + ";" + user.Id + ";" + ipAddress.ToString() + ";" + port;
+            return "TCPConnectTo;" + user.Name + ";" + user.Id + ";;;" + ipAddress.ToString() + ";" + port;
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace CSharpChatClient
         /// <returns></returns>
         public static string GenerateTCPNotify(Message message)
         {
-            return "TCPNotify;" + message.FromUser.Name + ";" + message.FromUser.Id + ";" + message.MessageContent;
+            return "TCPNotify;" + message.FromUser.Name + ";" + message.FromUser.Id + ";;;" + message.MessageContent;
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace CSharpChatClient
             if (content.StartsWith("TCPConnectTo;"))
             {
                 string[] temp = content.Split(';');
-                if (temp.Length >= 5)
+                if (temp.Length >= 7)
                 {
                     return true;
                 }
@@ -115,7 +115,7 @@ namespace CSharpChatClient
             if (content.StartsWith("TCPNotify;"))
             {
                 string[] temp = content.Split(';');
-                if (temp.Length >= 3)
+                if (temp.Length >= 6)
                 {
                     return true;
                 }

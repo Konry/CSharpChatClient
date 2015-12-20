@@ -69,14 +69,9 @@ namespace CSharpChatClient.Controller
         /// <param name="message">Containing the new currentliy active user</param>
         internal void InitiateCurrentlyActiveUser(Message message)
         {
-            if(CurrentlyActiveChatUser == null)
+            if (CurrentlyActiveChatUser == null || CurrentlyActiveChatUser.Name.StartsWith("#ManualConnect") || CurrentlyActiveChatUser.Name.StartsWith("#AutoConnect"))
             {
                 CurrentlyActiveChatUser = ExtendedUser.ParseFromMessage(message);
-            }
-            if (CurrentlyActiveChatUser.Name.StartsWith("#ManualConnect") || CurrentlyActiveChatUser.Name.StartsWith("#AutoConnect"))
-            {
-                CurrentlyActiveChatUser.Name = message.FromUser.Name;
-                CurrentlyActiveChatUser.Id = message.FromUser.Id;
                 chatForm.NotifyConnectedWithChange();
             }
             else if (message.MessageContent.StartsWith("Rename:"))
@@ -124,14 +119,7 @@ namespace CSharpChatClient.Controller
                     ExtendedUser exUser = new ExtendedUser("#ManualConnect");
                     exUser.IpAddress = IPAddress.Parse(split[0]);
                     exUser.Port = int.Parse(split[1]);
-                    try
-                    {
-                        programControl.NetworkService.ManualConnectToExUser(exUser);
-                    }
-                    catch (Exception ex ) when (ex is TimeoutException || ex is AlreadyConnectedException)
-                    {
-                        chatForm.InformUser("Verbindung nicht möglich, da die Gegenseite nicht antwortet.");
-                    }
+                    programControl.NetworkService.ManualConnectToExUser(exUser);
                     currentlyActiveChatUser = exUser;
                 }
                 catch (Exception e)
