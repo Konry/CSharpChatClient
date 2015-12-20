@@ -146,6 +146,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="ShortClassDiagramm.cd" />
     <None Include="ClassDiagramOverview.cd" />
     <None Include="CSharpChatClient_TemporaryKey.pfx" />
     <None Include="packages.config" />

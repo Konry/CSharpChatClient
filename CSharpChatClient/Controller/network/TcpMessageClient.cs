@@ -48,7 +48,57 @@ namespace CSharpChatClient.Controller.Network
             }
         }
 
-		/// <summary>
+        /// <summary>
+        /// Disconnect from the current session and start an other one
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="port"></param>
+        /// <returns></returns>
+        public bool ReConnect(IPAddress ipAddress, int port)
+        {
+            Disconnect();
+            return Connect(ipAddress, port);
+        }
+
+        /// <summary>
+        /// Disconnect from session, clean up socket
+        /// </summary>
+        public void Disconnect()
+        {
+            shouldStop = true;
+            connected = false;
+            if (Socket != null)
+            {
+                try
+                {
+                    Socket.Disconnect(true);
+                }
+                catch (ObjectDisposedException ode)
+                {
+                    Logger.LogException("ReConnect ObjectDisposedException", ode);
+                    /*throw away*/
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sends a message to the given socket.
+        /// </summary>
+        /// <param name="message"></param>
+        public void Send(string message)
+        {
+            Send(Socket, message);
+            sendDone.Set();
+        }
+
+        private void SendConnectMessage(User user, IPAddress ipAddress, int port)
+        {
+            Logger.LogInfo("Send Connect Message " + Message.GenerateConnectMessage(user, ipAddress, port));
+            Send(Socket, Message.GenerateConnectMessage(user, ipAddress, port));
+            sendDone.Set();
+        }
+
+        /// <summary>
         /// Connects to the given address and port, blocking, by starting a new receiving thread
         /// </summary>
         /// <param name="ipAddress"></param>
@@ -69,7 +119,11 @@ namespace CSharpChatClient.Controller.Network
 
                 /* connect to the selected ipaddress */
                 Socket.BeginConnect(remoteEnd, new AsyncCallback(ConnectCallback), Socket);
-                connectDone.WaitOne();
+                bool ret = connectDone.WaitOne(2000, true);
+                if (!ret)
+                {
+                    netService.CloseConnectionFromClient();
+                }
 
                 thread = new Thread(StartReceiving);
                 /* Send a first message + TRY Connect to the remote */
@@ -87,60 +141,6 @@ namespace CSharpChatClient.Controller.Network
                 return false;
             }
             return false;
-        }
-
-        public bool ReConnect(IPAddress ipAddress, int port)
-        {
-            Disconnect();
-            return Connect(ipAddress, port);
-        }
-
-        public void Disconnect()
-        {
-            shouldStop = true;
-            connected = false;
-            if (Socket != null)
-            {
-                try
-                {
-                    Socket.Disconnect(true);
-                }
-                catch (ObjectDisposedException ode)
-                {
-                    Logger.LogException("ReConnect ObjectDisposedException", ode);
-                    /*throw away*/
-                }
-            }
-        }
-
-        public void Cancel()
-        {
-            shouldStop = true;
-            if (Socket != null)
-            {
-                Socket.Close();
-            }
-            if (thread != null)
-            {
-                thread.Abort();
-            }
-        }
-
-        /// <summary>
-        /// Sends a message to the given socket.
-        /// </summary>
-        /// <param name="message"></param>
-        public void Send(string message)
-        {
-            Send(Socket, message);
-            sendDone.Set();
-        }
-
-        private void SendConnectMessage(User user, IPAddress ipAddress, int port)
-        {
-            Logger.LogInfo("Send Connect Message " + Message.GenerateConnectMessage(user, ipAddress, port));
-            Send(Socket, Message.GenerateConnectMessage(user, ipAddress, port));
-            sendDone.Set();
         }
 
         /// <summary>
@@ -216,10 +216,7 @@ namespace CSharpChatClient.Controller.Network
 
                 if (bytesRead > 0)
                 {
-                    // There might be more data, so store the data received so far.
-                    //state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
-
-                    content = Encoding.ASCII.GetString(state.buffer, 0, bytesRead);
+                    content = Encoding.Unicode.GetString(state.buffer, 0, bytesRead);
                     Logger.LogInfo(content);
 
                     if (!content.Equals(""))
@@ -266,8 +263,8 @@ namespace CSharpChatClient.Controller.Network
         /// <param name="data">The string to send over the network</param>
         private void Send(Socket handler, String data)
         {
-            // Convert the string data to byte data using ASCII encoding.
-            byte[] byteData = Encoding.ASCII.GetBytes(data);
+            // Convert the string data to byte data using Unicode encoding.
+            byte[] byteData = Encoding.Unicode.GetBytes(data);
 
             // Begin sending the data to the remote device.
             try

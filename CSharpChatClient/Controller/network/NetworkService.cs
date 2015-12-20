@@ -97,7 +97,7 @@ namespace CSharpChatClient
                 tcpServer.Send(control.GraphicControl.CurrentlyActiveChatUser, Message.GenerateTCPNotify(message));
             }
             tcpServer.Stop();
-            tcpClient.Cancel();
+            tcpClient.Disconnect();
         }
 
 
@@ -326,10 +326,15 @@ namespace CSharpChatClient
                 if (control.GraphicControl.CurrentlyActiveChatUser != null && ex.Equals(control.GraphicControl.CurrentlyActiveChatUser)) { return false; }
                 if (!ConnectionOverServer)
                 {
-                    success = tcpClient.ReConnect(ex.IpAddress, ex.Port);
-                    if (success)
+                    try {
+                        success = tcpClient.ReConnect(ex.IpAddress, ex.Port);
+                        if (success)
+                        {
+                            ConnectionOverClient = true;
+                        }
+                    }catch(SocketException ex)
                     {
-                        ConnectionOverClient = true;
+                        CloseConnectionFromClient();
                     }
                 }
             }
