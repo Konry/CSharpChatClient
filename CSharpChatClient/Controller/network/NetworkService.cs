@@ -56,6 +56,14 @@ namespace CSharpChatClient
             tcpClient = new TcpMessageClient(this);
         }
 
+        private void FillNetworkConfiguration()
+        {
+            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            IPAddress ipAddress = GetLocalIPAddress(ipHostInfo);
+            Configuration.localIpAddress = ipAddress;
+            Configuration.selectedTcpPort = GetAvaiableTCPPort();
+        }
+
         /// <summary>
         /// Send the username Change to the remote connection
         /// </summary>
@@ -92,13 +100,6 @@ namespace CSharpChatClient
             tcpClient.Cancel();
         }
 
-        private void FillNetworkConfiguration()
-        {
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = GetLocalIPAddress(ipHostInfo);
-            Configuration.localIpAddress = ipAddress;
-            Configuration.selectedTcpPort = GetAvaiableTCPPort();
-        }
 
         /// <summary>
         /// Sends the given message to the current open connection
@@ -377,6 +378,9 @@ namespace CSharpChatClient
             }
         }
 
+        /// <summary>
+        /// Remove from the UserconnectionList the active user
+        /// </summary>
         private void RemoveCurrentActiveUserSocketFromList()
         {
             bool isInside = false;

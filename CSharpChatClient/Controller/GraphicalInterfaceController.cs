@@ -135,12 +135,6 @@ namespace CSharpChatClient.Controller
             }
         }
 
-        public ExtendedUser CurrentlyActiveChatUser
-        {
-            get { return currentlyActiveChatUser; }
-            set { currentlyActiveChatUser = value; chatForm.NotifyConnectedWithChange(); }
-        }
-
         /// <summary>
         /// Sets the current configuration
         /// </summary>
@@ -181,9 +175,19 @@ namespace CSharpChatClient.Controller
             chatForm.UpdateMessageHistory();
         }
 
+        /// <summary>
+        /// Informs the graphicalInterface to show message
+        /// </summary>
+        /// <param name="text"></param>
         internal void InformUser(string text)
         {
             chatForm.InformUser(text);
+        }
+
+        public ExtendedUser CurrentlyActiveChatUser
+        {
+            get { return currentlyActiveChatUser; }
+            set { currentlyActiveChatUser = value; chatForm.NotifyConnectedWithChange(); }
         }
     }
 }
