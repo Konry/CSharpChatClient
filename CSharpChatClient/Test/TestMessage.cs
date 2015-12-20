@@ -42,10 +42,6 @@ namespace CSharpChatClient.Test
             User user = new User("TestUser");
             String correctResult = "TCPConnectTo;TestUser;-1;;;127.0.0.1;12345";
             Assert.AreEqual(correctResult, Message.GenerateConnectMessage(user, IPAddress.Parse("127.0.0.1"), 12345));
-
-            //user = new User("TestUser");
-            //correctResult = "TCPConnectTo;TestUser;127.0.0.1;" + Configuration.DEFAULT_TCP_PORT;
-            //Assert.AreEqual(correctResult, NetworkMessage.GenerateConnectMessage(user, IPAddress.Parse("127.0.0.1"), 12345));
         }
 
         [Test]
@@ -68,7 +64,6 @@ namespace CSharpChatClient.Test
             Message mess = new Message("This is the message");
             mess.FromUser = fromUser;
             mess.ToUser = toUser;
-            //String correctResult = "TCPMessage;FromUser;-1;ToUser;-1;This is the message";
             Assert.AreEqual("TCPMessage", Message.ParseTCPNotifyMessage(Message.GenerateTCPMessage(mess)).MessageType);
             Assert.AreEqual("FromUser", Message.ParseTCPMessage(Message.GenerateTCPMessage(mess)).FromUser.Name);
             Assert.AreEqual(-1, Message.ParseTCPMessage(Message.GenerateTCPMessage(mess)).FromUser.Id);
@@ -85,7 +80,6 @@ namespace CSharpChatClient.Test
             Message mess = new Message("Rename:123");
             mess.FromUser = fromUser;
             mess.ToUser = toUser;
-            //String correctResult = "TCPMessage;FromUser;-1;ToUser;-1;This is the message";
             Assert.AreEqual("TCPNotify", Message.ParseTCPNotifyMessage(Message.GenerateTCPNotify(mess)).MessageType);
             Assert.AreEqual("FromUser", Message.ParseTCPNotifyMessage(Message.GenerateTCPNotify(mess)).FromUser.Name);
             Assert.AreEqual(-1, Message.ParseTCPNotifyMessage(Message.GenerateTCPNotify(mess)).FromUser.Id);
@@ -101,7 +95,6 @@ namespace CSharpChatClient.Test
             Message mess = new Message("Rename:123");
             mess.FromUser = fromUser;
             mess.ToUser = toUser;
-            //String correctResult = "TCPMessage;FromUser;-1;ToUser;-1;This is the message";
             Assert.AreEqual("TCPNotify", Message.ParseTCPNotifyMessage(Message.GenerateTCPNotify(mess)).MessageType);
             Assert.AreEqual("FromUser", Message.ParseTCPNotifyMessage(Message.GenerateTCPNotify(mess)).FromUser.Name);
             Assert.AreEqual(-1, Message.ParseTCPNotifyMessage(Message.GenerateTCPNotify(mess)).FromUser.Id);

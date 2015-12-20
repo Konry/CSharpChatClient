@@ -18,7 +18,6 @@ namespace CSharpChatClient.Controller
         internal MessageHistory messageHistory = null;
 
         private LinkedList<ExtendedUser> onlineChatPartner = null;
-        //private LinkedList<ExtendedUser> offlineChatPartner = null;
 
         public GraphicalInterfaceController(ProgramController programControl, ChatForm chatForm)
         {
@@ -32,6 +31,7 @@ namespace CSharpChatClient.Controller
             messageHistory = new MessageHistory();
             onlineChatPartner = new LinkedList<ExtendedUser>();
         }
+
         /// <summary>
         /// Changes the username and inform all instances
         /// </summary>

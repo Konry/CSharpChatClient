@@ -108,16 +108,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controller\GraphicalInterfaceController.cs" />
-    <Compile Include="Controller\Logger.cs" />
+    <Compile Include="Model\Logger.cs" />
     <Compile Include="Controller\ProgramController.cs" />
     <Compile Include="Model\ConnectionList.cs" />
     <Compile Include="Model\ExtendedUser.cs" />
     <Compile Include="Model\ExtendedUserList.cs" />
     <Compile Include="Model\MessageHistory.cs" />
     <Compile Include="Model\User.cs" />
-    <Compile Include="Model\OwnExceptions.cs" />
     <Compile Include="Model\Configuration.cs" />
-    <Compile Include="Controller\FileService.cs" />
+    <Compile Include="Model\FileService.cs" />
     <Compile Include="Gui\MainFrame.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -134,7 +133,6 @@
     <Compile Include="Test\TestExtendedUser.cs" />
     <Compile Include="Test\TestMessage.cs" />
     <Compile Include="Test\TestMessageHistory.cs" />
-    <Compile Include="Test\TestTcpMessageServer.cs" />
     <EmbeddedResource Include="Gui\MainFrame.resx">
       <DependentUpon>MainFrame.cs</DependentUpon>
     </EmbeddedResource>
