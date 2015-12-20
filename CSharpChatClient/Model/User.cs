@@ -1,14 +1,22 @@
-﻿namespace CSharpChatClient
+﻿using System;
+
+namespace CSharpChatClient
 {
     public class User
     {
-        protected string name { get; set; }
-        protected long id { get; set; }
+        protected string name = "";
+        protected long id = -1;
 
         public User(string name)
         {
             this.name = name;
             this.id = -1;
+        }
+
+        public User(string name, long id)
+        {
+            this.name = name;
+            this.id = id;
         }
 
         public string Name
@@ -35,6 +43,28 @@
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Generates a long int as random user id
+        /// </summary>
+        /// <returns></returns>
+        public static long GenerateUserID()
+        {
+            Random random = new Random();
+            byte[] buffer = new byte[8];
+            random.NextBytes(buffer);
+            return BitConverter.ToInt64(buffer, 0);
+        }
+
+        /// <summary>
+        /// Generates a name of type "Namenslos "+ number from 1 to 999
+        /// </summary>
+        /// <returns></returns>
+        public static string GenerateRandomNameless()
+        {
+            Random random = new Random();
+            return "Namenslos" + random.Next(1, 999);
         }
     }
 }

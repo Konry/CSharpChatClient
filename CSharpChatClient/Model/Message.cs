@@ -1,4 +1,5 @@
 ﻿using CSharpChatClient.Controller;
+using CSharpChatClient.Model;
 using System;
 using System.Net;
 
@@ -32,19 +33,44 @@ namespace CSharpChatClient
             this.MessageType = MessageType;
         }
 
+        /// <summary>
+        /// Generates a message of type TCPConnectTo;fromUserName;fromUserId;;;message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public static string GenerateConnectMessage(User user, IPAddress ipAddress, int port)
         {
-            return "TCPConnectTo;" + user.Name + ";" + user.Id + ";" + ipAddress.ToString() + ";" + port;
+            return "TCPConnectTo;" + user.Name + ";" + user.Id + ";;;" + ipAddress.ToString() + ";" + port;
         }
 
+        /// <summary>
+        /// Generates a message out of an extendedUser of a connect message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static string GenerateConnectMessage(ExtendedUser exUser)
+        {
+            return GenerateConnectMessage(exUser, exUser.IpAddress, exUser.Port);
+        }
+
+        /// <summary>
+        /// Generates a message of type TCPMessage;fromUserName;fromUserId;toUserName;toUserId,message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public static string GenerateTCPMessage(Message message)
         {
             return "TCPMessage;" + message.FromUser.Name + ";" + message.FromUser.Id + ";" + message.ToUser.Name + ";" + message.ToUser.Id + ";" + message.MessageContent;
         }
 
+        /// <summary>
+        /// Generates a message of type TCPNotfy;fromUserName;fromUserId;message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public static string GenerateTCPNotify(Message message)
         {
-            return "TCPNotify;" + message.FromUser.Name + ";" + message.FromUser.Id + ";" + message.MessageContent;
+            return "TCPNotify;" + message.FromUser.Name + ";" + message.FromUser.Id + ";;;" + message.MessageContent;
         }
 
         /// <summary>
@@ -55,7 +81,7 @@ namespace CSharpChatClient
             if (content.StartsWith("TCPConnectTo;"))
             {
                 string[] temp = content.Split(';');
-                if (temp.Length >= 5)
+                if (temp.Length >= 7)
                 {
                     return true;
                 }
@@ -79,12 +105,17 @@ namespace CSharpChatClient
             return false;
         }
 
+        /// <summary>
+        /// Checks if the message starts with TCPNotfy and has enough elements for the string split
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
         internal static bool IsNotifyMessage(string content)
         {
             if (content.StartsWith("TCPNotify;"))
             {
                 string[] temp = content.Split(';');
-                if (temp.Length >= 3)
+                if (temp.Length >= 6)
                 {
                     return true;
                 }
@@ -130,7 +161,7 @@ namespace CSharpChatClient
         /// Reads a message out of a well formated NewContactMessage, test before if string is correct with method <see cref="IsNewContactMessage"/>.
         /// Format for a new contact message: TCPConnectTo;username;userid;ipaddress;port
         /// </summary>
-        /// <param name="content">A well formated </param>
+        /// <param name="content"></param>
         /// <returns></returns>
         internal static Message ParseNewContactMessage(string content)
         {
@@ -152,10 +183,18 @@ namespace CSharpChatClient
             return null;
         }
 
+        /// <summary>
+        /// Parses a string to a message, awaits a correct formated string, can be tested with method <see cref="IsNotifyMessage"/>.
+        /// </summary>
+        ///
+        /// <param name="content">a string formed like
+        /// TCPNotify;user.name;user.id;message
+        /// </param>
+        /// <returns>A new message object or null when exception occurs</returns>
         internal static Message ParseTCPNotifyMessage(string content)
         {
             string[] temp = content.Split(';');
-            if (temp.Length >= 5)
+            if (temp.Length >= 3)
             {
                 try
                 {
@@ -166,6 +205,7 @@ namespace CSharpChatClient
                     {
                         message += temp[i];
                     }
+                    Logger.LogInfo("Notfiy Message: " + message);
                     return new Message(from, null, message, temp[0]);
                 }
                 catch (Exception ex)

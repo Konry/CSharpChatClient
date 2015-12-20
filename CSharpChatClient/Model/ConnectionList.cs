@@ -7,16 +7,16 @@ namespace CSharpChatClient.Model
     /// </summary>
     public class UserConnection
     {
-        private ExternalUser user;
+        private ExtendedUser user;
         private Socket socket;
 
-        public UserConnection(ExternalUser user, Socket socket)
+        public UserConnection(ExtendedUser user, Socket socket)
         {
             this.user = user;
             this.socket = socket;
         }
 
-        public ExternalUser User
+        public ExtendedUser User
         {
             get { return user; }
             set { user = value; }

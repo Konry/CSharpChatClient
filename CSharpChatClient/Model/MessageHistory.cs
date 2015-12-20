@@ -14,20 +14,31 @@ namespace CSharpChatClient.Model
             stringBuilder = new StringBuilder();
         }
 
+        /// <summary>
+        /// Fills the list up with a amount of messages
+        /// </summary>
+        /// <param name="rawHistory"></param>
         public void FillUpMessageHistory(Message[] rawHistory)
         {
             foreach (Message message in rawHistory)
             {
-                listOfMessages.AddLast(message);
+                AddMessage(message);
             }
         }
 
+        /// <summary>
+        /// Adds a message to the history
+        /// </summary>
+        /// <param name="message"></param>
         public void AddMessage(Message message)
         {
             listOfMessages.AddLast(message);
             stringBuilder.Append(message.FromUser.Name + ": " + message.MessageContent + "\r\n");
         }
 
+        /// <summary>
+        /// Clears the content of the objects which containing the message history
+        /// </summary>
         public void ClearHistory()
         {
             listOfMessages.Clear();

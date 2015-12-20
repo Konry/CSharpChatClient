@@ -15,17 +15,23 @@ namespace CSharpChatClient.controller
             InitiateController();
         }
 
+        /// <summary>
+        /// Initiate the controllerModul
+        /// </summary>
         private void InitiateController()
         {
             Logger.LogInfo("New Program start");
             fileService = new FileService(this);
             networkService = new NetworkService(this);
-            graphicControl = new GraphicalInterfaceController(this, chatForm, networkService);
+            graphicControl = new GraphicalInterfaceController(this, chatForm);
 
             Logger.LogInfo("Start network service.");
             networkService.Start();
         }
 
+        /// <summary>
+        /// Stops the connections and running threads in the controller
+        /// </summary>
         internal void Stop()
         {
             Logger.LogInfo("Stop program controller.");
@@ -35,25 +41,21 @@ namespace CSharpChatClient.controller
         public ChatForm ChatForm
         {
             get { return chatForm; }
-            //set { chatForm = value; }
         }
 
         public GraphicalInterfaceController GraphicControl
         {
             get { return graphicControl; }
-            //set { graphicControl = value; }
         }
 
         public NetworkService NetworkService
         {
             get { return networkService; }
-            //set { networkService = value; }
         }
 
         public FileService FileService
         {
             get { return fileService; }
-            //set { fileService = value; }
         }
     }
 }

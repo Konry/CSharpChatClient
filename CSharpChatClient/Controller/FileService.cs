@@ -5,6 +5,10 @@ using System.IO;
 
 namespace CSharpChatClient
 {
+    /// <summary>
+    /// The FileSerice handles all file operations instead of the Logger. 
+    /// 
+    /// </summary>
     public class FileService
     {
         private ProgramController programController;
@@ -18,18 +22,31 @@ namespace CSharpChatClient
         {
             if (!HasUserCfgFile())
             {
-                WriteUserIDFile();
+                WriteUserIDFile(true);
             }
         }
 
-        private void UpdateUserIDFile()
+        /// <summary>
+        /// Writes the user in the file, if it is a new user, than create a new id.
+        /// </summary>
+        /// <param name="newUser">if this is a new user -> generate a new ID</param>
+        private void WriteUserIDFile(bool newUser = false)
         {
             try
             {
                 using (StreamWriter sw = new StreamWriter("user.cfg"))
                 {
                     sw.WriteLine(Configuration.localUser.Name);
-                    sw.WriteLine(Configuration.localUser.Id);
+                    if (newUser)
+                    {
+                        long id = User.GenerateUserID();
+                        Configuration.localUser.Id = id;
+                        sw.WriteLine(id);
+                    }
+                    else
+                    {
+                        sw.WriteLine(Configuration.localUser.Id);
+                    }
                     sw.Close();
                 }
             }
@@ -43,29 +60,10 @@ namespace CSharpChatClient
             }
         }
 
-        private void WriteUserIDFile()
-        {
-            try
-            {
-                long id = GenerateUserID();
-                Configuration.localUser.Id = id;
-                using (StreamWriter sw = new StreamWriter("user.cfg"))
-                {
-                    sw.WriteLine(Configuration.localUser.Name);
-                    sw.WriteLine(id);
-                    sw.Close();
-                }
-            }
-            catch (IOException ex)
-            {
-                Logger.LogException("Writing is not possible, please check your permissions.", ex);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException("File could not be written by the application.", ex);
-            }
-        }
-
+        /// <summary>
+        /// Reads the configuration file, catches all errors and returns a null user
+        /// </summary>
+        /// <returns>The user which read out the file. Occuring error returning a null Object.</returns>
         internal User ReadUserCfgFile()
         {
             try
@@ -102,11 +100,19 @@ namespace CSharpChatClient
             return null;
         }
 
-        internal bool HasCurrentUserName()
+        /// <summary>
+        /// Function checks if there is a usernamefile existing.
+        /// </summary>
+        /// <returns></returns>
+        internal bool HasCurrentUserFile()
         {
             return HasUserCfgFile();
         }
 
+        /// <summary>
+        /// Checks if there is an existing and readable user.cfg file
+        /// </summary>
+        /// <returns></returns>
         private bool HasUserCfgFile()
         {
             if (ReadUserCfgFile() != null)
@@ -116,62 +122,13 @@ namespace CSharpChatClient
             return false;
         }
 
+        /// <summary>
+        /// Update the user in the file.
+        /// </summary>
         internal void UpdateUserName()
         {
-            UpdateUserIDFile();
+            WriteUserIDFile(false);
         }
 
-        private static long GenerateUserID()
-        {
-            Random random = new Random();
-            byte[] buffer = new byte[8];
-            random.NextBytes(buffer);
-            return BitConverter.ToInt64(buffer, 0);
-        }
-
-        //private bool CreateHistoryFilesDirectory()
-        //{
-        //    string path = Application.ExecutablePath()+"history";
-        //    if (Directory.Exists(path))
-        //    {
-        //        return true;
-        //    } else
-        //    {
-        //        DirectoryInfo di = Directory.CreateDirectory(path);
-        //        Debug.WriteLine("The directory was created successfully at {0}.", Directory.GetCreationTime(path));
-        //    }
-        //}
-
-        //internal Message[] ReadHistoryFile()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //internal Message[] WriteHistoryFile()
-        //{
-        //    try
-        //    {
-        //        long id = GenerateUserID();
-        //        Configuration.localUser.id = id;
-        //        using (StreamWriter sw = new StreamWriter("history"Configuration.localUser.name + ".cfg"))
-        //        {
-        //            sw.WriteLine(Configuration.localUser.name);
-        //            sw.WriteLine(id);
-        //            sw.Close();
-        //        }
-        //    }
-        //    catch (IOException ex)
-        //    {
-        //        Debug.WriteLine("Schreiben nicht möglich, bitte prüfen Sie ihre Rechte! " + ex.StackTrace);
-        //    }
-        //    catch (ObjectDisposedException ex)
-        //    {
-        //        Debug.WriteLine("Datei konnte aufgrund eines internen Fehlers nicht geschrieben werden! " + ex.StackTrace);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine("Unbekannte Exeption wurde gefangen! " + ex.StackTrace);
-        //    }
-        //}
     }
 }

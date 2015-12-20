@@ -166,7 +166,7 @@
             // 
             // externalUserListBindingSource
             // 
-            this.externalUserListBindingSource.DataSource = typeof(CSharpChatClient.Model.ExternalUserList);
+            this.externalUserListBindingSource.DataSource = typeof(CSharpChatClient.Model.ExtendedUserList);
             // 
             // ChatForm
             // 

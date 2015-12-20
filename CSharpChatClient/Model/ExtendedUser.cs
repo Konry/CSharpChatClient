@@ -6,30 +6,35 @@ using System.Net;
 namespace CSharpChatClient.Model
 {
     /// <summary>
-    /// The ExternalUser extends the User by the address information and port information.
+    /// The ExtendedUser extends the User by the address information and port information.
     /// </summary>
-    public class ExternalUser : User, INotifyPropertyChanged
+    public class ExtendedUser : User, INotifyPropertyChanged
     {
-        private IPAddress ipAddress;
-        private int port;
+        private IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
+        private int port = Configuration.DEFAULT_TCP_PORT;
 
-        public ExternalUser(string name) : base(name)
+        public ExtendedUser(string name) : base(name)
         {
         }
 
-        public ExternalUser(User user) : this(user.Name)
+        public ExtendedUser(User user) : this(user.Name)
         {
             this.Id = user.Id;
         }
 
-        public ExternalUser(User user, IPAddress ipAddress, int port) : this(user.Name)
+        public ExtendedUser(User user, IPAddress ipAddress, int port) : this(user.Name)
         {
             this.Id = user.Id;
             this.IpAddress = ipAddress;
             this.Port = port;
         }
 
-        public bool Equals(ExternalUser user)
+        /// <summary>
+        /// Checks if username and id are equal
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public bool Equals(ExtendedUser user)
         {
             return base.Equals(user);
         }
@@ -39,11 +44,12 @@ namespace CSharpChatClient.Model
         /// </summary>
         /// <param name="message">Needs an TCP-connect message, more information at <see cref="Message"/></param>
         /// <returns>The external user out of this message</returns>
-        public static ExternalUser ParseFromMessage(Message message)
+        public static ExtendedUser ParseFromMessage(Message message)
         {
             try
             {
-                ExternalUser exUser = new ExternalUser(message.FromUser);
+                Logger.LogFatal("Message content+" + message.MessageContent);
+                ExtendedUser exUser = new ExtendedUser(message.FromUser);
                 String[] split = message.MessageContent.Split(';');
                 exUser.ipAddress = IPAddress.Parse(split[0]);
                 exUser.port = int.Parse(split[1]);
@@ -78,6 +84,25 @@ namespace CSharpChatClient.Model
         {
             get { return id; }
             set { id = value; NotifyPropertyChanged("Id"); }
+        }
+
+        /// <summary>
+        /// Creates an extendedUser out of the configuration information
+        /// </summary>
+        /// <returns></returns>
+        public static ExtendedUser ConfigurationToExtendedUser()
+        {
+            try
+            {
+                ExtendedUser exUser = new ExtendedUser(Configuration.localUser);
+                exUser.ipAddress = Configuration.localIpAddress;
+                exUser.port = Configuration.selectedTcpPort;
+                return exUser;
+            }
+            catch (NullReferenceException)
+            {
+                return null;
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

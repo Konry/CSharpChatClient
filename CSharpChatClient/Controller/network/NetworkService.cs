@@ -90,7 +90,7 @@ namespace CSharpChatClient
             }
             else if (connectionOverServer)
             {
-                tcpServer.Send(Configuration.localUser, Message.GenerateTCPNotify(message));
+                tcpServer.Send(control.GraphicControl.CurrentlyActiveChatUser, Message.GenerateTCPNotify(message));
             }
             tcpServer.Stop();
             tcpClient.Cancel();
@@ -104,6 +104,11 @@ namespace CSharpChatClient
             Configuration.selectedTcpPort = GetAvaiableTCPPort();
         }
 
+        /// <summary>
+        /// Sends the given message to the current open connection
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         internal bool SendMessage(Message message)
         {
             if (ConnectionOverClient)
@@ -142,10 +147,10 @@ namespace CSharpChatClient
         }
 
         /// <summary>
-        ///
+        /// Reads the first local ip-address adapter id
         /// </summary>
         /// <param name="host"></param>
-        /// <exception cref="Exception">Throws a </exception>
+        /// <exception cref="Exception">Throws a new address is not found exception. </exception>
         /// <returns></returns>
         private IPAddress GetLocalIPAddress(IPHostEntry host)
         {
@@ -161,24 +166,46 @@ namespace CSharpChatClient
             throw new Exception("Local IP Address Not Found!");
         }
 
-        internal static int GetAvaiableTCPPort()
+        /// <summary>
+        /// Checks if there is a free port between two numbers, sets also the input values into bounds of 0 - 65535
+        /// </summary>
+        /// <returns>The next fee tcp port.</returns>
+        internal static int GetAvaiableTCPPort(int portStartIndex = 51110, int portEndIndex = 51150)
         {
-            int PortStartIndex = 51110;
-            int PortEndIndex = 51150;
+            if (portStartIndex < 0)
+            {
+                portStartIndex = 0;
+            }
+            else if (portEndIndex > 65535)
+            {
+                portStartIndex = 65535;
+            }
+            if (portEndIndex < 0)
+            {
+                portEndIndex = 0;
+            }
+            else if (portEndIndex > 65535)
+            {
+                portEndIndex = 65535;
+            }
+            else if (portEndIndex < portStartIndex)
+            {
+                portEndIndex = portStartIndex;
+            }
 
             IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
             IPEndPoint[] tcpEndPoints = properties.GetActiveTcpListeners();
             List<int> usedPorts = tcpEndPoints.Select(p => p.Port).ToList<int>();
-            int unusedPort = 0;
-            for (int _port = PortStartIndex; _port < PortEndIndex; _port++)
+            int unusedPort = 51110;
+            for (int portIndex = portStartIndex; portIndex < portEndIndex; portIndex++)
             {
-                if (!usedPorts.Contains(_port))
+                if (!usedPorts.Contains(portIndex))
                 {
-                    unusedPort = _port;
+                    Logger.LogInfo("Unused Port: " + unusedPort);
+                    unusedPort = portIndex;
                     break;
                 }
             }
-            Logger.LogInfo("Unused Port: " + unusedPort);
             return unusedPort;
         }
 
@@ -220,6 +247,9 @@ namespace CSharpChatClient
             control.GraphicControl.InitiateCurrentlyActiveUser(message);
         }
 
+        /// <summary>
+        /// Closes the current connection from the client.
+        /// </summary>
         internal void CloseConnectionFromServer()
         {
             if (ConnectionOverServer)
@@ -228,6 +258,7 @@ namespace CSharpChatClient
                 UserConnection toRemove = null;
                 foreach (UserConnection ex in ConnectionList)
                 {
+                    Logger.LogInfo("CloseConnectionFromServer "+ex.User.Name);
                     if (ex.Equals(control.GraphicControl.CurrentlyActiveChatUser))
                     {
                         isInside = true;
@@ -244,12 +275,42 @@ namespace CSharpChatClient
             }
         }
 
+        /// <summary>
+        /// Closes an active connection from the server.
+        /// </summary>
         internal void CloseConnectionFromClient()
         {
-            control.GraphicControl.CurrentlyActiveChatUser = null;
-            ConnectionOverClient = false;
+            if (ConnectionOverClient)
+            {
+                tcpClient.Disconnect();
+                control.GraphicControl.CurrentlyActiveChatUser = null;
+                ConnectionOverClient = false;
+            }
         }
 
+        internal void IncomingNotifyMessage(Message message)
+        {
+            if (message.MessageContent.StartsWith("UserDisconnect"))
+            {
+                if (connectionOverClient)
+                {
+                    CloseConnectionFromClient();
+                }
+                else if (connectionOverServer)
+                {
+                    CloseConnectionFromServer();
+                }
+            }
+            else if (message.MessageContent.StartsWith("Rename:"))
+            {
+                control.GraphicControl.InitiateCurrentlyActiveUser(message);
+            }
+        }
+
+        /// <summary>
+        /// Informs the graphical interface about a new currently active user
+        /// </summary>
+        /// <param name="message"></param>
         internal void NoftifyFromCurrentUser(Message message)
         {
             if (message.MessageContent.StartsWith("UserDisconnect"))
@@ -268,6 +329,10 @@ namespace CSharpChatClient
             }
         }
 
+        /// <summary>
+        /// Notifys the Gui Thread when there is a new connection established.
+        /// </summary>
+        /// <param name="tcpAcceptMessage"></param>
         internal void IncomingConnectionFromServer(Message tcpAcceptMessage)
         {
             lock (incomingConnectionLock)
@@ -275,12 +340,17 @@ namespace CSharpChatClient
                 if (!ConnectionOverClient && !ConnectionOverServer)
                 {
                     ConnectionOverServer = true;
-                    control.GraphicControl.CurrentlyActiveChatUser = new ExternalUser(tcpAcceptMessage.FromUser);
+                    control.GraphicControl.CurrentlyActiveChatUser = new ExtendedUser(tcpAcceptMessage.FromUser);
                 }
             }
         }
 
-        internal bool ManualConnectToExUser(ExternalUser ex)
+        /// <summary>
+        /// Connect to the given address external user, who has the address informations inside.
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="port"></param>
+        internal bool ManualConnectToExUser(ExtendedUser ex)
         {
             bool success = false;
             lock (incomingConnectionLock)
@@ -298,7 +368,11 @@ namespace CSharpChatClient
             return success;
         }
 
-        internal void ManuelDisconnectFromExUser(ExternalUser ex)
+        /// <summary>
+        /// Disconnects from the current user
+        /// </summary>
+        /// <param name="ex"></param>
+        internal void ManualDisconnectFromExUser(ExtendedUser ex)
         {
             lock (incomingConnectionLock)
             {
@@ -330,11 +404,16 @@ namespace CSharpChatClient
         //    }
         //}
 
+        /// <summary>
+        /// Adds the socket to the connection list, if not exisiting
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="handle"></param>
         internal void AddSocketToList(Socket handle, Message message)
         {
             /* Add the new contact to the connection list */
             bool isAlreadyInList = false;
-            ExternalUser exUser = ExternalUser.ParseFromMessage(message);
+            ExtendedUser exUser = ExtendedUser.ParseFromMessage(message);
             foreach (UserConnection uc in ConnectionList)
             {
                 if (uc.Equals(exUser))
@@ -345,6 +424,7 @@ namespace CSharpChatClient
             }
             if (!isAlreadyInList)
             {
+                Logger.LogInfo("Add user " + (message.FromUser == null) + " " + (message.ToUser == null) + " ");
                 ConnectionList.AddLast(new UserConnection(exUser, handle));
             }
         }

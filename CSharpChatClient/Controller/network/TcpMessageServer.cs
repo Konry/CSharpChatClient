@@ -25,7 +25,6 @@ namespace CSharpChatClient.Controller.Network
         public TcpMessageServer(NetworkService netService)
         {
             this.netService = netService;
-            Initialize();
         }
 
         ~TcpMessageServer()
@@ -37,10 +36,10 @@ namespace CSharpChatClient.Controller.Network
             thread.Abort();
         }
 
-        private void Initialize()
-        {
-        }
 
+        /// <summary>
+        /// Starts the server thread
+        /// </summary>
         public void Start()
         {
             shouldStop = false;
@@ -55,6 +54,9 @@ namespace CSharpChatClient.Controller.Network
             }
         }
 
+        /// <summary>
+        /// Stops the server permanently
+        /// </summary>
         public void Stop()
         {
             shouldStop = true;
@@ -65,16 +67,26 @@ namespace CSharpChatClient.Controller.Network
             }
         }
 
+        /// <summary>
+        /// Sends Message to user
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="message"></param>
         public void Send(User user, string message)
         {
-            foreach (UserConnection uc in netService.ConnectionList)
-            {
-                if (uc.User.Equals(user))
+            try
+            {                
+                foreach (UserConnection uc in netService.ConnectionList)
                 {
-                    Send(uc.Socket, message);
-                    sendDone.Set();
+                    if (uc.User.Equals(user))
+                    {
+                        Logger.LogInfo("CloseConnectionFromServer " + uc.User.Name);
+                        Send(uc.Socket, message);
+                        sendDone.Set();
+                    }
                 }
             }
+            catch (NullReferenceException ex) { }
         }
 
         private void StartListening()
