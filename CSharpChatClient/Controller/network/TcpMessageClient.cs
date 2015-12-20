@@ -48,6 +48,11 @@ namespace CSharpChatClient.Controller.Network
             }
         }
 
+		/// <summary>
+        /// Connects to the given address and port, blocking, by starting a new receiving thread
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="port"></param>
         public bool Connect(IPAddress ipAddress, int port)
         {
             try
@@ -126,6 +131,10 @@ namespace CSharpChatClient.Controller.Network
             }
         }
 
+        /// <summary>
+        /// Sends a message to the given socket.
+        /// </summary>
+        /// <param name="message"></param>
         public void Send(string message)
         {
             Send(Socket, message);
@@ -139,6 +148,10 @@ namespace CSharpChatClient.Controller.Network
             sendDone.Set();
         }
 
+        /// <summary>
+        /// Awaits the connection
+        /// </summary>
+        /// <param name="ar"></param>
         private void ConnectCallback(IAsyncResult ar)
         {
             try
@@ -188,6 +201,11 @@ namespace CSharpChatClient.Controller.Network
             }
         }
 
+        /// <summary>
+        /// Analyises an incoming AsyncResult Object, resulting in the message.
+        /// Informes networkService about the incoming 
+        /// </summary>
+        /// <param name="ar"></param>
         private void ReceiveCallback(IAsyncResult ar)
         {
             String content = String.Empty;
@@ -248,7 +266,7 @@ namespace CSharpChatClient.Controller.Network
         }
 
         /// <summary>
-        /// Sends a message to the selected socket handler.
+        /// Sends a message asynchrone to the selected socket handler.
         /// </summary>
         /// <param name="data">The string to send over the network</param>
         private void Send(Socket handler, String data)
@@ -268,6 +286,10 @@ namespace CSharpChatClient.Controller.Network
             }
         }
 
+        /// <summary>
+        /// Sends the data to the remote device. Async function.
+        /// </summary>
+        /// <param name="ar"></param>
         private void SendCallback(IAsyncResult ar)
         {
             try

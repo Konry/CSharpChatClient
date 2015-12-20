@@ -1,11 +1,6 @@
 ﻿using CSharpChatClient.Model;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CSharpChatClient.Test
 {
@@ -28,13 +23,6 @@ namespace CSharpChatClient.Test
             Assert.AreEqual(exUserToTest.Port, ExtendedUser.ParseFromMessage(message).Port);
             Assert.True(exUserToTest.Equals(exUserToTest));
         }
-
-        //[Test]
-        ////[ExpectedException(typeof(NullReferenceException))]
-        //public void TestConfigurationToExtendedUser()
-        //{
-        //    ExtendedUser.ConfigurationToExtendedUser();
-        //}
 
         [Test]
         public void TestEquals()

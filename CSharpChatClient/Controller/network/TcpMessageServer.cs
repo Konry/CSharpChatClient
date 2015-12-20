@@ -68,7 +68,7 @@ namespace CSharpChatClient.Controller.Network
         }
 
         /// <summary>
-        /// Sends Message to user
+        /// Send a message to the socket of the given user and sends the message to it
         /// </summary>
         /// <param name="user"></param>
         /// <param name="message"></param>
@@ -89,6 +89,9 @@ namespace CSharpChatClient.Controller.Network
             catch (NullReferenceException ex) { }
         }
 
+        /// <summary>
+        /// Starts the listening to the port
+        /// </summary>
         private void StartListening()
         {
             byte[] bytes = new Byte[1024];
@@ -208,7 +211,7 @@ namespace CSharpChatClient.Controller.Network
                 }
                 else
                 {
-                    /* socket closed*/
+                    // socket closed
                     Logger.LogInfo("TCP-Server - Socket closed by Client.");
                     netService.CloseConnectionFromServer();
                     receiveDone.Set();

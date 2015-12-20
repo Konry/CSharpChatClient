@@ -150,8 +150,6 @@ namespace CSharpChatClient
         {
             if (e.KeyCode == Keys.Return)
             {
-                Debug.WriteLine("Enter Pressed");
-                //                SendMessage();
                 e.Handled = true;
                 e.SuppressKeyPress = true;
                 sendButton.PerformClick();

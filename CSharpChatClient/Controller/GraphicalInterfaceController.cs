@@ -6,6 +6,9 @@ using System.Net;
 
 namespace CSharpChatClient.Controller
 {
+    /// <summary>
+    /// Its the controller behind the graphical interface which has the connection to the programm controller, networkservice and the gui.
+    /// </summary>
     public class GraphicalInterfaceController
     {
         private ChatForm chatForm = null;
