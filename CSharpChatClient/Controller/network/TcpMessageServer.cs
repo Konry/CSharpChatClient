@@ -169,7 +169,6 @@ namespace CSharpChatClient.Controller.Network
 
                 int bytesRead = state.workSocket.EndReceive(ar);
 
-                Logger.LogInfo("Server incoming " + content + " " + bytesRead);
                 if (bytesRead > 0)
                 {
                     // There  might be more data, so store the data received so far.
@@ -177,6 +176,7 @@ namespace CSharpChatClient.Controller.Network
 
                     content = Encoding.ASCII.GetString(state.buffer, 0, bytesRead);
 
+                    Logger.LogInfo("Server incoming " + content + " " + bytesRead);
                     if (Message.IsNewContactMessage(content))
                     {
                         if (netService.AcceptIncomingConnectionFromServer())
@@ -245,6 +245,7 @@ namespace CSharpChatClient.Controller.Network
             }
             catch (Exception ex)
             {
+                netService.CloseConnectionFromClient();
                 Logger.LogException("Message can not be send!", ex, Logger.LogState.FATAL);
             }
         }
@@ -261,7 +262,7 @@ namespace CSharpChatClient.Controller.Network
                 Logger.LogInfo("Sent " + bytesSent + " bytes to server.");
 
                 // Signal that all bytes have been sent.
-                sendDone.Set();
+                sendDone.WaitOne();
             }
             catch (Exception e)
             {

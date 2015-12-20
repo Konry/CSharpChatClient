@@ -25,6 +25,9 @@ namespace CSharpChatClient
 
         private Object incomingConnectionLock = new Object();
 
+        public delegate void DisconnectDelegate();
+        public delegate void NoConnectionDelegate();
+
         public NetworkService(ProgramController control)
         {
             this.control = control;
@@ -414,6 +417,7 @@ namespace CSharpChatClient
             /* Add the new contact to the connection list */
             bool isAlreadyInList = false;
             ExtendedUser exUser = ExtendedUser.ParseFromMessage(message);
+
             foreach (UserConnection uc in ConnectionList)
             {
                 if (uc.Equals(exUser))

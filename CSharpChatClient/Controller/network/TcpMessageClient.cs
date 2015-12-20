@@ -238,7 +238,7 @@ namespace CSharpChatClient.Controller.Network
             }
             catch (SocketException se)
             {
-                Disconnect();
+                netService.CloseConnectionFromClient();
                 Logger.LogException("Socket from Remote has been closed abruptly.", se, Logger.LogState.INFO);
             }
             catch (Exception e)

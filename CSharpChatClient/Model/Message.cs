@@ -159,20 +159,20 @@ namespace CSharpChatClient
 
         /// <summary>
         /// Reads a message out of a well formated NewContactMessage, test before if string is correct with method <see cref="IsNewContactMessage"/>.
-        /// Format for a new contact message: TCPConnectTo;username;userid;ipaddress;port
+        /// Format for a new contact message: TCPConnectTo;username;userid;;;ipaddress;port
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
         internal static Message ParseNewContactMessage(string content)
         {
             string[] temp = content.Split(';');
-            if (temp.Length >= 5)
+            if (temp.Length >= 6)
             {
                 try
                 {
                     User from = new User(temp[1]);
                     from.Id = long.Parse(temp[2]);
-                    string message = temp[3] + ";" + temp[4];
+                    string message = temp[5] + ";" + temp[6];
                     return new Message(from, null, message, temp[0]);
                 }
                 catch (Exception ex)
@@ -201,7 +201,7 @@ namespace CSharpChatClient
                     User from = new User(temp[1]);
                     from.Id = long.Parse(temp[2]);
                     string message = "";
-                    for (int i = 3; i < temp.Length; i++)
+                    for (int i = 5; i < temp.Length; i++)
                     {
                         message += temp[i];
                     }
