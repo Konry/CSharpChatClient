@@ -249,7 +249,7 @@ namespace CSharpChatClient
         }
 
         /// <summary>
-        /// Closes the current connection from the server. Remove 
+        /// Closes the current connection from the server. Remove the used socket from the connection list.
         /// </summary>
         internal void CloseConnectionFromServer()
         {

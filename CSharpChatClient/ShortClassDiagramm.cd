@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="Model">
+    <Position X="6.124" Y="5.495" Height="0.75" Width="1.7" />
+  </Comment>
+  <Comment CommentText="View&#xD;&#xA;">
+    <Position X="0.5" Y="6.854" Height="0.75" Width="1.7" />
+  </Comment>
+  <Comment CommentText="Controller&#xD;&#xA;">
+    <Position X="4.826" Y="4.504" Height="0.516" Width="1.058" />
+  </Comment>
+  <Class Name="CSharpChatClient.NetworkService" Collapsed="true">
+    <Position X="3.5" Y="3.75" Width="1.5" />
+    <NestedTypes>
+      <Delegate Name="CSharpChatClient.NetworkService.DisconnectDelegate" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Controller\Network\NetworkService.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="CSharpChatClient.NetworkService.NoConnectionDelegate" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Controller\Network\NetworkService.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <AssociationLine Name="tcpClient" Type="CSharpChatClient.Controller.Network.TcpMessageClient" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="5" Y="4" />
+        <Point X="5.562" Y="4" />
+        <Point X="5.562" Y="3.312" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="tcpServer" Type="CSharpChatClient.Controller.Network.TcpMessageServer" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="3.5" Y="4.25" />
+        <Point X="3.062" Y="4.25" />
+        <Point X="3.062" Y="3.312" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AACAgAAAhCQAhQAABGAAgAQgIQgQAgAEJBAQBAAAAQA=</HashCode>
+      <FileName>Controller\Network\NetworkService.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="tcpClient" />
+      <Field Name="tcpServer" />
+      <Field Name="control" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="CSharpChatClient.Controller.Network.TcpMessageClient" Collapsed="true">
+    <Position X="4.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>lASACAFAQAAAAAGAAEAAAIAAAACCAQAQAAEAAAAgAAE=</HashCode>
+      <FileName>Controller\Network\TcpMessageClient.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.Controller.Network.TcpMessageServer" Collapsed="true">
+    <Position X="2.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gACgCAAAACAAAAGAAEAAAAAAAAACAQAAIAEAAAAAAIU=</HashCode>
+      <FileName>Controller\Network\TcpMessageServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.Controller.GraphicalInterfaceController" Collapsed="true">
+    <Position X="3.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>JBAAAAgACAAAAcAAACBAAAgAACAAAAAAEAAAABAAgAA=</HashCode>
+      <FileName>Controller\GraphicalInterfaceController.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="chatForm" />
+      <Field Name="messageHistory" />
+      <Field Name="currentlyActiveChatUser" />
+      <Field Name="programControl" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="CSharpChatClient.Program" Collapsed="true">
+    <Position X="0.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Controller\Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.ChatForm" Collapsed="true">
+    <Position X="0.5" Y="6" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Delegate Name="CSharpChatClient.ChatForm.MessageBoxDelegate" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Gui\MainFrame.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="CSharpChatClient.ChatForm.ConnectedWithLabelDelegate" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Gui\MainFrame.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="CSharpChatClient.ChatForm.UsernameLabelDelegate" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Gui\MainFrame.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>CBAgAENpAKIAIAAADKHAEYBGAQABAGoAACaEDiiDAgg=</HashCode>
+      <FileName>Gui\MainFrame.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.Model.MessageHistory" Collapsed="true">
+    <Position X="6.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAACAAAAAAAAAAAAAAgCAAAAAEAAAABAAAAACAA=</HashCode>
+      <FileName>Model\MessageHistory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.Model.ExtendedUser" Collapsed="true">
+    <Position X="6.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAIAAggCAAAQAiAAAAAgAAAAAAAEAAAA=</HashCode>
+      <FileName>Model\ExtendedUser.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CSharpChatClient.controller.ProgramController" Collapsed="true">
+    <Position X="3.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BCAAAAAAAAAAAAAQAAAAEAAAAAAAAAAAIAACAAQgEgA=</HashCode>
+      <FileName>Controller\ProgramController.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="graphicControl" />
+      <Field Name="networkService" />
+    </ShowAsAssociation>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
