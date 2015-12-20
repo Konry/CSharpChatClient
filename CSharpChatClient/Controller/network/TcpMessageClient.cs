@@ -54,6 +54,7 @@ namespace CSharpChatClient.Controller.Network
         /// <param name="port"></param>
         /// <exception cref="AlreadyConnectedException">Thrown when the connection is already existing.</exception>
         /// <exception cref="TimeoutException">Thrown when the connection could not be established.</exception>
+        /// <exception cref="SocketException">Thrown when the connection could not be established.</exception>
         public void Connect(IPAddress ipAddress, int port)
         {
             if (connected)
@@ -70,6 +71,7 @@ namespace CSharpChatClient.Controller.Network
         /// <param name="ipAddress"></param>
         /// <param name="port"></param>
         /// <exception cref="TimeoutException">Thrown when the connection could not be established.</exception>
+        /// <exception cref="SocketException">Thrown when the connection could not be established.</exception>
         public void StartConnecting(IPAddress ipAddress, int port)
         {
             try
@@ -107,10 +109,10 @@ namespace CSharpChatClient.Controller.Network
             {
                 Logger.LogException("Connect ObjectDisposedException", ode);
             }
-            catch (SocketException se)
-            {
-                Logger.LogException("Connect", se);
-            }
+            //catch (SocketException se)
+            //{
+            //    Logger.LogException("Connect", se);
+            //}
         }
 
         /// <summary>
@@ -120,6 +122,7 @@ namespace CSharpChatClient.Controller.Network
         /// <param name="port"></param>
         /// <exception cref="AlreadyConnectedException">Thrown when the connection is already existing.</exception>
         /// <exception cref="TimeoutException">Thrown when the connection could not be established.</exception>
+        /// <exception cref="SocketException">Thrown when the connection could not be established.</exception>
         public void ReConnect(IPAddress ipAddress, int port)
         {
             Disconnect();
@@ -178,6 +181,7 @@ namespace CSharpChatClient.Controller.Network
         /// Awaits the connection
         /// </summary>
         /// <param name="ar"></param>
+        /// <exception cref="SocketException">Thrown when the connection could not be established.</exception>
         private void ConnectCallback(IAsyncResult ar)
         {
             try
@@ -191,6 +195,10 @@ namespace CSharpChatClient.Controller.Network
                 Logger.LogInfo("Socket connected to " + client.RemoteEndPoint.ToString());
                 // Signal that the connection has been made.
                 connectDone.Set();
+            }
+            catch (SocketException e)
+            {
+                throw new SocketException();
             }
             catch (Exception e)
             {

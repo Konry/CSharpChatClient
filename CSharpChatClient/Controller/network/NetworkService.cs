@@ -370,6 +370,9 @@ namespace CSharpChatClient
                     catch (AlreadyConnectedException ex)
                     {
                         control.GraphicControl.InformUser("Verbindung besteht bereits. " + ex.Message);
+                    } catch(SocketException ex)
+                    {
+                        control.GraphicControl.InformUser("Verbindung nicht möglich " + ex.Message);
                     }
                 }
             }

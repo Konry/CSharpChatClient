@@ -1,0 +1,17 @@
+diff a/CSharpChatClient/Controller/GraphicalInterfaceController.cs b/CSharpChatClient/Controller/GraphicalInterfaceController.cs	(rejected hunks)
+@@ -69,14 +69,9 @@
+         /// <param name="message">Containing the new currentliy active user</param>
+         internal void InitiateCurrentlyActiveUser(Message message)
+         {
+-            if(CurrentlyActiveChatUser == null)
++            if (CurrentlyActiveChatUser == null || CurrentlyActiveChatUser.Name.StartsWith("#ManualConnect") || CurrentlyActiveChatUser.Name.StartsWith("#AutoConnect"))
+             {
+                 CurrentlyActiveChatUser = ExtendedUser.ParseFromMessage(message);
+-            }
+-            if (CurrentlyActiveChatUser.Name.StartsWith("#ManualConnect") || CurrentlyActiveChatUser.Name.StartsWith("#AutoConnect"))
+-            {
+-                CurrentlyActiveChatUser.Name = message.FromUser.Name;
+-                CurrentlyActiveChatUser.Id = message.FromUser.Id;
+                 chatForm.NotifyConnectedWithChange();
+             }
+             else if (message.MessageContent.StartsWith("Rename:"))
