@@ -56,34 +56,27 @@ namespace CSharpChatClient
             tcpClient = new TcpMessageClient(this);
         }
 
+        /// <summary>
+        /// Send the username Change to the remote connection
+        /// </summary>
+        /// <param name="message"></param>
         internal void RenameUsernameNotifyRemote(Message message)
         {
             SendNotify(message);
         }
 
-        public bool ConnectionOverClient
-        {
-            get { return connectionOverClient; }
-            set { connectionOverClient = value; }
-        }
 
-        public bool ConnectionOverServer
-        {
-            get { return connectionOverServer; }
-            set { connectionOverServer = value; }
-        }
-
-        public LinkedList<UserConnection> ConnectionList
-        {
-            get { return connectionList; }
-            set { connectionList = value; }
-        }
-
+        /// <summary>
+        /// Starts TCP-Listening Server
+        /// </summary>
         public void Start()
         {
             tcpServer.Start();
         }
 
+        /// <summary>
+        /// Stops the server totally and disconnect all connections.
+        /// </summary>
         public void Stop()
         {
             Message message = new Message(Configuration.localUser, null, "UserDisconnect");
@@ -131,6 +124,11 @@ namespace CSharpChatClient
             return true;
         }
 
+        /// <summary>
+        /// Send a notfiy message to the current open connection
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         internal bool SendNotify(Message message)
         {
             if (ConnectionOverClient)
@@ -210,19 +208,14 @@ namespace CSharpChatClient
                 }
             }
             return unusedPort;
-        }
+        }        
 
-        internal void IncomingMessageFromServer(Message content)
+        /// <summary>
+        /// Manages an incoming message from the client. Send message to graphic controller
+        /// </summary>
+        /// <param name="content"></param>
+        internal void IncomingMessage(Message content)
         {
-            if (content.FromUser.Equals(control.GraphicControl.CurrentlyActiveChatUser) || control.GraphicControl.CurrentlyActiveChatUser == null)
-            {
-                control.GraphicControl.ReceiveMessage(content);
-            }
-        }
-
-        internal void IncomingMessageFromClient(Message content)
-        {
-            //Debug.WriteLine("Incoming IncomingMessageFromClient "+ content.FromUser.Equals(control.graphicControl.CurrentlyActiveChatUser)+" "+ control.graphicControl.CurrentlyActiveChatUser == null);
             if (content.FromUser.Equals(control.GraphicControl.CurrentlyActiveChatUser) ||
                 control.GraphicControl.CurrentlyActiveChatUser == null)
             {
@@ -230,7 +223,11 @@ namespace CSharpChatClient
             }
         }
 
-        internal bool AcceptIncomingConnectionFromServer()
+        /// <summary>
+        /// Check if there is a session to a client or server active.
+        /// </summary>
+        /// <returns>true for active session</returns>
+        internal bool HasIncomingConnection()
         {
             lock (incomingConnectionLock)
             {
@@ -251,35 +248,22 @@ namespace CSharpChatClient
         }
 
         /// <summary>
-        /// Closes the current connection from the client.
+        /// Closes the current connection from the server. Remove 
         /// </summary>
         internal void CloseConnectionFromServer()
         {
             if (ConnectionOverServer)
             {
-                bool isInside = false;
-                UserConnection toRemove = null;
-                foreach (UserConnection ex in ConnectionList)
-                {
-                    Logger.LogInfo("CloseConnectionFromServer "+ex.User.Name);
-                    if (ex.Equals(control.GraphicControl.CurrentlyActiveChatUser))
-                    {
-                        isInside = true;
-                        toRemove = ex;
-                    }
-                }
-                if (isInside)
-                {
-                    ConnectionList.Remove(toRemove);
-                }
+                RemoveCurrentActiveUserSocketFromList();
 
                 control.GraphicControl.CurrentlyActiveChatUser = null;
                 ConnectionOverServer = false;
             }
         }
 
+
         /// <summary>
-        /// Closes an active connection from the server.
+        /// Closes an active connection from the server, update all neccessary modules
         /// </summary>
         internal void CloseConnectionFromClient()
         {
@@ -288,25 +272,6 @@ namespace CSharpChatClient
                 tcpClient.Disconnect();
                 control.GraphicControl.CurrentlyActiveChatUser = null;
                 ConnectionOverClient = false;
-            }
-        }
-
-        internal void IncomingNotifyMessage(Message message)
-        {
-            if (message.MessageContent.StartsWith("UserDisconnect"))
-            {
-                if (connectionOverClient)
-                {
-                    CloseConnectionFromClient();
-                }
-                else if (connectionOverServer)
-                {
-                    CloseConnectionFromServer();
-                }
-            }
-            else if (message.MessageContent.StartsWith("Rename:"))
-            {
-                control.GraphicControl.InitiateCurrentlyActiveUser(message);
             }
         }
 
@@ -351,8 +316,7 @@ namespace CSharpChatClient
         /// <summary>
         /// Connect to the given address external user, who has the address informations inside.
         /// </summary>
-        /// <param name="ipAddress"></param>
-        /// <param name="port"></param>
+        /// <param name="ex"></param>
         internal bool ManualConnectToExUser(ExtendedUser ex)
         {
             bool success = false;
@@ -387,26 +351,6 @@ namespace CSharpChatClient
             }
         }
 
-        //internal void RemoveSocketToList(Socket handle)
-        //{
-        //    /* Add the new contact to the connection list */
-        //    bool isInList = false;
-        //    ExternalUser exUser = ExternalUser.ParseFromMessage(message);
-        //    foreach (UserConnection uc in ConnectionList)
-        //    {
-        //        if (uc.Equals(exUser))
-        //        {
-        //            isInList = true;
-        //            break;
-        //        }
-        //    }
-        //    if (isInList)
-        //    {
-        //        ConnectionList.AddLast(new UserConnection(exUser, handle));
-
-        //    }
-        //}
-
         /// <summary>
         /// Adds the socket to the connection list, if not exisiting
         /// </summary>
@@ -431,6 +375,43 @@ namespace CSharpChatClient
                 Logger.LogInfo("Add user " + (message.FromUser == null) + " " + (message.ToUser == null) + " ");
                 ConnectionList.AddLast(new UserConnection(exUser, handle));
             }
+        }
+
+        private void RemoveCurrentActiveUserSocketFromList()
+        {
+            bool isInside = false;
+            UserConnection toRemove = null;
+            foreach (UserConnection ex in ConnectionList)
+            {
+                Logger.LogInfo("CloseConnectionFromServer " + ex.User.Name);
+                if (ex.Equals(control.GraphicControl.CurrentlyActiveChatUser))
+                {
+                    isInside = true;
+                    toRemove = ex;
+                }
+            }
+            if (isInside)
+            {
+                ConnectionList.Remove(toRemove);
+            }
+        }
+
+        public bool ConnectionOverClient
+        {
+            get { return connectionOverClient; }
+            set { connectionOverClient = value; }
+        }
+
+        public bool ConnectionOverServer
+        {
+            get { return connectionOverServer; }
+            set { connectionOverServer = value; }
+        }
+
+        public LinkedList<UserConnection> ConnectionList
+        {
+            get { return connectionList; }
+            set { connectionList = value; }
         }
     }
 }

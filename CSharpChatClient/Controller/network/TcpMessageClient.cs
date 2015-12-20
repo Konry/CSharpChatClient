@@ -226,7 +226,7 @@ namespace CSharpChatClient.Controller.Network
                     {
                         if (Message.IsTCPMessage(content))
                         {
-                            netService.IncomingMessageFromClient(Message.ParseTCPMessage(content));
+                            netService.IncomingMessage(Message.ParseTCPMessage(content));
                         }
                         else if (Message.IsNewContactMessage(content))
                         {

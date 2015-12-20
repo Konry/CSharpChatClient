@@ -36,14 +36,16 @@ namespace CSharpChatClient.Controller
         /// Changes the username and inform all instances
         /// </summary>
         /// <param name="username"></param>
-        internal void ChangeUsername(string username)
+        internal void ChangeUsername(string username, bool initialChange = false)
         {
-            Logger.LogInfo("changeto " + username);
-            Message message = new Message(Configuration.localUser, CurrentlyActiveChatUser, "Rename:" + username);
             username = SetConfigurationUser(username);
             chatForm.UsernameLabel_UpdateText(username);
             programControl.FileService.UpdateUserName();
-            programControl.NetworkService.RenameUsernameNotifyRemote(message);
+            if (!initialChange)
+            {
+                Message message = new Message(Configuration.localUser, CurrentlyActiveChatUser, "Rename:" + username);
+                programControl.NetworkService.RenameUsernameNotifyRemote(message);
+            }
         }
 
         /// <summary>

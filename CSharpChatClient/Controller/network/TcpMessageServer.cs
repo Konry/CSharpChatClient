@@ -177,7 +177,7 @@ namespace CSharpChatClient.Controller.Network
                     Logger.LogInfo("Server incoming " + content + " " + bytesRead);
                     if (Message.IsNewContactMessage(content))
                     {
-                        if (netService.AcceptIncomingConnectionFromServer())
+                        if (netService.HasIncomingConnection())
                         {
                             netService.IncomingConnectionFromServer(Message.ParseNewContactMessage(content));
                             netService.AddSocketToList(handle, Message.ParseNewContactMessage(content));
@@ -188,7 +188,7 @@ namespace CSharpChatClient.Controller.Network
                     else if (Message.IsTCPMessage(content))
                     {
                         /* TODO Handle here the incoming data from an other client */
-                        netService.IncomingMessageFromServer(Message.ParseTCPMessage(content));
+                        netService.IncomingMessage(Message.ParseTCPMessage(content));
                     }
                     else if (Message.IsNotifyMessage(content))
                     {
