@@ -91,6 +91,14 @@ namespace CSharpChatClient
 
             toolTips.SetToolTip(this.sendButton, "Sendet die Nachricht, alternativ mit der Enter Taste.");
             toolTips.SetToolTip(this.buttonClearHistory, "Löscht die Historie die aktuell angezeigt wird.");
+            toolTips.SetToolTip(this.labelUserName, "Durch klicken auf dieses Feld kann der Benutzername geändert werden.");
+            toolTips.SetToolTip(this.labelUserNameValue, "Durch klicken auf dieses Feld kann der Benutzername geändert werden.");
+            toolTips.SetToolTip(this.labelConnectedWith, "Durch klicken auf dieses Feld kann die Verbindung zu einem anderen Computer hergestellt werden.");
+            toolTips.SetToolTip(this.labelConnectedWithValue, "Durch klicken auf dieses Feld kann die Verbindung zu einem anderen Computer hergestellt werden.");
+            toolTips.SetToolTip(this.labelIpAddress, "Hier werden die aktuellen Adressdaten dieses Computers angezeigt.");
+            toolTips.SetToolTip(this.labelIpAddressValue, "Hier werden die aktuellen Adressdaten dieses Computers angezeigt.");
+            toolTips.SetToolTip(this.labelPort, "Hier werden die aktuellen Adressdaten dieses Computers angezeigt.");
+            toolTips.SetToolTip(this.labelPortValue, "Hier werden die aktuellen Adressdaten dieses Computers angezeigt.");
         }
 
         private void AvailableConnectionsList_SelectedIndexChanged(object sender, EventArgs e)
@@ -166,7 +174,7 @@ namespace CSharpChatClient
         {
             String ipAndPort = ShowEnterIpAddressAndPort();
 
-            graphicControl.ManuelConnectToIPAndPort(ipAndPort);
+            graphicControl.ManualConnectToIPAndPort(ipAndPort);
         }
 
         private void ButtonClearHistory_Click(object sender, EventArgs e)

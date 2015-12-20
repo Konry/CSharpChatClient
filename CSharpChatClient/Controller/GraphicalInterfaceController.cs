@@ -103,7 +103,7 @@ namespace CSharpChatClient.Controller
         /// Connect manually to the selected ip and port. 
         /// </summary>
         /// <param name="ipAndPort"></param>
-        internal void ManuelConnectToIPAndPort(string ipAndPort)
+        internal void ManualConnectToIPAndPort(string ipAndPort)
         {
             if (ipAndPort == "")
             {
