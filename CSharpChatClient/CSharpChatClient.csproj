@@ -111,8 +111,8 @@
     <Compile Include="Controller\Logger.cs" />
     <Compile Include="Controller\ProgramController.cs" />
     <Compile Include="Model\ConnectionList.cs" />
-    <Compile Include="Model\ExternalUser.cs" />
-    <Compile Include="Model\ExternalUserList.cs" />
+    <Compile Include="Model\ExtendedUser.cs" />
+    <Compile Include="Model\ExtendedUserList.cs" />
     <Compile Include="Model\MessageHistory.cs" />
     <Compile Include="Model\User.cs" />
     <Compile Include="Model\OwnExceptions.cs" />
@@ -129,7 +129,6 @@
     <Compile Include="Controller\Network\TcpMessageServer.cs" />
     <Compile Include="Controller\Network\NetworkService.cs" />
     <Compile Include="Controller\Program.cs" />
-    <Compile Include="Model\UserList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\TcpDataObject.cs" />
     <Compile Include="Test\TestMessage.cs" />

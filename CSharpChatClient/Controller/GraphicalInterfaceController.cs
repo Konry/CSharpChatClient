@@ -6,49 +6,56 @@ using System.Net;
 
 namespace CSharpChatClient.Controller
 {
+    /// <summary>
+    /// Its the controller behind the graphical interface which has the connection to the programm controller, networkservice and the gui.
+    /// </summary>
     public class GraphicalInterfaceController
     {
         private ChatForm chatForm = null;
         private ProgramController programControl = null;
-        private NetworkService networkService = null;
 
-        private ExternalUser currentlyActiveChatUser = null;
+        private ExtendedUser currentlyActiveChatUser = null;
         internal MessageHistory messageHistory = null;
 
-        private LinkedList<ExternalUser> onlineChatPartner = null;
-        //private LinkedList<ExternalUser> offlineChatPartner = null;
+        private LinkedList<ExtendedUser> onlineChatPartner = null;
+        //private LinkedList<ExtendedUser> offlineChatPartner = null;
 
-        public GraphicalInterfaceController(ProgramController programControl, ChatForm chatForm, NetworkService networkService)
+        public GraphicalInterfaceController(ProgramController programControl, ChatForm chatForm)
         {
             this.programControl = programControl;
             this.chatForm = chatForm;
-            this.networkService = networkService;
             Initialize();
         }
 
         private void Initialize()
         {
             messageHistory = new MessageHistory();
-            onlineChatPartner = new LinkedList<ExternalUser>();
-
-            /* TODO load history from file */
-            //messageHistory.FillUpMessageHistory(programControl.fileService.ReadHistoryFile());
+            onlineChatPartner = new LinkedList<ExtendedUser>();
         }
 
+        /// <summary>
+        /// Changes the username and inform all instances
+        /// </summary>
+        /// <param name="username"></param>
         internal void ChangeUsername(string username)
         {
-            Message message = new Message(Configuration.localUser, CurrentlyActiveChatUser, "Rename:"+username);
-            username = SetConfigurationUsername(username);
+            Logger.LogInfo("changeto " + username);
+            Message message = new Message(Configuration.localUser, CurrentlyActiveChatUser, "Rename:" + username);
+            username = SetConfigurationUser(username);
             chatForm.UsernameLabel_UpdateText(username);
             programControl.FileService.UpdateUserName();
-            networkService.RenameUsernameNotifyRemote(message);
+            programControl.NetworkService.RenameUsernameNotifyRemote(message);
         }
 
+        /// <summary>
+        /// Sends a new message to the network service and the updates the message history
+        /// </summary>
+        /// <param name="text"></param>
         internal void SendMessage(string text)
         {
             Message message = new Message(Configuration.localUser, CurrentlyActiveChatUser, text);
 
-            bool success = networkService.SendMessage(message);
+            bool success = programControl.NetworkService.SendMessage(message);
             if (success)
             {
                 messageHistory.AddMessage(message);
@@ -56,16 +63,36 @@ namespace CSharpChatClient.Controller
             }
         }
 
+        /// <summary>
+        /// Initiate the current user
+        /// </summary>
+        /// <param name="message">Containing the new currentliy active user</param>
         internal void InitiateCurrentlyActiveUser(Message message)
         {
+            if(CurrentlyActiveChatUser == null)
+            {
+                CurrentlyActiveChatUser = ExtendedUser.ParseFromMessage(message);
+            }
             if (CurrentlyActiveChatUser.Name.StartsWith("#ManualConnect") || CurrentlyActiveChatUser.Name.StartsWith("#AutoConnect"))
             {
                 CurrentlyActiveChatUser.Name = message.FromUser.Name;
                 CurrentlyActiveChatUser.Id = message.FromUser.Id;
                 chatForm.NotifyConnectedWithChange();
             }
+            else if (message.MessageContent.StartsWith("Rename:"))
+            {
+                string name = message.MessageContent.Replace("Rename:", "");
+                Logger.LogInfo("Rename Currentyl active chat user to " + name);
+                CurrentlyActiveChatUser.Name = name;
+                chatForm.NotifyConnectedWithChange();
+            }
         }
 
+        /// <summary>
+        /// Receive a message from a controller, updates the message history.
+        /// Accept the message when currentlyActiveChatUser is matching the FromUser of the message.
+        /// </summary>
+        /// <param name="message"></param>
         internal void ReceiveMessage(Message message)
         {
             if (message.FromUser.Equals(CurrentlyActiveChatUser))
@@ -75,11 +102,15 @@ namespace CSharpChatClient.Controller
             }
             else
             {
-                Logger.LogError("Fehler: Die letzte Nachricht war nicht vom aktuellen Benutzer");
+                Logger.LogError("Error, the last messsage was not from the currently active user.");
             }
         }
-        
-        internal void ManuelConnectToIPAndPort(string ipAndPort)
+
+        /// <summary>
+        /// Connect manually to the selected ip and port. 
+        /// </summary>
+        /// <param name="ipAndPort"></param>
+        internal void ManualConnectToIPAndPort(string ipAndPort)
         {
             if (ipAndPort == "")
             {
@@ -90,49 +121,46 @@ namespace CSharpChatClient.Controller
                 String[] split = ipAndPort.Split(':');
                 try
                 {
-                    ExternalUser ex = new ExternalUser("#ManualConnect");
-                    ex.IpAddress = IPAddress.Parse(split[0]);
-                    ex.Port = int.Parse(split[1]);
-                    if (!programControl.NetworkService.ManualConnectToExUser(ex))
+                    ExtendedUser exUser = new ExtendedUser("#ManualConnect");
+                    exUser.IpAddress = IPAddress.Parse(split[0]);
+                    exUser.Port = int.Parse(split[1]);
+                    try
+                    {
+                        programControl.NetworkService.ManualConnectToExUser(exUser);
+                    }
+                    catch (Exception ex ) when (ex is TimeoutException || ex is AlreadyConnectedException)
                     {
                         chatForm.InformUser("Verbindung nicht möglich, da die Gegenseite nicht antwortet.");
                     }
-                    currentlyActiveChatUser = ex;
+                    currentlyActiveChatUser = exUser;
                 }
                 catch (Exception e)
                 {
-                    Logger.LogException("Fehlerhafter String ", e);
+                    Logger.LogException("Wrong formated string.", e);
                 }
             }
         }
 
-        public ExternalUser CurrentlyActiveChatUser
-        {
-            get { return currentlyActiveChatUser; }
-            set { currentlyActiveChatUser = value; chatForm.NotifyConnectedWithChange(); }
-        }
-
-        private static string GenerateRandomName()
-        {
-            Random random = new Random();
-            return "Namenslos" + random.Next(1, 999);
-        }
-
-        private static string SetConfigurationUsername(string username)
+        /// <summary>
+        /// Sets the current configuration
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        internal static string SetConfigurationUser(string username)
         {
             if (Configuration.localUser == null)
             {
                 if (username.Equals(""))
                 {
-                    username = GenerateRandomName();
+                    username = User.GenerateRandomNameless();
                 }
-                Configuration.localUser = new User(username);
+                Configuration.localUser = new User(username, User.GenerateUserID());
             }
             else
             {
                 if (username.Equals("") && Configuration.localUser.Name.Equals(""))
                 {
-                    username = GenerateRandomName();
+                    username = User.GenerateRandomNameless();
                 }
                 else if (username.Equals(""))
                 {
@@ -144,10 +172,24 @@ namespace CSharpChatClient.Controller
             return username;
         }
 
+        /// <summary>
+        /// Informs the gui and the message history to clear the history
+        /// </summary>
         internal void ClearHistory()
         {
             messageHistory.ClearHistory();
             chatForm.UpdateMessageHistory();
+        }
+
+        public ExtendedUser CurrentlyActiveChatUser
+        {
+            get { return currentlyActiveChatUser; }
+            set { currentlyActiveChatUser = value; chatForm.NotifyConnectedWithChange(); }
+        }
+
+        internal void InformUser(string text)
+        {
+            chatForm.InformUser(text);
         }
     }
 }

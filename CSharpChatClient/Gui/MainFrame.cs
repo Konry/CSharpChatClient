@@ -12,7 +12,7 @@ namespace CSharpChatClient
         private ProgramController programControl = null;
         private GraphicalInterfaceController graphicControl = null;
 
-        public static ExternalUserList exUserList = null;
+        public static ExtendedUserList exUserList = null;
         //private bool exUserListChanged = false;
 
         private Object thisLock = new Object();
@@ -50,7 +50,7 @@ namespace CSharpChatClient
             sendButton.Enabled = false;
             enterTextBox.Multiline = false;
 
-            exUserList = new ExternalUserList();
+            exUserList = new ExtendedUserList();
             this.FormClosing += ChatForm_OnFormClosing;
         }
 
@@ -114,7 +114,7 @@ namespace CSharpChatClient
             graphicControl.ChangeUsername(username);
         }
 
-        internal void InformUser(string v)
+        internal void InformUser(string text)
         {
             MessageBox.Show("Verbindung nicht möglich, da die Gegenseite nicht antwortet.");
         }
@@ -150,16 +150,6 @@ namespace CSharpChatClient
             }
         }
 
-        //private void EnterTextBox_KeyPressHandler(object sender, KeyEventArgs e)
-        //{
-        //    if (e.KeyCode == Keys.Return)
-        //    {
-        //        Debug.WriteLine("Enter Pressed");
-        //        e.Handled = true;
-        //        e.SuppressKeyPress = true;
-        //    }
-        //}
-
         private void ChatForm_OnFormClosing(object sender, EventArgs e)
         {
             programControl.Stop();
@@ -176,7 +166,7 @@ namespace CSharpChatClient
         {
             String ipAndPort = ShowEnterIpAddressAndPort();
 
-            graphicControl.ManuelConnectToIPAndPort(ipAndPort);
+            graphicControl.ManualConnectToIPAndPort(ipAndPort);
         }
 
         private void ButtonClearHistory_Click(object sender, EventArgs e)

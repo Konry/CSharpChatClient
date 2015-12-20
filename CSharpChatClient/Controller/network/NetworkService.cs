@@ -55,7 +55,7 @@ namespace CSharpChatClient
 
         internal void RenameUsernameNotifyRemote(Message message)
         {
-            SendNotify(message);
+            SendNotifyMessage(message);
         }
 
         public bool ConnectionOverClient
@@ -90,7 +90,7 @@ namespace CSharpChatClient
             }
             else if (connectionOverServer)
             {
-                tcpServer.Send(Configuration.localUser, Message.GenerateTCPNotify(message));
+                tcpServer.Send(control.GraphicControl.CurrentlyActiveChatUser, Message.GenerateTCPNotify(message));
             }
             tcpServer.Stop();
             tcpClient.Cancel();
@@ -104,6 +104,11 @@ namespace CSharpChatClient
             Configuration.selectedTcpPort = GetAvaiableTCPPort();
         }
 
+        /// <summary>
+        /// Sends the given message to the current open connection
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         internal bool SendMessage(Message message)
         {
             if (ConnectionOverClient)
@@ -123,7 +128,7 @@ namespace CSharpChatClient
             return true;
         }
 
-        internal bool SendNotify(Message message)
+        internal bool SendNotifyMessage(Message message)
         {
             if (ConnectionOverClient)
             {
@@ -141,11 +146,30 @@ namespace CSharpChatClient
             return true;
         }
 
+        internal bool SendConnectMessage(ExtendedUser localExtendedUser)
+        {
+            if (ConnectionOverClient)
+            {
+                // No need to send connection message
+            }
+            else if (ConnectionOverServer)
+            {
+                Logger.LogInfo("Send connect Message");
+                tcpServer.Send(control.GraphicControl.CurrentlyActiveChatUser, Message.GenerateConnectMessage(localExtendedUser));
+            }
+            else
+            {
+                Logger.LogError("There is currently no connection!");
+                return false;
+            }
+            return true;
+        }
+
         /// <summary>
-        ///
+        /// Reads the first local ip-address adapter id
         /// </summary>
         /// <param name="host"></param>
-        /// <exception cref="Exception">Throws a </exception>
+        /// <exception cref="Exception">Throws a new address is not found exception. </exception>
         /// <returns></returns>
         private IPAddress GetLocalIPAddress(IPHostEntry host)
         {
@@ -161,38 +185,52 @@ namespace CSharpChatClient
             throw new Exception("Local IP Address Not Found!");
         }
 
-        internal static int GetAvaiableTCPPort()
+
+        /// <summary>
+        /// Checks if there is a free port between two numbers, sets also the input values into bounds of 0 - 65535
+        /// </summary>
+        /// <returns>The next fee tcp port.</returns>
+        internal static int GetAvaiableTCPPort(int portStartIndex = 51110, int portEndIndex = 51150)
         {
-            int PortStartIndex = 51110;
-            int PortEndIndex = 51150;
+            if (portStartIndex < 0)
+            {
+                portStartIndex = 0;
+            }
+            else if (portEndIndex > 65535)
+            {
+                portStartIndex = 65535;
+            }
+            if (portEndIndex < 0)
+            {
+                portEndIndex = 0;
+            }
+            else if (portEndIndex > 65535)
+            {
+                portEndIndex = 65535;
+            }
+            else if (portEndIndex < portStartIndex)
+            {
+                portEndIndex = portStartIndex;
+            }
 
             IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
             IPEndPoint[] tcpEndPoints = properties.GetActiveTcpListeners();
             List<int> usedPorts = tcpEndPoints.Select(p => p.Port).ToList<int>();
-            int unusedPort = 0;
-            for (int _port = PortStartIndex; _port < PortEndIndex; _port++)
+            int unusedPort = 51110;
+            for (int portIndex = portStartIndex; portIndex < portEndIndex; portIndex++)
             {
-                if (!usedPorts.Contains(_port))
+                if (!usedPorts.Contains(portIndex))
                 {
-                    unusedPort = _port;
+                    Logger.LogInfo("Unused Port: " + unusedPort);
+                    unusedPort = portIndex;
                     break;
                 }
             }
-            Logger.LogInfo("Unused Port: " + unusedPort);
             return unusedPort;
         }
 
-        internal void IncomingMessageFromServer(Message content)
+        internal void IncomingMessage(Message content)
         {
-            if (content.FromUser.Equals(control.GraphicControl.CurrentlyActiveChatUser) || control.GraphicControl.CurrentlyActiveChatUser == null)
-            {
-                control.GraphicControl.ReceiveMessage(content);
-            }
-        }
-
-        internal void IncomingMessageFromClient(Message content)
-        {
-            //Debug.WriteLine("Incoming IncomingMessageFromClient "+ content.FromUser.Equals(control.graphicControl.CurrentlyActiveChatUser)+" "+ control.graphicControl.CurrentlyActiveChatUser == null);
             if (content.FromUser.Equals(control.GraphicControl.CurrentlyActiveChatUser) ||
                 control.GraphicControl.CurrentlyActiveChatUser == null)
             {
@@ -200,7 +238,7 @@ namespace CSharpChatClient
             }
         }
 
-        internal bool AcceptIncomingConnectionFromServer()
+        internal bool AcceptIncomingConnection()
         {
             lock (incomingConnectionLock)
             {
@@ -215,11 +253,23 @@ namespace CSharpChatClient
             }
         }
 
-        internal void SetConnectionInformation(Message message)
+
+        /// <summary>
+        /// Closes the current connection from the client.
+        /// </summary>
+        internal void CloseConnectionFromClient()
         {
-            control.GraphicControl.InitiateCurrentlyActiveUser(message);
+            if (ConnectionOverClient)
+            {
+                tcpClient.Disconnect();
+                control.GraphicControl.CurrentlyActiveChatUser = null;
+                ConnectionOverClient = false;
+            }
         }
 
+        /// <summary>
+        /// Closes an active connection from the server.
+        /// </summary>
         internal void CloseConnectionFromServer()
         {
             if (ConnectionOverServer)
@@ -238,19 +288,12 @@ namespace CSharpChatClient
                 {
                     ConnectionList.Remove(toRemove);
                 }
-
                 control.GraphicControl.CurrentlyActiveChatUser = null;
                 ConnectionOverServer = false;
             }
         }
 
-        internal void CloseConnectionFromClient()
-        {
-            control.GraphicControl.CurrentlyActiveChatUser = null;
-            ConnectionOverClient = false;
-        }
-
-        internal void NoftifyFromCurrentUser(Message message)
+        internal void IncomingNotifyMessage(Message message)
         {
             if (message.MessageContent.StartsWith("UserDisconnect"))
             {
@@ -262,43 +305,78 @@ namespace CSharpChatClient
                 {
                     CloseConnectionFromServer();
                 }
-            } else if (message.MessageContent.StartsWith("Rename:"))
+            }
+            else if (message.MessageContent.StartsWith("Rename:"))
             {
                 control.GraphicControl.InitiateCurrentlyActiveUser(message);
             }
         }
 
-        internal void IncomingConnectionFromServer(Message tcpAcceptMessage)
+
+        /// <summary>
+        /// Informs the graphical interface about a new currently active user
+        /// </summary>
+        /// <param name="message"></param>
+        private void IncomingNewContactMessage(Message message)
+        {
+            control.GraphicControl.InitiateCurrentlyActiveUser(message);
+        }
+
+        /// <summary>
+        /// Notifys the Gui Thread when there is a new connection established.
+        /// </summary>
+        /// <param name="tcpAcceptMessage"></param>
+        private void IncomingConnectionFromServer(Message tcpAcceptMessage)
         {
             lock (incomingConnectionLock)
             {
                 if (!ConnectionOverClient && !ConnectionOverServer)
                 {
                     ConnectionOverServer = true;
-                    control.GraphicControl.CurrentlyActiveChatUser = new ExternalUser(tcpAcceptMessage.FromUser);
+                    control.GraphicControl.CurrentlyActiveChatUser = new ExtendedUser(tcpAcceptMessage.FromUser);
                 }
             }
         }
 
-        internal bool ManualConnectToExUser(ExternalUser ex)
+        /// <summary>
+        /// Connect to the given address external user, who has the address informations inside.
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="port"></param>
+        /// <exception cref="AlreadyConnectedException">Thrown when the connection is already existing.</exception>
+        /// <exception cref="TimeoutException">Thrown when the connection could not be established.</exception>
+        internal bool ManualConnectToExUser(ExtendedUser exUser)
         {
             bool success = false;
             lock (incomingConnectionLock)
             {
-                if (control.GraphicControl.CurrentlyActiveChatUser != null && ex.Equals(control.GraphicControl.CurrentlyActiveChatUser)) { return false; }
+                if (control.GraphicControl.CurrentlyActiveChatUser != null && exUser.Equals(control.GraphicControl.CurrentlyActiveChatUser)) { return false; }
                 if (!ConnectionOverServer)
                 {
-                    success = tcpClient.ReConnect(ex.IpAddress, ex.Port);
-                    if (success)
+                    try
                     {
+                        tcpClient.ReConnect(exUser.IpAddress, exUser.Port);
                         ConnectionOverClient = true;
+                    }
+                    catch (TimeoutException ex)
+                    {
+                        control.GraphicControl.InformUser("Verbindung unterbrochen. "+ex.Message);
+                        ConnectionOverClient = false;
+                    }
+                    catch (AlreadyConnectedException ex)
+                    {
+                        control.GraphicControl.InformUser("Verbindung besteht bereits. " + ex.Message);
                     }
                 }
             }
             return success;
         }
 
-        internal void ManuelDisconnectFromExUser(ExternalUser ex)
+        /// <summary>
+        /// Disconnects from the current user
+        /// </summary>
+        /// <param name="ex"></param>
+        internal void ManualDisconnectFromExUser(ExtendedUser ex)
         {
             lock (incomingConnectionLock)
             {
@@ -310,40 +388,64 @@ namespace CSharpChatClient
             }
         }
 
-        //internal void RemoveSocketToList(Socket handle)
-        //{
-        //    /* Add the new contact to the connection list */
-        //    bool isInList = false;
-        //    ExternalUser exUser = ExternalUser.ParseFromMessage(message);
-        //    foreach (UserConnection uc in ConnectionList)
-        //    {
-        //        if (uc.Equals(exUser))
-        //        {
-        //            isInList = true;
-        //            break;
-        //        }
-        //    }
-        //    if (isInList)
-        //    {
-        //        ConnectionList.AddLast(new UserConnection(exUser, handle));
 
-        //    }
-        //}
-
-        internal void AddSocketToList(Socket handle, Message message)
+        /// <summary>
+        /// The content analyser, which get the message and the handling informations out of the string.
+        /// </summary>
+        /// <param name="content">Stream message</param>
+        /// <param name="server"></param>
+        /// <param name="handle">Socket needed if there if server is true</param>
+        /// <exception cref="ArgumentNullException">When the server variable is true, but there is no socket</exception>
+        public void AnalyseIncomingContent(string content, bool server = false, Socket handle = null)
         {
-            /* Add the new contact to the connection list */
-            bool isAlreadyInList = false;
-            ExternalUser exUser = ExternalUser.ParseFromMessage(message);
+            Logger.LogInfo("Incoming " + content);
+            if (Message.IsTCPMessage(content))
+            {
+                IncomingMessage(Message.ParseTCPMessage(content));
+            }
+            else if (Message.IsNewContactMessage(content) && AcceptIncomingConnection())
+            {
+                Message contactMessage = Message.ParseNewContactMessage(content);
+                if (server)
+                {
+                    if (handle == null)
+                    {
+                        throw new ArgumentNullException("If the server is true the handle can not be null");
+                    }
+                    IncomingConnectionFromServer(contactMessage);
+                    AddSocketToList(contactMessage, handle);
+                    SendConnectMessage(ExtendedUser.ConfigurationToExtendedUser());
+                }
+                else
+                {
+                    IncomingNewContactMessage(contactMessage);
+                    ConnectionOverClient = true;
+                }
+            }
+            else if (Message.IsNotifyMessage(content))
+            {
+                IncomingNotifyMessage(Message.ParseTCPNotifyMessage(content));
+            }
+        }
+
+        /// <summary>
+        /// Adds the socket to the connection list, if not exisiting
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="handle"></param>
+        private void AddSocketToList(Message message, Socket handle)
+        {
+            bool alreadyInList = false;
+            ExtendedUser exUser = ExtendedUser.ParseFromMessage(message);
             foreach (UserConnection uc in ConnectionList)
             {
                 if (uc.Equals(exUser))
                 {
-                    isAlreadyInList = true;
+                    alreadyInList = true;
                     break;
                 }
             }
-            if (!isAlreadyInList)
+            if (!alreadyInList)
             {
                 ConnectionList.AddLast(new UserConnection(exUser, handle));
             }

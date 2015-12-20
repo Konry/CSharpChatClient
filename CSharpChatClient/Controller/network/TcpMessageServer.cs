@@ -12,7 +12,6 @@ namespace CSharpChatClient.Controller.Network
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
         private static ManualResetEvent receiveDone = new ManualResetEvent(false);
         private static ManualResetEvent sendDone = new ManualResetEvent(false);
-        public static ManualResetEvent serverBlock = new ManualResetEvent(false);
 
         private Socket socket = null;
 
@@ -30,9 +29,9 @@ namespace CSharpChatClient.Controller.Network
 
         ~TcpMessageServer()
         {
-            if (Socket != null)
+            if (socket != null)
             {
-                Socket.Close();
+                socket.Close();
             }
             thread.Abort();
         }
@@ -58,13 +57,18 @@ namespace CSharpChatClient.Controller.Network
         public void Stop()
         {
             shouldStop = true;
-            Socket.Close();
+            socket.Close();
             if (thread != null)
             {
                 thread.Abort();
             }
         }
 
+        /// <summary>
+        /// Send a message to the socket of the given user and sends the message to it
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="message"></param>
         public void Send(User user, string message)
         {
             foreach (UserConnection uc in netService.ConnectionList)
@@ -77,6 +81,9 @@ namespace CSharpChatClient.Controller.Network
             }
         }
 
+        /// <summary>
+        /// Starts the listening to the port
+        /// </summary>
         private void StartListening()
         {
             byte[] bytes = new Byte[1024];
@@ -84,25 +91,24 @@ namespace CSharpChatClient.Controller.Network
             IPEndPoint localEndPoint = null;
 
             localEndPoint = new IPEndPoint(Configuration.localIpAddress, Configuration.selectedTcpPort);
-            Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             try
             {
                 // Binds the socket to the local address
-                Socket.Bind(localEndPoint);
-                Socket.Listen(100);
+                socket.Bind(localEndPoint);
+                socket.Listen(100);
                 while (!shouldStop)
                 {
-                    // Set the event to nonsignaled state.
-                    serverBlock.Reset();
+                    connectDone.Reset();
 
                     // Start an asynchronous socket to listen for connections.
-                    Socket.BeginAccept(
+                    socket.BeginAccept(
                         new AsyncCallback(AcceptCallback),
-                        Socket);
+                        socket);
 
                     // Wait until a connection is made before continuing.
-                    serverBlock.WaitOne();
+                    connectDone.WaitOne();
                 }
             }
             catch (Exception e)
@@ -110,18 +116,13 @@ namespace CSharpChatClient.Controller.Network
                 Logger.LogException("StartListening ", e);
             }
         }
-
-        internal void CloseConnection(User localUser, string v)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         private void AcceptCallback(IAsyncResult ar)
         {
             try
             {
                 // Signal the main thread to continue.
-                serverBlock.Set();
+                connectDone.Set();
 
                 // Get the socket that handles the client request.
                 Socket listener = (Socket)ar.AsyncState;
@@ -133,7 +134,7 @@ namespace CSharpChatClient.Controller.Network
 
                 handle.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
                     new AsyncCallback(ReadCallback), state);
-                //receiveDone.WaitOne();
+                receiveDone.WaitOne();
             }
             catch (ObjectDisposedException ode)
             {
@@ -160,43 +161,16 @@ namespace CSharpChatClient.Controller.Network
                 Logger.LogInfo("Server incoming " + content + " " + bytesRead);
                 if (bytesRead > 0)
                 {
-                    // There  might be more data, so store the data received so far.
-                    //state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
-
                     content = Encoding.ASCII.GetString(state.buffer, 0, bytesRead);
-
-                    if (Message.IsNewContactMessage(content))
-                    {
-                        if (netService.AcceptIncomingConnectionFromServer())
-                        {
-                            netService.IncomingConnectionFromServer(Message.ParseNewContactMessage(content));
-                            netService.AddSocketToList(handle, Message.ParseNewContactMessage(content));
-                            Send(handle, Message.GenerateConnectMessage(Configuration.localUser, Configuration.localIpAddress, Configuration.selectedTcpPort));
-                            sendDone.Set();
-                        }
-                    }
-                    else if (Message.IsTCPMessage(content))
-                    {
-                        /* TODO Handle here the incoming data from an other client */
-                        netService.IncomingMessageFromServer(Message.ParseTCPMessage(content));
-                    }
-                    else if (Message.IsNotifyMessage(content))
-                    {
-                        netService.NoftifyFromCurrentUser(Message.ParseTCPNotifyMessage(content));
-                    }
-
-                    // Echo the data back to the client. TODO optional, normally remove this.
-                    //Send(handle, Message.GenerateConnectMessage(Configuration.localUser, Configuration.localIpAddress, Configuration.selectedTcpPort));
-                    //state.sb.Clear();
-
-                    // Again ReceiveData
+                    Logger.LogInfo(content);
+                    netService.AnalyseIncomingContent(content, true, handle);
 
                     handle.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
                 new AsyncCallback(ReadCallback), state);
                 }
                 else
                 {
-                    /* socket closed*/
+                    // socket closed
                     Logger.LogInfo("TCP-Server - Socket closed by Client.");
                     netService.CloseConnectionFromServer();
                     receiveDone.Set();
@@ -255,12 +229,6 @@ namespace CSharpChatClient.Controller.Network
             {
                 Logger.LogException("Error in SendCallback ", e);
             }
-        }
-
-        public Socket Socket
-        {
-            get { return socket; }
-            set { socket = value; }
         }
     }
 }

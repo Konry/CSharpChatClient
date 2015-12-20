@@ -23,33 +23,60 @@ namespace CSharpChatClient.Controller
 
         static Logger()
         {
-            var globalStartTime = DateTime.Now;
-            writer = File.AppendText("log" + globalStartTime.ToString("yyyy-MM-tt") + ".txt");
-            writer.Write("CSharpChat Tool Log: ");
-            writer.WriteLine("  :");
-            writer.WriteLine("-------------------------------");
+            try
+            {
+                var globalStartTime = DateTime.Now;
+                writer = File.AppendText("log" + globalStartTime.ToString("yyyy-MM-TT") + ".txt");
+                writer.Write("CSharpChat Tool Log: ");
+                writer.WriteLine("  :");
+                writer.WriteLine("-------------------------------");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Writer could not created.");
+            }
         }
 
+        /// <summary>
+        /// Logs automatically a trace level message
+        /// </summary>
+        /// <param name="logMessage"></param>
         public static void LogTrace(string logMessage)
         {
             Log(logMessage, LogState.TRACE);
         }
 
+        /// <summary>
+        /// Logs automatically an info level message
+        /// </summary>
+        /// <param name="logMessage"></param>
         public static void LogInfo(string logMessage)
         {
             Log(logMessage, LogState.INFO);
         }
 
+        /// <summary>
+        /// Logs automatically a warning level message
+        /// </summary>
+        /// <param name="logMessage"></param>
         public static void LogWarning(string logMessage)
         {
             Log(logMessage, LogState.WARNING);
         }
 
+        /// <summary>
+        /// Logs automatically an error level message
+        /// </summary>
+        /// <param name="logMessage"></param>
         public static void LogError(string logMessage)
         {
             Log(logMessage, LogState.ERROR);
         }
 
+        /// <summary>
+        /// Logs automatically a fatal level message
+        /// </summary>
+        /// <param name="logMessage"></param>
         public static void LogFatal(string logMessage)
         {
             Log(logMessage, LogState.FATAL);
@@ -65,11 +92,18 @@ namespace CSharpChatClient.Controller
         {
             if (Configuration.logLevel <= state)
             {
-                string logLevel = string.Empty;
-                logLevel = GetStateString(state);
-                string temp = "\r\n" + DateTime.Now.ToString("s") + " \t- " + logLevel + " - " + logMessage;
-                Debug.WriteLine(temp);
-                writer.WriteLineAsync(temp);
+                try
+                {
+                    string logLevel = string.Empty;
+                    logLevel = GetStateString(state);
+                    string temp = "\r\n" + DateTime.Now.ToString("s") + " \t- " + logLevel + " - " + logMessage;
+                    Debug.WriteLine(temp);
+                    writer.WriteLineAsync(temp);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Writer could not created.");
+                }
                 //writer.FlushAsync();
             }
         }
@@ -85,6 +119,11 @@ namespace CSharpChatClient.Controller
             Log(logMessage + "\r\n" + exception.Message + "\r\n\r\n" + exception.StackTrace + "\r\n", state);
         }
 
+        /// <summary>
+        /// Get the String for the enum of LogState
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns>The string of the state</returns>
         private static string GetStateString(LogState state)
         {
             string logLevel;

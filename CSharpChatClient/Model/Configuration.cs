@@ -17,5 +17,6 @@ namespace CSharpChatClient
         public static int selectedTcpPort = -1;
 
         public static LogState logLevel = LogState.INFO;
+        public const bool DEBUG_SESSION = true;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSharpChatClient.Model;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -12,13 +13,11 @@ namespace CSharpChatClient.Controller.Network
         private static ManualResetEvent receiveDone = new ManualResetEvent(false);
         private static ManualResetEvent sendDone = new ManualResetEvent(false);
         private Socket socket = null;
-        //private static ManualResetEvent sendDone = new ManualResetEvent(false);
 
         private bool connected = false;
         private NetworkService netService = null;
 
         private Thread thread = null;
-        private volatile bool shouldStop = false;
 
         public TcpMessageClient(NetworkService netService)
         {
@@ -29,18 +28,18 @@ namespace CSharpChatClient.Controller.Network
         ~TcpMessageClient()
         {
             connected = false;
-            if (Socket != null)
+            if (socket != null)
             {
                 try
                 {
-                    Socket.Disconnect(false);
+                    socket.Disconnect(false);
                 }
                 catch (ObjectDisposedException ode)
                 {
                     Logger.LogException("Connect ObjectDisposedException", ode);
                     /*throw away*/
                 }
-                Socket.Close();
+                socket.Close();
             }
             if (thread != null)
             {
@@ -48,62 +47,91 @@ namespace CSharpChatClient.Controller.Network
             }
         }
 
-        public bool Connect(IPAddress ipAddress, int port)
+        /// <summary>
+        /// Connects to the given address and port, non blocking, by starting a new thread
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="port"></param>
+        /// <exception cref="AlreadyConnectedException">Thrown when the connection is already existing.</exception>
+        /// <exception cref="TimeoutException">Thrown when the connection could not be established.</exception>
+        public void Connect(IPAddress ipAddress, int port)
+        {
+            if (connected)
+            {
+                throw new AlreadyConnectedException("Connection already established.");
+            }
+            thread = new Thread(delegate () { StartConnecting(ipAddress, port); });
+            thread.Start();
+        }
+
+        /// <summary>
+        /// Connects to 
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="port"></param>
+        /// <exception cref="TimeoutException">Thrown when the connection could not be established.</exception>
+        public void StartConnecting(IPAddress ipAddress, int port)
         {
             try
             {
-                if (connected)
-                {
-                    return true;
-                }
-                shouldStop = false;
                 connected = true;
                 IPEndPoint remoteEnd = new IPEndPoint(ipAddress, port);
-                Socket = new Socket(AddressFamily.InterNetwork,
+                socket = new Socket(AddressFamily.InterNetwork,
                     SocketType.Stream, ProtocolType.Tcp);
 
                 /* connect to the selected ipaddress */
-                Socket.BeginConnect(remoteEnd, new AsyncCallback(ConnectCallback), Socket);
-                connectDone.WaitOne();
+                socket.BeginConnect(remoteEnd, new AsyncCallback(ConnectCallback), socket);
+                if (!Configuration.DEBUG_SESSION && !connectDone.WaitOne(5000, true))
+                {
+                    throw new TimeoutException("Connection could not be established.");
+                }else
+                {
+                    connectDone.WaitOne();
+                }
 
-                thread = new Thread(StartReceiving);
                 /* Send a first message + TRY Connect to the remote */
-                SendConnectMessage(Configuration.localUser, ipAddress, port);
-                thread.Start();
-                return true;
+                netService.SendConnectMessage(ExtendedUser.ConfigurationToExtendedUser());
+
+                Receive(socket);
+                if (!Configuration.DEBUG_SESSION && !receiveDone.WaitOne(5000, true))
+                {
+                    throw new TimeoutException("Message receive is interrupted.");
+                }else
+                {
+                    receiveDone.WaitOne();
+                }
             }
-            catch (System.ObjectDisposedException ode)
+            catch (ObjectDisposedException ode)
             {
                 Logger.LogException("Connect ObjectDisposedException", ode);
             }
             catch (SocketException se)
             {
                 Logger.LogException("Connect", se);
-                return false;
             }
-            return false;
         }
 
-        internal void CloseConnection(string v)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool ReConnect(IPAddress ipAddress, int port)
+        /// <summary>
+        /// Reconnects to the given address information, by close the current connection.
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="port"></param>
+        /// <exception cref="AlreadyConnectedException">Thrown when the connection is already existing.</exception>
+        /// <exception cref="TimeoutException">Thrown when the connection could not be established.</exception>
+        public void ReConnect(IPAddress ipAddress, int port)
         {
             Disconnect();
-            return Connect(ipAddress, port);
+            Connect(ipAddress, port);
         }
 
         public void Disconnect()
         {
-            shouldStop = true;
             connected = false;
-            if (Socket != null)
+            if (socket != null)
             {
                 try
                 {
-                    Socket.Disconnect(true);
+                    socket.Disconnect(true);
                 }
                 catch (ObjectDisposedException ode)
                 {
@@ -115,10 +143,9 @@ namespace CSharpChatClient.Controller.Network
 
         public void Cancel()
         {
-            shouldStop = true;
-            if (Socket != null)
+            if (socket != null)
             {
-                Socket.Close();
+                socket.Close();
             }
             if (thread != null)
             {
@@ -126,19 +153,28 @@ namespace CSharpChatClient.Controller.Network
             }
         }
 
+        /// <summary>
+        /// Sends a message to the given socket.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <exception cref="TimeoutException">Thrown when the send has reached timeout.</exception>
         public void Send(string message)
         {
-            Send(Socket, message);
-            sendDone.Set();
+            Send(socket, message);
+            if ( !Configuration.DEBUG_SESSION && !sendDone.WaitOne(5000, true))
+            {
+                throw new TimeoutException("Connection could not be established.");
+            } else
+            {
+                sendDone.WaitOne();
+            }
         }
 
-        private void SendConnectMessage(User user, IPAddress ipAddress, int port)
-        {
-            Logger.LogInfo("Send Connect Message " + Message.GenerateConnectMessage(user, ipAddress, port));
-            Send(Socket, Message.GenerateConnectMessage(user, ipAddress, port));
-            sendDone.Set();
-        }
 
+        /// <summary>
+        /// Awaits the connection
+        /// </summary>
+        /// <param name="ar"></param>
         private void ConnectCallback(IAsyncResult ar)
         {
             try
@@ -150,7 +186,6 @@ namespace CSharpChatClient.Controller.Network
                 client.EndConnect(ar);
 
                 Logger.LogInfo("Socket connected to " + client.RemoteEndPoint.ToString());
-
                 // Signal that the connection has been made.
                 connectDone.Set();
             }
@@ -160,11 +195,11 @@ namespace CSharpChatClient.Controller.Network
             }
         }
 
-        private void StartReceiving()
-        {
-            Receive(Socket);
-        }
-
+        /// <summary>
+        /// Awaits message from the client.
+        /// </summary>
+        /// <param name="client">The socket of the client</param>
+        /// <exception cref="TimeoutException">Thrown when the connection could not be established.</exception>
         private void Receive(Socket client)
         {
             try
@@ -176,7 +211,13 @@ namespace CSharpChatClient.Controller.Network
 
                 // Begin receiving the data from the remote device.
                 client.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0, new AsyncCallback(ReceiveCallback), state);
-                receiveDone.WaitOne();
+                if (!Configuration.DEBUG_SESSION && !receiveDone.WaitOne(5000, true))
+                {
+                    throw new TimeoutException("Receive is interrupted.");
+                } else
+                {
+                    receiveDone.WaitOne();
+                }
             }
             catch (ObjectDisposedException ode)
             {
@@ -188,6 +229,11 @@ namespace CSharpChatClient.Controller.Network
             }
         }
 
+        /// <summary>
+        /// Analyises an incoming AsyncResult Object, resulting in the message.
+        /// Informes networkService about the incoming 
+        /// </summary>
+        /// <param name="ar"></param>
         private void ReceiveCallback(IAsyncResult ar)
         {
             String content = String.Empty;
@@ -209,22 +255,7 @@ namespace CSharpChatClient.Controller.Network
                     content = Encoding.ASCII.GetString(state.buffer, 0, bytesRead);
                     Logger.LogInfo(content);
 
-                    if (!content.Equals(""))
-                    {
-                        if (Message.IsTCPMessage(content))
-                        {
-                            netService.IncomingMessageFromClient(Message.ParseTCPMessage(content));
-                        }
-                        else if (Message.IsNewContactMessage(content))
-                        {
-                            netService.SetConnectionInformation(Message.ParseNewContactMessage(content));
-                        } else if (Message.IsNotifyMessage(content))
-                        {
-                            netService.NoftifyFromCurrentUser(Message.ParseTCPNotifyMessage(content));
-                        }
-                    }
-                    // Get the rest of the data.
-                    //state.sb.Clear();
+                    netService.AnalyseIncomingContent(content);
                     client.BeginReceive(state.buffer, 0, TcpDataObject.BufferSize, 0,
                         new AsyncCallback(ReceiveCallback), state);
                 }
@@ -248,7 +279,7 @@ namespace CSharpChatClient.Controller.Network
         }
 
         /// <summary>
-        /// Sends a message to the selected socket handler.
+        /// Sends a message asynchrone to the selected socket handler.
         /// </summary>
         /// <param name="data">The string to send over the network</param>
         private void Send(Socket handler, String data)
@@ -268,6 +299,10 @@ namespace CSharpChatClient.Controller.Network
             }
         }
 
+        /// <summary>
+        /// Sends the data to the remote device. Async function.
+        /// </summary>
+        /// <param name="ar"></param>
         private void SendCallback(IAsyncResult ar)
         {
             try
@@ -286,12 +321,6 @@ namespace CSharpChatClient.Controller.Network
             {
                 Logger.LogException("Error in SendCallback ", e);
             }
-        }
-
-        public Socket Socket
-        {
-            get { return socket; }
-            set { socket = value; }
         }
     }
 }
