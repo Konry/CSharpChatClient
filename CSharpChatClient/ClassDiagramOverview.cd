@@ -1,70 +1,214 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Comment CommentText="Modell">
-    <Position X="4.708" Y="6.812" Height="0.417" Width="0.7" />
+    <Position X="4.435" Y="8.324" Height="0.417" Width="0.7" />
   </Comment>
   <Comment CommentText="View">
-    <Position X="3.562" Y="0.5" Height="0.75" Width="1.7" />
+    <Position X="2.177" Y="1.028" Height="0.75" Width="1.7" />
   </Comment>
   <Comment CommentText="controller">
-    <Position X="5.646" Y="3.708" Height="0.75" Width="1.7" />
+    <Position X="5.737" Y="0.775" Height="0.732" Width="1.481" />
   </Comment>
-  <Class Name="CSharpChatClient.ChatForm" Collapsed="true">
-    <Position X="5.5" Y="0.5" Width="1.5" />
+  <Class Name="CSharpChatClient.ChatForm">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Delegate Name="CSharpChatClient.ChatForm.MessageBoxDelegate" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Gui\MainFrame.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="CSharpChatClient.ChatForm.ConnectedWithLabelDelegate" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Gui\MainFrame.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="CSharpChatClient.ChatForm.UsernameLabelDelegate" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Gui\MainFrame.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
     <TypeIdentifier>
       <HashCode>CBAgAENpAKIAIAAADKHAEYBGAQABAGoAACaEDiiDAgg=</HashCode>
       <FileName>Gui\MainFrame.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="CSharpChatClient.Program" Collapsed="true">
-    <Position X="5.75" Y="2.75" Width="1.5" />
+  <Class Name="CSharpChatClient.Program">
+    <Position X="4" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
       <FileName>Controller\Program.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="CSharpChatClient.Properties.Resources">
-    <Position X="2.25" Y="4.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAIAAAAAIAAABEEAAAQAAEAAAAAAAAAAAAIA=</HashCode>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="CSharpChatClient.Properties.Settings">
-    <Position X="4" Y="4.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAABAAAAAAAAAAAAAAA=</HashCode>
-    </TypeIdentifier>
-  </Class>
   <Class Name="CSharpChatClient.Message">
-    <Position X="4" Y="7.5" Width="2.25" />
+    <Position X="9.25" Y="9.25" Width="2.25" />
+    <Compartments>
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
       <HashCode>IAEAAAQpAAAkIAAEAAAAAACAAQEAMAAAAAAABDAAAAA=</HashCode>
       <FileName>Model\Message.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CSharpChatClient.User">
-    <Position X="2.25" Y="7.5" Width="1.5" />
+    <Position X="2.25" Y="9.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
       <HashCode>AIACAAAAAAAAAAAAgAAAAAQAAAAEAAAAAAIAAAAAAgA=</HashCode>
       <FileName>Model\User.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CSharpChatClient.FileService">
-    <Position X="7.75" Y="0.5" Width="1.5" />
+    <Position X="5.75" Y="9.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAACAAAAAAgQAAAAgAAAAAAAAAEAAAAQAQA=</HashCode>
       <FileName>Model\FileService.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="CSharpChatClient.TcpDataObject">
-    <Position X="9.5" Y="0.5" Width="1.5" />
+    <Position X="7.5" Y="9.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAACAEAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
       <FileName>Model\TcpDataObject.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="CSharpChatClient.NetworkService">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Delegate Name="CSharpChatClient.NetworkService.DisconnectDelegate" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Controller\Network\NetworkService.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="CSharpChatClient.NetworkService.NoConnectionDelegate" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Controller\Network\NetworkService.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AACAgBAAgCQQhQAABGAAAAQgIQgQAgAFJBAQBAAAAAA=</HashCode>
+      <FileName>Controller\Network\NetworkService.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.Controller.Network.TcpMessageClient">
+    <Position X="11" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>lASACAFAQAAAAAGAAEAAAIAAAACCAQAQAAEAAAAgAAE=</HashCode>
+      <FileName>Controller\Network\TcpMessageClient.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.Controller.Network.TcpMessageServer">
+    <Position X="9.25" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>gACgCAAAACAAAAGAAEAAAAAAAAACAQAAIAEAAAAAAIU=</HashCode>
+      <FileName>Controller\Network\TcpMessageServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.Controller.GraphicalInterfaceController">
+    <Position X="4" Y="1.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>JBAAAAgACAAAAcAAACBAAAgAACAAAAAAEAAAABAAgAA=</HashCode>
+      <FileName>Controller\GraphicalInterfaceController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.controller.ProgramController">
+    <Position X="5.75" Y="1.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>BCAAAAAAAAAAAAAQAAAAEAAAAAAAAAAAIAACAAQgEgA=</HashCode>
+      <FileName>Controller\ProgramController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.Model.UserConnection">
+    <Position X="4" Y="9.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAEAAAAAAQA=</HashCode>
+      <FileName>Model\ConnectionList.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.Model.ExtendedUser" Collapsed="true">
+    <Position X="2.25" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAIAAggCAAAQAiAAAAAgAAAAAAAEAAAA=</HashCode>
+      <FileName>Model\ExtendedUser.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CSharpChatClient.Model.ExtendedUserList">
+    <Position X="2.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Model\ExtendedUserList.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.Controller.Logger">
+    <Position X="4" Y="11" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="CSharpChatClient.Controller.Logger.LogState" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Model\Logger.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAAAAAAAAAAAAAIAgKAAAAAYAAAAAgAgA=</HashCode>
+      <FileName>Model\Logger.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSharpChatClient.Model.MessageHistory">
+    <Position X="7.5" Y="10.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAEAAAACAAAAAAAAAAAAAAgCAAAAAEAAAABAAAAACAA=</HashCode>
+      <FileName>Model\MessageHistory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Struct Name="CSharpChatClient.Configuration">
-    <Position X="6.5" Y="7.5" Width="1.5" />
+    <Position X="5.75" Y="12.25" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
     <TypeIdentifier>
       <HashCode>AAAKABAACAAAAAAAAAQQAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Model\Configuration.cs</FileName>

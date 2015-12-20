@@ -89,11 +89,6 @@ namespace CSharpChatClient.Controller.Network
             return false;
         }
 
-        internal void CloseConnection(string v)
-        {
-            throw new NotImplementedException();
-        }
-
         public bool ReConnect(IPAddress ipAddress, int port)
         {
             Disconnect();

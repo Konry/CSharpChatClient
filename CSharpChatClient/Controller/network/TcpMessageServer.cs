@@ -126,11 +126,6 @@ namespace CSharpChatClient.Controller.Network
             }
         }
 
-        internal void CloseConnection(User localUser, string v)
-        {
-            throw new NotImplementedException();
-        }
-
         private void AcceptCallback(IAsyncResult ar)
         {
             try
