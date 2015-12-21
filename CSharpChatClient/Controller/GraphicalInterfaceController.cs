@@ -125,6 +125,7 @@ namespace CSharpChatClient.Controller
                     if (!programControl.NetworkService.ManualConnectToExUser(ex))
                     {
                         chatForm.InformUser("Verbindung nicht möglich, da die Gegenseite nicht antwortet.");
+                        return;
                     }
                     currentlyActiveChatUser = ex;
                 }

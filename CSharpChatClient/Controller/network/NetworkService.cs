@@ -317,17 +317,17 @@ namespace CSharpChatClient
         /// <summary>
         /// Connect to the given address external user, who has the address informations inside.
         /// </summary>
-        /// <param name="ex"></param>
-        internal bool ManualConnectToExUser(ExtendedUser ex)
+        /// <param name="exUser"></param>
+        internal bool ManualConnectToExUser(ExtendedUser exUser)
         {
             bool success = false;
             lock (incomingConnectionLock)
             {
-                if (control.GraphicControl.CurrentlyActiveChatUser != null && ex.Equals(control.GraphicControl.CurrentlyActiveChatUser)) { return false; }
+                if (control.GraphicControl.CurrentlyActiveChatUser != null && exUser.Equals(control.GraphicControl.CurrentlyActiveChatUser)) { return false; }
                 if (!ConnectionOverServer)
                 {
                     try {
-                        success = tcpClient.ReConnect(ex.IpAddress, ex.Port);
+                        success = tcpClient.ReConnect(exUser.IpAddress, exUser.Port);
                         if (success)
                         {
                             ConnectionOverClient = true;

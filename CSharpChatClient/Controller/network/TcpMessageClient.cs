@@ -75,8 +75,11 @@ namespace CSharpChatClient.Controller.Network
                 }
                 catch (ObjectDisposedException ode)
                 {
-                    Logger.LogException("ReConnect ObjectDisposedException", ode);
+                    Logger.LogException("Disconnect ObjectDisposedException", ode);
                     /*throw away*/
+                } catch(SocketException se)
+                {
+                    Logger.LogException("Disconnect SocketException", se);
                 }
             }
         }
@@ -122,7 +125,8 @@ namespace CSharpChatClient.Controller.Network
                 bool ret = connectDone.WaitOne(2000, true);
                 if (!ret)
                 {
-                    netService.CloseConnectionFromClient();
+                    Disconnect();
+                    return false;
                 }
 
                 thread = new Thread(StartReceiving);
