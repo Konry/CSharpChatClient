@@ -37,7 +37,12 @@ namespace CSharpChatClient.Controller.Network
                 }
                 catch (ObjectDisposedException ode)
                 {
-                    Logger.LogException("Connect ObjectDisposedException", ode);
+                    Logger.LogException("KILL TcpMessageClient ObjectDisposedException", ode);
+                    /*throw away*/
+                }
+                catch (SocketException se)
+                {
+                    Logger.LogException("KILL TcpMessageClient SocketException", se);
                     /*throw away*/
                 }
                 Socket.Close();
@@ -81,6 +86,10 @@ namespace CSharpChatClient.Controller.Network
                 {
                     Logger.LogException("Disconnect SocketException", se);
                 }
+            }
+            if (thread != null)
+            {
+                thread.Abort();
             }
         }
 

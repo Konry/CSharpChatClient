@@ -12,7 +12,6 @@ namespace CSharpChatClient.Controller.Network
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
         private static ManualResetEvent receiveDone = new ManualResetEvent(false);
         private static ManualResetEvent sendDone = new ManualResetEvent(false);
-        public static ManualResetEvent serverBlock = new ManualResetEvent(false);
 
         private Socket socket = null;
 
@@ -60,10 +59,17 @@ namespace CSharpChatClient.Controller.Network
         public void Stop()
         {
             shouldStop = true;
-            Socket.Close();
-            if (thread != null)
+            try
             {
-                thread.Abort();
+                Socket.Close();
+                if (thread != null)
+                {
+                    thread.Abort();
+                }
+            }
+            catch (Exception e)
+            {
+
             }
         }
 
@@ -75,7 +81,7 @@ namespace CSharpChatClient.Controller.Network
         public void Send(User user, string message)
         {
             try
-            {                
+            {
                 foreach (UserConnection uc in netService.ConnectionList)
                 {
                     if (uc.User.Equals(user))
@@ -109,7 +115,7 @@ namespace CSharpChatClient.Controller.Network
                 while (!shouldStop)
                 {
                     // Set the event to nonsignaled state.
-                    serverBlock.Reset();
+                    connectDone.Reset();
 
                     // Start an asynchronous socket to listen for connections.
                     Socket.BeginAccept(
@@ -117,7 +123,7 @@ namespace CSharpChatClient.Controller.Network
                         Socket);
 
                     // Wait until a connection is made before continuing.
-                    serverBlock.WaitOne();
+                    connectDone.WaitOne();
                 }
             }
             catch (Exception e)
@@ -131,7 +137,7 @@ namespace CSharpChatClient.Controller.Network
             try
             {
                 // Signal the main thread to continue.
-                serverBlock.Set();
+                connectDone.Set();
 
                 // Get the socket that handles the client request.
                 Socket listener = (Socket)ar.AsyncState;

@@ -26,10 +26,11 @@ namespace CSharpChatClient.Controller
             try
             {
                 var globalStartTime = DateTime.Now;
-                writer = File.AppendText("log" + globalStartTime.ToString("yyyy-MM-TT") + ".txt");
+                writer = File.AppendText("log" + globalStartTime.ToString("-yyyy-MM-dd") + ".txt");
                 writer.Write("CSharpChat Tool Log: ");
                 writer.WriteLine("  :");
                 writer.WriteLine("-------------------------------");
+                writer.AutoFlush = true;
             }
             catch (Exception ex)
             {
@@ -98,7 +99,7 @@ namespace CSharpChatClient.Controller
                     logLevel = GetStateString(state);
                     string temp = "\r\n" + DateTime.Now.ToString("s") + " \t- " + logLevel + " - " + logMessage;
                     Debug.WriteLine(temp);
-                    writer.WriteLineAsync(temp);
+                    writer.WriteLine(temp);
                 }
                 catch (Exception ex)
                 {
